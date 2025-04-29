@@ -27,7 +27,7 @@
 
 		<!-- Dependency versions as properties for centralized management -->
 		<lombok.version>1.18.30</lombok.version>
-		<mysql.version>8.3.0</mysql.version>
+		<mysql.version>9.0.0</mysql.version>
 		<mariadb.version>3.3.2</mariadb.version>
 		<stripe.version>24.9.0</stripe.version>
 		<javafaker.version>1.0.2</javafaker.version>
@@ -119,6 +119,12 @@
 			<artifactId>mysql-connector-j</artifactId>
 			<version>${mysql.version}</version>
 			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-community-dialects</artifactId>
+			<version>6.5.2.Final</version>
 		</dependency>
 
 		<!-- Uncomment if you prefer MariaDB -->
