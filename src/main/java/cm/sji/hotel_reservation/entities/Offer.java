@@ -9,24 +9,23 @@ import lombok.Setter;
 @Getter
 @Data
 @Entity
-@IdClass(Offer.class)
+@IdClass(OfferKey.class)
 public class Offer {
-    @EmbeddedId
-    private OfferKey id;
 
+    @Id
     @ManyToOne
-    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
-    User client;
+    @JoinColumn(name = "fk_roomType", insertable = false, updatable = false)
+    RoomType roomType;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "fk_roomService", insertable = false, updatable = false)
     RoomService roomService;
 
     public Offer() {}
 
-    public Offer(OfferKey id, User client, RoomService roomService) {
-        this.id = id;
-        this.client = client;
+    public Offer(RoomType roomType, RoomService roomService) {
+        this.roomType = roomType;
         this.roomService = roomService;
     }
 }

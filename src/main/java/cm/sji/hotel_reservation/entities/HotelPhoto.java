@@ -11,7 +11,7 @@ import lombok.Data;
 @Entity
 public class HotelPhoto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     int id;
 

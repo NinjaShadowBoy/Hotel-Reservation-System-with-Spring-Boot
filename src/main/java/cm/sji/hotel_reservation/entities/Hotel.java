@@ -11,13 +11,14 @@ import lombok.*;
 @Entity
 public class Hotel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     int id;
 
     String name;
     String location;
     int rating;
+    String description;
 
     @ManyToOne
     @JoinColumn(name = "fk_owner")
@@ -25,11 +26,12 @@ public class Hotel {
 
     public Hotel() {}
 
-    public Hotel(int id, String name, String location, int rating, User owner) {
+    public Hotel(int id, String name, String location, int rating, String description, User owner) {
         this.id = id;
         this.name = name;
         this.location = location;
         this.rating = rating;
+        this.description = description;
         this.owner = owner;
     }
 }

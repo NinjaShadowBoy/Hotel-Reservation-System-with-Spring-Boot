@@ -1,7 +1,6 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,27 +11,27 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class FAQKey implements Serializable {
-    private int clientID;
-    private int HotelID;
+    private int client;
+    private int hotel;
 
     //Default constructor
     public FAQKey() {}
 
-    public FAQKey(int clientID, int hotelID) {
-        this.clientID = clientID;
-        this.HotelID = hotelID;
+    public FAQKey(int client, int hotel) {
+        this.client = client;
+        this.hotel = hotel;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FAQKey faqKey)) return false;
-        return clientID == faqKey.clientID && HotelID == faqKey.HotelID;
+        return client == faqKey.client && hotel == faqKey.hotel;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientID, HotelID);
+        return Objects.hash(client, hotel);
     }
 }
 

@@ -11,26 +11,26 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class OfferKey implements Serializable {
-    private int room_TypeID;
-    private String roomServiceLabel;
+    private int roomType;
+    private String roomService;
 
     //Default constructor
     public OfferKey() {}
 
-    public OfferKey(int roomTypeID, String roomServiceLabel) {
-        this.room_TypeID = roomTypeID;
-        this.roomServiceLabel = roomServiceLabel;
+    public OfferKey(int roomTypeID, String roomService) {
+        this.roomType = roomTypeID;
+        this.roomService = roomService;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof OfferKey offerKey)) return false;
-        return room_TypeID == offerKey.room_TypeID && Objects.equals(roomServiceLabel, offerKey.roomServiceLabel);
+        return roomType == offerKey.roomType && Objects.equals(roomService, offerKey.roomService);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(room_TypeID, roomServiceLabel);
+        return Objects.hash(roomType, roomService);
     }
 }

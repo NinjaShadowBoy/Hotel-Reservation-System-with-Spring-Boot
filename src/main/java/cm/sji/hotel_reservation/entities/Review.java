@@ -9,15 +9,14 @@ import java.time.LocalDate;
 @Getter
 @Data
 @Entity
+@IdClass(FAQKey.class)
 public class Review {
-
-    @EmbeddedId
-    private FAQKey id;
-
+    @Id
     @ManyToOne
     @JoinColumn(name = "fk_clientID", insertable = false, updatable = false)
     User client;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "fk_hotelID", insertable = false, updatable = false)
     Hotel hotel;
@@ -28,8 +27,7 @@ public class Review {
 
     public Review() {}
 
-    public Review(FAQKey id, User client, Hotel hotel, String reviewText, LocalDate reviewDate, int rating) {
-        this.id = id;
+    public Review(User client, Hotel hotel, String reviewText, LocalDate reviewDate, int rating) {
         this.client = client;
         this.hotel = hotel;
         this.reviewText = reviewText;

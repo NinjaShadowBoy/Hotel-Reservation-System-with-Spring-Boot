@@ -11,7 +11,7 @@ import lombok.Setter;
 @Entity
 public class RoomPhoto {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private int id;
 

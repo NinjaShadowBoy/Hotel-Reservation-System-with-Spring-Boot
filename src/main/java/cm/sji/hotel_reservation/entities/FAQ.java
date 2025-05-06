@@ -11,15 +11,14 @@ import java.util.Date;
 @Getter
 @Data
 @Entity
-@IdClass(FAQ.class)
+@IdClass(FAQKey.class)
 public class FAQ {
-    @EmbeddedId
-    private FAQKey id;
-
+    @Id
     @ManyToOne
     @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
     User client;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
     Hotel hotel;
@@ -29,8 +28,7 @@ public class FAQ {
 
     public FAQ() {}
 
-    public FAQ(FAQKey id, User client, Hotel hotel, String faqQuestion, String faqAnswer) {
-        this.id = id;
+    public FAQ(User client, Hotel hotel, String faqQuestion, String faqAnswer) {
         this.client = client;
         this.hotel = hotel;
         this.faqQuestion = faqQuestion;
