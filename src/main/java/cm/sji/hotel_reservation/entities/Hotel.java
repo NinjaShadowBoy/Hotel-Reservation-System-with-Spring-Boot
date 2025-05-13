@@ -1,37 +1,51 @@
+
 package cm.sji.hotel_reservation.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.*;
+import lombok.NoArgsConstructor;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
-@Setter
-@Getter
-@Data
 @Entity
-public class Hotel {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "hotels")
+public class Hotel implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    int id;
+    private Long id;
 
-    String name;
-    String location;
-    int rating;
-    String description;
+    @Column(nullable = false)
+    private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_owner")
-    private User owner;
+    @Column(nullable = false)
+    private String location;
 
-    public Hotel() {}
+    @Column(nullable = false)
+    private Integer rating;
 
-    public Hotel(int id, String name, String location, int rating, String description, User owner) {
-        this.id = id;
-        this.name = name;
-        this.location = location;
-        this.rating = rating;
-        this.description = description;
-        this.owner = owner;
+    @Column(nullable = false, length = 1000)
+    private String description;
+
+    @Column(nullable = false)
+    private String owner;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }
