@@ -2,21 +2,15 @@ package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomService {
     @Id
     String label;
 
-    public RoomService() {}
-
-    public RoomService(String label) {
-        this.label = label;
-    }
 }

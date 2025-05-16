@@ -1,17 +1,16 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
 @IdClass(FAQKey.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FAQ {
     @Id
     @ManyToOne
@@ -25,14 +24,5 @@ public class FAQ {
 
     String faqQuestion;
     String faqAnswer;
-
-    public FAQ() {}
-
-    public FAQ(User client, Hotel hotel, String faqQuestion, String faqAnswer) {
-        this.client = client;
-        this.hotel = hotel;
-        this.faqQuestion = faqQuestion;
-        this.faqAnswer = faqAnswer;
-    }
 
 }

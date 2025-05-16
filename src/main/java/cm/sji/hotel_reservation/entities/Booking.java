@@ -1,17 +1,17 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
 @IdClass(BookingKey.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Booking {
 //    @EmbeddedId
 //    private BookingKey id;
@@ -24,15 +24,8 @@ public class Booking {
     @Id
     @ManyToOne
     @JoinColumn(name = "fk_room_type_id", insertable = false, updatable = false)
-    RoomType room_Type;
+    RoomType roomType;
 
-    LocalDate date;
+    LocalDateTime date;
 
-    public Booking() {}
-
-    public Booking(User client, RoomType room_Type, LocalDate date) {
-        this.client = client;
-        this.room_Type = room_Type;
-        this.date = date;
-    }
 }

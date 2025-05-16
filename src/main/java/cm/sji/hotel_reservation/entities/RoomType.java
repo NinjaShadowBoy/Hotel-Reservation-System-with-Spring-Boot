@@ -1,37 +1,26 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
-@Data
+
 @Entity
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class RoomType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    int id;
+    Integer id;
 
     @ManyToOne
     @JoinColumn(name = "fk_hotel")
     Hotel hotel;
 
     String label;
-    int totalNumber;
-    int numberAvailable;
-    double price;
+    Integer totalNumber;
+    Integer numberAvailable;
+    Double price;
 
-    public RoomType() {}
-
-    public RoomType(int id, Hotel hotel, String label, int totalNumber, int numberAvailable, double price) {
-        this.id = id;
-        this.hotel = hotel;
-        this.label = label;
-        this.totalNumber = totalNumber;
-        this.numberAvailable = numberAvailable;
-        this.price = price;
-    }
 }

@@ -2,6 +2,7 @@ package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,12 +14,12 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "users")
+@Builder
 public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     private String firstName;
@@ -37,18 +38,18 @@ public class User implements Serializable {
     private UserRole role;
 
     @Column(nullable = false)
-    private boolean active = true;
+    private Boolean active = true;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Booking> bookings;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private Set<Booking> bookings;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Set<Review> reviews;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+//    private Set<Review> reviews;
 
     @PrePersist
     protected void onCreate() {
@@ -61,6 +62,6 @@ public class User implements Serializable {
     }
 
     public enum UserRole {
-        USER, HOTEL_MANAGER, ADMIN
+        CLIENT, OWNER, ADMIN
     }
 }

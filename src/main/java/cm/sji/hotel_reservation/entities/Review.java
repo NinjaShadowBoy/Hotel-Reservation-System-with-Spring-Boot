@@ -4,35 +4,27 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
 @IdClass(FAQKey.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Review {
     @Id
     @ManyToOne
-    @JoinColumn(name = "fk_clientID", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
     User client;
 
     @Id
     @ManyToOne
-    @JoinColumn(name = "fk_hotelID", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
     Hotel hotel;
 
     String reviewText;
-    LocalDate reviewDate;
-    int rating;
-
-    public Review() {}
-
-    public Review(User client, Hotel hotel, String reviewText, LocalDate reviewDate, int rating) {
-        this.client = client;
-        this.hotel = hotel;
-        this.reviewText = reviewText;
-        this.reviewDate = reviewDate;
-        this.rating = rating;
-    }
+    LocalDateTime reviewDate;
+    Float rating;
 
 }

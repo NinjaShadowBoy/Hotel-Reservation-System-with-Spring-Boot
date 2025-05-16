@@ -3,6 +3,7 @@ package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
@@ -10,14 +11,14 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "hotels")
 public class Hotel implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(nullable = false)
     private String name;
@@ -26,7 +27,7 @@ public class Hotel implements Serializable {
     private String location;
 
     @Column(nullable = false)
-    private Integer rating;
+    private Float rating;
 
     @Column(nullable = false, length = 1000)
     private String description;

@@ -11,13 +11,13 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class FAQKey implements Serializable {
-    private int client;
-    private int hotel;
+    private Integer client;
+    private Integer hotel;
 
     //Default constructor
     public FAQKey() {}
 
-    public FAQKey(int client, int hotel) {
+    public FAQKey(Integer client, Integer hotel) {
         this.client = client;
         this.hotel = hotel;
     }
