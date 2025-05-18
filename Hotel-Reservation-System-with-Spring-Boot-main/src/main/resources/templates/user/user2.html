@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Resort & Spa | Mountain View Hotel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Color palette */
+            --color-primary: #3a86ff;
+            --color-secondary: #ff006e;
+            --color-accent: #ffbe0b;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-background: #f5f7fb;
+            --color-white: #ffffff;
+            --color-success: #38b000;
+            --color-error: #e5383b;
+            /* Glassmorphism */
+            --glass-background: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --glass-blur: 10px;
+            /* Neumorphism */
+            --neu-light: rgba(255, 255, 255, 0.5);
+            --neu-dark: rgba(209, 217, 230, 0.5);
+            --neu-flat: rgba(245, 247, 251, 1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-background);
+            color: var(--color-text);
+            line-height: 1.6;
+            background-image: linear-gradient(135deg, #f5f7fb 0%, #e6eeff 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        h1, h2, h3, h4, h5 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--color-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header & Navigation */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .nav-link {
+            color: var(--color-text);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--color-primary);
+        }
+
+        /* Breadcrumbs */
+        .breadcrumbs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumbs a {
+            color: var(--color-text-light);
+            text-decoration: none;
+            margin-right: 0.5rem;
+        }
+
+        .breadcrumbs span {
+            margin-right: 0.5rem;
+        }
+
+        .breadcrumbs a:hover {
+            color: var(--color-primary);
+        }
+
+        .breadcrumbs .current {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        /* Hotel Gallery */
+        .gallery-container {
+            position: relative;
+            margin-bottom: 2rem;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: 400px;
+        }
+
+        .gallery-slides {
+            display: flex;
+            height: 100%;
+            width: 100%;
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-background);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(var(--glass-blur));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--color-text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .gallery-nav:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .gallery-prev {
+            left: 1rem;
+        }
+
+        .gallery-next {
+            right: 1rem;
+        }
+
+        .gallery-dots {
+            position: absolute;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .gallery-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--glass-background);
+            border: 1px solid var(--glass-border);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-dot.active {
+            background: var(--color-primary);
+            transform: scale(1.2);
+        }
+
+        /* Hotel Info Section */
+        .hotel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .hotel-title h1 {
+            font-size: 2rem;
+            color: var(--color-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .hotel-title .location {
+            display: flex;
+            align-items: center;
+            color: var(--color-text-light);
+            font-size: 1rem;
+        }
+
+        .hotel-title .location svg {
+            margin-right: 0.5rem;
+        }
+
+        .hotel-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .star {
+            color: var(--color-accent);
+            font-size: 1.25rem;
+            margin-right: 2px;
+        }
+
+        .rating-text {
+            margin-left: 0.5rem;
+            font-weight: 500;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .hotel-info {
+            flex: 2;
+        }
+
+        .booking-sidebar {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .info-card, .booking-card {
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .hotel-description {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Amenities Section */
+        .amenities-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .amenity-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .amenity-icon {
+            margin-right: 0.5rem;
+            color: var(--color-primary);
+        }
+
+        /* Map Section */
+        .map-container {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Booking Card */
+        .price-tag {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .price-per-night {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            margin-bottom: 1.5rem;
+        }
+
+        .booking-form-group {
+            margin-bottom: 1rem;
+        }
+
+        .booking-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .booking-form-group input, .booking-form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: var(--neu-flat);
+            color: var(--color-text);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 3px 3px 5px var(--neu-dark), inset -3px -3px 5px var(--neu-light);
+        }
+
+        .booking-form-group input:focus, .booking-form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .booking-dates {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .booking-dates .booking-form-group {
+            flex: 1;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+            box-shadow: 5px 5px 10px var(--neu-dark), -5px -5px 10px var(--neu-light);
+        }
+
+        .btn-primary:hover {
+            background: #2a75ee;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary:active {
+            background: #1c66e0;
+            transform: translateY(0);
+            box-shadow: 2px 2px 5px var(--neu-dark), -2px -2px 5px var(--neu-light);
+        }
+
+        /* Room Types Section */
+        .room-types {
+            margin-top: 2rem;
+        }
+
+        .room-card {
+            display: flex;
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .room-image {
+            width: 250px;
+            min-width: 250px;
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .room-details {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .room-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .room-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-capacity {
+            display: flex;
+            align-items: center;
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .room-capacity svg {
+            margin-right: 0.25rem;
+        }
+
+        .room-amenities {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .room-amenity {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            color: var(--color-text-light);
+        }
+
+        .room-amenity svg {
+            margin-right: 0.25rem;
+            color: var(--color-primary);
+        }
+
+        .room-description {
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .room-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-secondary);
+        }
+
+        .price-duration {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+        }
+
+        .select-room-btn {
+            padding: 0.5rem 1rem;
+            min-width: 150px;
+        }
+
+        /* Availability Calendar */
+        .availability-section {
+            margin-bottom: 2rem;
+        }
+
+        .calendar-container {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+        }
+
+        .calendar {
+            min-width: 300px;
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-month {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+            text-align: center;
+        }
+
+        .calendar-day-header {
+            font-weight: 500;
+            font-size: 0.8rem;
+            color: var(--color-text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-day {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-day:hover {
+            background: rgba(58, 134, 255, 0.1);
+        }
+
+        .calendar-day.available {
+            background: rgba(56, 176, 0, 0.1);
+            color: var(--color-success);
+        }
+
+        .calendar-day.unavailable {
+            background: rgba(229, 56, 59, 0.1);
+            color: var(--color-error);
+            text-decoration: line-through;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.selected {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .calendar-day.today {
+            border: 2px solid var(--color-primary);
+            font-weight: 600;
+        }
+
+        .calendar-day.other-month {
+            color: var(--color-text-light);
+            opacity: 0.5;
+        }
+
+        /* Reviews Section */
+        .reviews-section {
+            margin-top: 2rem;
+        }
+
+        .reviews-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .reviews-summary {
+            display: flex;
+            align-items: center;
+        }
+
+        .overall-rating {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .rating-breakdown {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .rating-category {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .rating-category-name {
+            width: 100px;
+        }
+
+        .rating-bar-container {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-right: 0.5rem;
+        }
+
+        .rating-bar {
+            height: 100%;
+            background: var(--color-primary);
+            border-radius: 4px;
+        }
+
+        .rating-value {
+            font-weight: 500;
+        }
+
+        .write-review-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+            box-shadow: none;
+        }
+
+        .write-review-btn:hover {
+            background: rgba(58, 134, 255, 0.1);
+            transform: none;
+        }
+
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .review-card {
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .reviewer-name {
+            font-weight: 500;
+        }
+
+        .review-date {
+            color: var(--color-text-light);
+            font-size: 0.9rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .review-content {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Review Form Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--color-white);
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50px);
+            transition: all 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-light);
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: var(--color-text);
+        }
+
+        .star-rating {
+            display: flex;
+            margin-bottom: 1.5rem;
+        }
+
+        .star-rating-input {
+            display: none;
+        }
+
+        .star-rating-label {
+            font-size: 2rem;
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .star-rating-label:hover, .star-rating-input:checked ~ .star-rating-label {
+            color: var(--color-accent);
+        }
+
+        .review-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .review-form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .review-form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: var(--neu-flat);
+            color: var(--color-text);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            min-height: 150px;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-shadow: inset 3px 3px 5px var(--neu-dark), inset -3px -3px 5px var(--neu-light);
+        }
+
+        .review-form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .submit-review-btn {
+            min-width: 150px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .booking-sidebar {
+                min-width: 100%;
+            }
+
+            .room-card {
+                flex-direction: column;
+            }
+
+            .room-image {
+                width: 100%;
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .nav-menu {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hotel-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .reviews-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .booking-dates {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .gallery-container {
+                height: 300px;
+            }
+        }
+
+        /* Accessibility */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus styling for accessibility */
+        button:focus, a:focus, input:focus, select:focus, textarea:focus {
+            outline: 3px solid rgba(58, 134, 255, 0.5);
+            outline-offset: 2px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        /* Booking Form Section from original code */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .booking-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .booking-summary {
+            flex: 1;
+            min-width: 300px;
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .booking-form {
+            flex: 2;
+            min-width: 500px;
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-row {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--color-text);
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            background: var(--neu-flat);
+            color: var(--color-text);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: inset 3px 3px 5px var(--neu-dark), inset -3px -3px 5px var(--neu-light);
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .error-message {
+            color: var(--color-error);
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .has-error input, .has-error select, .has-error textarea {
+            border-color: var(--color-error);
+            box-shadow: 0 0 0 3px rgba(229, 56, 59, 0.2);
+        }
+
+        .has-error .error-message {
+            display: block;
+        }
+
+        .divider {
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 1.5rem 0;
+        }
+
+        .booking-summary-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .booking-summary-header h3 {
+            margin: 0;
+            color: var(--color-primary);
+        }
+        /* Summary Info Items */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .summary-label {
+            color: var(--color-text-light);
+        }
+
+        .summary-value {
+            font-weight: 500;
+        }
+
+        .summary-price {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+
+        .price-includes {
+            font-size: 0.85rem;
+            color: var(--color-text-light);
+            margin-top: 0.5rem;
+        }
+
+        /* Form Columns Layout */
+        .form-columns {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-column {
+            flex: 1;
+        }
+
+        /* Payment Method Section */
+        .payment-methods {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .payment-method {
+            flex: 1;
+            position: relative;
+        }
+
+        .payment-method input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .payment-method label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-method input[type="radio"]:checked + label {
+            border-color: var(--color-primary);
+            background-color: rgba(58, 134, 255, 0.05);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.2);
+        }
+
+        .payment-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Policy Agreement */
+        .policy-agreement {
+            margin-top: 2rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            box-shadow: none;
+        }
+
+        /* Confirmation Button */
+        .confirm-btn {
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-columns {
+                flex-direction: column;
+            }
+
+            .booking-wrapper {
+                flex-direction: column;
+            }
+
+            .booking-form {
+                min-width: 100%;
+            }
+        }
+
+        /* Success Modal */
+        .success-modal .modal-content {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--color-success);
+            margin-bottom: 1.5rem;
+        }
+
+        .success-message {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .booking-id {
+            background-color: var(--neu-flat);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 1.25rem;
+            margin: 1.5rem 0;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            background: var(--glass-background);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+            opacity: 0;
+            transform: translateX(100%);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .toast-success .toast-icon {
+            color: var(--color-success);
+        }
+
+        .toast-error .toast-icon {
+            color: var(--color-error);
+        }
+
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: 1rem;
+            cursor: pointer;
+            color: var(--color-text-light);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Header & Navigation -->
+    <header class="header">
+        <a href="index.html" class="logo">MountainStay</a>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="#" class="nav-link active">Hotels</a>
+            <a href="#" class="nav-link">Destinations</a>
+            <a href="#" class="nav-link">Deals</a>
+            <a href="#" class="nav-link">Contact</a>
+        </nav>
+    </header>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="index.html">Home</a>
+        <span>></span>
+        <a href="#">Hotels</a>
+        <span>></span>
+        <span class="current">Mountain View Resort & Spa</span>
+    </div>
+
+    <!-- Hotel Gallery -->
+    <div class="gallery-container">
+        <div class="gallery-slides" id="gallerySlides">
+            <div class="gallery-slide" style="background-image: url('/api/placeholder/1200/600')"></div>
+            <div class="gallery-slide" style="background-image: url('/api/placeholder/1200/600')"></div>
+            <div class="gallery-slide" style="background-image: url('/api/placeholder/1200/600')"></div>
+            <div class="gallery-slide" style="background-image: url('/api/placeholder/1200/600')"></div>
+            <div class="gallery-slide" style="background-image: url('/api/placeholder/1200/600')"></div>
+        </div>
+        <button class="gallery-nav gallery-prev" aria-label="Previous image">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="gallery-nav gallery-next" aria-label="Next image">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="gallery-dots" id="galleryDots"></div>
+    </div>
+
+    <!-- Hotel Header -->
+    <div class="hotel-header">
+        <div class="hotel-title">
+            <h1>Mountain View Resort & Spa</h1>
+            <div class="location">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>123 Alpine Road, Mountain Valley, CA 98765</span>
+            </div>
+        </div>
+        <div class="hotel-rating">
+            <div class="stars">
+                <i class="fas fa-star star"></i>
+                <i class="fas fa-star star"></i>
+                <i class="fas fa-star star"></i>
+                <i class="fas fa-star star"></i>
+                <i class="fas fa-star-half-alt star"></i>
+            </div>
+            <span class="rating-text">4.5/5 (128 reviews)</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Hotel Info -->
+        <div class="hotel-info">
+            <!-- Description -->
+            <div class="info-card">
+                <h2 class="section-title">About This Hotel</h2>
+                <div class="hotel-description">
+                    <p>Welcome to Mountain View Resort & Spa, where luxury meets nature's beauty. Nestled in the scenic Mountain Valley, our resort offers breathtaking panoramic views of the surrounding mountains and valleys.</p>
+                    <p>Our recently renovated property features modern amenities while maintaining the rustic charm that has made us a favorite destination for travelers seeking both adventure and relaxation. Whether you're here for a family vacation, romantic getaway, or business retreat, our diverse accommodations and services ensure an unforgettable stay.</p>
+                    <p>Just minutes away from popular hiking trails, ski slopes, and the charming Mountain Valley town center, our location provides the perfect balance of serenity and accessibility.</p>
+                </div>
+
+                <h3 class="section-title">Amenities</h3>
+                <div class="amenities-list">
+                    <div class="amenity-item">
+                        <i class="fas fa-wifi amenity-icon"></i>
+                        <span>Free WiFi</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-swimming-pool amenity-icon"></i>
+                        <span>Indoor Pool</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-spa amenity-icon"></i>
+                        <span>Spa Center</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-utensils amenity-icon"></i>
+                        <span>Restaurant</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-dumbbell amenity-icon"></i>
+                        <span>Fitness Center</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-parking amenity-icon"></i>
+                        <span>Free Parking</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-concierge-bell amenity-icon"></i>
+                        <span>Room Service</span>
+                    </div>
+                    <div class="amenity-item">
+                        <i class="fas fa-paw amenity-icon"></i>
+                        <span>Pet Friendly</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Location Map -->
+            <div class="info-card">
+                <h2 class="section-title">Location</h2>
+                <div class="map-container">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12345.67890!2d-122.1234567!3d37.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDA3JzEyLjQiTiAxMjLCsDA3JzEyLjQiVw!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <!-- Room Types -->
+            <div class="room-types">
+                <h2 class="section-title">Available Room Types</h2>
+
+                <!-- Standard Room -->
+                <div class="room-card">
+                    <div class="room-image" style="background-image: url('/api/placeholder/500/300')"></div>
+                    <div class="room-details">
+                        <div class="room-header">
+                            <div>
+                                <h3 class="room-title">Standard Mountain Room</h3>
+                                <div class="room-capacity">
+                                    <i class="fas fa-user"></i>
+                                    <span>2 Guests</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="room-amenities">
+                            <div class="room-amenity">
+                                <i class="fas fa-bed"></i>
+                                <span>1 Queen Bed</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-mountain"></i>
+                                <span>Mountain View</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-wifi"></i>
+                                <span>Free WiFi</span>
+                            </div>
+                        </div>
+                        <div class="room-description">
+                            Our cozy Standard Mountain Room offers the perfect retreat after a day of adventure. Featuring a comfortable queen-sized bed, modern bathroom with shower, work desk, and stunning views of the surrounding mountains.
+                        </div>
+                        <div class="room-price">
+                            <div>
+                                <span class="price">$149</span>
+                                <span class="price-duration">per night</span>
+                            </div>
+                            <button class="btn btn-primary select-room-btn" data-room-type="standard" data-room-price="149">Select Room</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deluxe Room -->
+                <div class="room-card">
+                    <div class="room-image" style="background-image: url('/api/placeholder/500/300')"></div>
+                    <div class="room-details">
+                        <div class="room-header">
+                            <div>
+                                <h3 class="room-title">Deluxe Valley View Suite</h3>
+                                <div class="room-capacity">
+                                    <i class="fas fa-user"></i>
+                                    <span>3 Guests</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="room-amenities">
+                            <div class="room-amenity">
+                                <i class="fas fa-bed"></i>
+                                <span>1 King Bed</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-valley"></i>
+                                <span>Valley View</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-bath"></i>
+                                <span>Jacuzzi Tub</span>
+                            </div>
+                        </div>
+                        <div class="room-description">
+                            Enjoy extra space and premium amenities in our Deluxe Valley View Suite. This spacious suite features a luxurious king-sized bed, separate sitting area, large bathroom with jacuzzi tub, and a private balcony overlooking the valley.
+                        </div>
+                        <div class="room-price">
+                            <div>
+                                <span class="price">$249</span>
+                                <span class="price-duration">per night</span>
+                            </div>
+                            <button class="btn btn-primary select-room-btn" data-room-type="deluxe" data-room-price="249">Select Room</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Family Suite -->
+                <div class="room-card">
+                    <div class="room-image" style="background-image: url('/api/placeholder/500/300')"></div>
+                    <div class="room-details">
+                        <div class="room-header">
+                            <div>
+                                <h3 class="room-title">Family Mountain Suite</h3>
+                                <div class="room-capacity">
+                                    <i class="fas fa-user"></i>
+                                    <span>5 Guests</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="room-amenities">
+                            <div class="room-amenity">
+                                <i class="fas fa-bed"></i>
+                                <span>2 Queen Beds + Sofa Bed</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-door-open"></i>
+                                <span>Connecting Rooms</span>
+                            </div>
+                            <div class="room-amenity">
+                                <i class="fas fa-tv"></i>
+                                <span>Multiple TVs</span>
+                            </div>
+                        </div>
+                        <div class="room-description">
+                            Perfect for families, our Family Mountain Suite offers ample space for everyone. This suite includes two connected rooms with two queen beds and a sofa bed, two bathrooms, a kitchenette, and a shared balcony with mountain views.
+                        </div>
+                        <div class="room-price">
+                            <div>
+                                <span class="price">$349</span>
+                                <span class="price-duration">per night</span>
+                            </div>
+                            <button class="btn btn-primary select-room-btn" data-room-type="family" data-room-price="349">Select Room</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Availability Calendar -->
+            <div class="availability-section">
+                <h2 class="section-title">Check Availability</h2>
+                <div class="calendar-container" id="calendarContainer">
+                    <!-- Calendars will be generated dynamically via JavaScript -->
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div class="reviews-section">
+                <div class="reviews-header">
+                    <div class="reviews-summary">
+                        <div class="overall-rating">4.5</div>
+                        <div class="rating-breakdown">
+                            <div class="rating-category">
+                                <span class="rating-category-name">Cleanliness</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-bar" style="width: 94%"></div>
+                                </div>
+                                <span class="rating-value">4.7</span>
+                            </div>
+                            <div class="rating-category">
+                                <span class="rating-category-name">Comfort</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-bar" style="width: 90%"></div>
+                                </div>
+                                <span class="rating-value">4.5</span>
+                            </div>
+                            <div class="rating-category">
+                                <span class="rating-category-name">Location</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-bar" style="width: 96%"></div>
+                                </div>
+                                <span class="rating-value">4.8</span>
+                            </div>
+                            <div class="rating-category">
+                                <span class="rating-category-name">Service</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-bar" style="width: 88%"></div>
+                                </div>
+                                <span class="rating-value">4.4</span>
+                            </div>
+                            <div class="rating-category">
+                                <span class="rating-category-name">Value</span>
+                                <div class="rating-bar-container">
+                                    <div class="rating-bar" style="width: 82%"></div>
+                                </div>
+                                <span class="rating-value">4.1</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn write-review-btn" id="writeReviewBtn">Write a Review</button>
+                </div>
+
+                <div class="reviews-list" id="reviewsList">
+                    <!-- Reviews will be loaded dynamically from localStorage -->
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">JD</div>
+                                <div>
+                                    <div class="reviewer-name">John Doe</div>
+                                    <div class="review-date">May 10, 2025</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <p>We had an amazing stay at Mountain View Resort! The room was spacious and clean with breathtaking views. The staff was incredibly friendly and helpful. The spa services were top-notch and we enjoyed hiking on the nearby trails. Will definitely be coming back!</p>
+                        </div>
+                    </div>
+
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <div class="reviewer-avatar">JS</div>
+                                <div>
+                                    <div class="reviewer-name">Jane Smith</div>
+                                    <div class="review-date">April 25, 2025</div>
+                                </div>
+                            </div>
+                            <div class="review-rating">
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="fas fa-star star"></i>
+                                <i class="far fa-star star"></i>
+                            </div>
+                        </div>
+                        <div class="review-content">
+                            <p>Beautiful location and well-maintained property. The room was comfortable and had all the amenities we needed. The only reason for 4 stars instead of 5 was the restaurant service was a bit slow during peak hours. Otherwise, a wonderful experience overall.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Sidebar -->
+        <div class="booking-sidebar">
+            <div class="booking-card">
+                <div class="price-tag">From $149</div>
+                <div class="price-per-night">per night</div>
+
+                <form id="bookingForm">
+                    <div class="booking-form-group">
+                        <label for="checkInDate">Check In</label>
+                        <input type="date" id="checkInDate" required>
+                    </div>
+                    <div class="booking-form-group">
+                        <label for="checkOutDate">Check Out</label>
+                        <input type="date" id="checkOutDate" required>
+                    </div>
+                    <div class="booking-form-group">
+                        <label for="guests">Guests</label>
+                        <select id="guests" required>
+                            <option value="1">1 Guest</option>
+                            <option value="2" selected>2 Guests</option>
+                            <option value="3">3 Guests</option>
+                            <option value="4">4 Guests</option>
+                            <option value="5">5 Guests</option>
+                            <option value="6">6 Guests</option>
+                        </select>
+                    </div>
+                    <div class="booking-form-group">
+                        <label for="roomType">Room Type</label>
+                        <select id="roomType" required>
+                            <option value="standard">Standard Mountain Room</option>
+                            <option value="deluxe">Deluxe Valley View Suite</option>
+                            <option value="family">Family Mountain Suite</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Book Now</button>
+                </form>
+            </div>
+
+            <div class="info-card">
+                <h3 class="section-title">Special Offers</h3>
+                <div class="special-offers">
+                    <div class="special-offer">
+                        <div class="offer-badge">SAVE 15%</div>
+                        <div class="offer-title">Early Bird Special</div>
+                        <div class="offer-description">Book 30+ days in advance and save 15% on your stay.</div>
+                    </div>
+                    <div class="special-offer">
+                        <div class="offer-badge">SAVE 20%</div>
+                        <div class="offer-title">Stay Longer, Save More</div>
+                        <div class="offer-description">Stay 5+ nights and receive 20% off your entire booking.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Review Form Modal -->
+<div class="modal" id="reviewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Write a Review</h3>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <form id="reviewForm">
+            <div class="star-rating">
+                <input type="radio" name="rating" id="star5" value="5" class="star-rating-input">
+                <label for="star5" class="star-rating-label">★</label>
+                <input type="radio" name="rating" id="star4" value="4" class="star-rating-input">
+                <label for="star4" class="star-rating-label">★</label>
+                <input type="radio" name="rating" id="star3" value="3" class="star-rating-input">
+                <label for="star3" class="star-rating-label">★</label>
+                <input type="radio" name="rating" id="star2" value="2" class="star-rating-input">
+                <label for="star2" class="star-rating-label">★</label>
+                <input type="radio" name="rating" id="star1" value="1" class="star-rating-input">
+                <label for="star1" class="star-rating-label">★</label>
+            </div>
+            <div class="review-form-group">
+                <label for="reviewerName">Your Name</label>
+                <input type="text" id="reviewerName" required>
+            </div>
+            <div class="review-form-group">
+                <label for="reviewContent">Your Review</label>
+                <textarea id="reviewContent" required></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary submit-review-btn">Submit Review</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal" id="successModal">
+    <div class="modal-content success-modal">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h3 class="success-message">Booking Confirmed!</h3>
+        <p>Your reservation has been successfully confirmed. A confirmation email has been sent to your registered email address.</p>
+        <div class="booking-id">BOOKING ID: <span id="bookingIdDisplay"></span></div>
+        <button class="btn btn-primary" id="closeSuccessModal">Close</button>
+    </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize gallery
+        const gallerySlides = document.getElementById('gallerySlides');
+        const galleryDots = document.getElementById('galleryDots');
+        const totalSlides = document.querySelectorAll('.gallery-slide').length;
+        let currentSlide = 0;
+
+        // Create dots for gallery
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'gallery-dot';
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => {
+                goToSlide(i);
+            });
+            galleryDots.appendChild(dot);
+        }
+
+        // Gallery navigation
+        document.querySelector('.gallery-prev').addEventListener('click', prevSlide);
+        document.querySelector('.gallery-next').addEventListener('click', nextSlide);
+
+        function goToSlide(n) {
+            currentSlide = n;
+            gallerySlides.style.transform = `translateX(-${currentSlide * 100}%)`;
+            document.querySelectorAll('.gallery-dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            goToSlide(currentSlide);
+        }
+
+        // Auto-rotate gallery
+        let galleryInterval = setInterval(nextSlide, 5000);
+
+        document.querySelector('.gallery-container').addEventListener('mouseenter', () => {
+            clearInterval(galleryInterval);
+        });
+
+        document.querySelector('.gallery-container').addEventListener('mouseleave', () => {
+            galleryInterval = setInterval(nextSlide, 5000);
+        });
+
+        // Keyboard accessibility for gallery
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') {
+                prevSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+
+        // Initialize calendar
+        const calendarContainer = document.getElementById('calendarContainer');
+        const months = ['May', 'June', 'July'];
+
+        months.forEach(month => {
+            const calendar = createCalendar(month);
+            calendarContainer.appendChild(calendar);
+        });
+
+        function createCalendar(month) {
+            const calendar = document.createElement('div');
+            calendar.className = 'calendar';
+
+            const header = document.createElement('div');
+            header.className = 'calendar-header';
+            header.innerHTML = `<div class="calendar-month">${month} 2025</div>`;
+            calendar.appendChild(header);
+
+            const grid = document.createElement('div');
+            grid.className = 'calendar-grid';
+
+            // Add day headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = day;
+                grid.appendChild(dayHeader);
+            });
+
+            // Get month data
+            let startDay = 0;
+            let totalDays = 31;
+
+            if (month === 'May') {
+                startDay = 4; // Thursday (0-based index, 0 = Sunday)
+                totalDays = 31;
+            } else if (month === 'June') {
+                startDay = 0; // Sunday
+                totalDays = 30;
+            } else if (month === 'July') {
+                startDay = 2; // Tuesday
+                totalDays = 31;
+            }
+
+            // Add empty slots for days before the 1st
+            for (let i = 0; i < startDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day other-month';
+                grid.appendChild(emptyDay);
+            }
+
+            // Add days
+            const today = new Date();
+            const todayDate = today.getDate();
+            const currentMonth = today.getMonth(); // 0-based (0 = January)
+
+            let monthIndex;
+            if (month === 'May') monthIndex = 4;
+            else if (month === 'June') monthIndex = 5;
+            else if (month === 'July') monthIndex = 6;
+
+            for (let i = 1; i <= totalDays; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = i;
+
+                // Mark today
+                if (i === todayDate && monthIndex === currentMonth) {
+                    day.classList.add('today');
+                }
+
+                // Randomly mark some days as unavailable
+                if (Math.random() < 0.2) {
+                    day.classList.add('unavailable');
+                } else {
+                    day.classList.add('available');
+                    day.addEventListener('click', function() {
+                        selectDate(month, i);
+                    });
+                }
+
+                grid.appendChild(day);
+            }
+
+            calendar.appendChild(grid);
+            return calendar;
+        }
+
+        function selectDate(month, day) {
+            const date = new Date(2025, getMonthIndex(month), day);
+            const formattedDate = date.toISOString().split('T')[0];
+
+            // If check-in isn't set, set it
+            const checkInInput = document.getElementById('checkInDate');
+            const checkOutInput = document.getElementById('checkOutDate');
+
+            if (!checkInInput.value) {
+                checkInInput.value = formattedDate;
+            } else if (!checkOutInput.value && new Date(formattedDate) > new Date(checkInInput.value)) {
+                checkOutInput.value = formattedDate;
+            } else {
+                // Reset and set check-in
+                checkInInput.value = formattedDate;
+                checkOutInput.value = '';
+            }
+
+            // Update all calendar day selections
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                day.classList.remove('selected');
+            });
+
+            updateSelectedDates();
+            showToast('Date selected', 'success');
+        }
+
+        function getMonthIndex(month) {
+            const months = {
+                'January': 0,
+                'February': 1,
+                'March': 2,
+                'April': 3,
+                'May': 4,
+                'June': 5,
+                'July': 6,
+                'August': 7,
+                'September': 8,
+                'October': 9,
+                'November': 10,
+                'December': 11
+            };
+            return months[month];
+        }
+        function updateSelectedDates() {
+            const checkInDate = document.getElementById('checkInDate').value;
+            const checkOutDate = document.getElementById('checkOutDate').value;
+
+            if (checkInDate) {
+                const checkIn = new Date(checkInDate);
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    const dayMonth = day.closest('.calendar').querySelector('.calendar-month').textContent.split(' ')[0];
+                    const dayValue = parseInt(day.textContent);
+                    if (dayValue && !isNaN(dayValue)) {
+                        const dayDate = new Date(2025, getMonthIndex(dayMonth), dayValue);
+
+                        if (dayDate.toDateString() === checkIn.toDateString()) {
+                            day.classList.add('selected');
+                            day.classList.add('check-in');
+                        }
+                    }
+                });
+            }
+
+            if (checkOutDate) {
+                const checkOut = new Date(checkOutDate);
+                document.querySelectorAll('.calendar-day').forEach(day => {
+                    const dayMonth = day.closest('.calendar').querySelector('.calendar-month').textContent.split(' ')[0];
+                    const dayValue = parseInt(day.textContent);
+                    if (dayValue && !isNaN(dayValue)) {
+                        const dayDate = new Date(2025, getMonthIndex(dayMonth), dayValue);
+
+                        if (dayDate.toDateString() === checkOut.toDateString()) {
+                            day.classList.add('selected');
+                            day.classList.add('check-out');
+                        } else if (checkInDate && dayDate > new Date(checkInDate) && dayDate < checkOut) {
+                            day.classList.add('selected');
+                            day.classList.add('in-range');
+                        }
+                    }
+                });
+            }
+        }
+
+        // Initialize with today's date
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        document.getElementById('checkInDate').value = today.toISOString().split('T')[0];
+        document.getElementById('checkOutDate').value = tomorrow.toISOString().split('T')[0];
+
+        updateSelectedDates();
+
+        // Room selection functionality
+        document.querySelectorAll('.select-room-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const roomType = this.dataset.roomType;
+                const roomPrice = this.dataset.roomPrice;
+
+                document.getElementById('roomType').value = roomType;
+                document.querySelector('.price-tag').textContent = `From $${roomPrice}`;
+
+                // Scroll to booking form
+                document.querySelector('.booking-card').scrollIntoView({ behavior: 'smooth' });
+
+                showToast(`${roomType.charAt(0).toUpperCase() + roomType.slice(1)} room selected`, 'success');
+            });
+        });
+
+        // Handle booking form submission
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const checkIn = document.getElementById('checkInDate').value;
+            const checkOut = document.getElementById('checkOutDate').value;
+            const guests = document.getElementById('guests').value;
+            const roomType = document.getElementById('roomType').value;
+
+            if (!checkIn || !checkOut) {
+                showToast('Please select check-in and check-out dates', 'error');
+                return;
+            }
+
+            const checkInDate = new Date(checkIn);
+            const checkOutDate = new Date(checkOut);
+
+            if (checkOutDate <= checkInDate) {
+                showToast('Check-out date must be after check-in date', 'error');
+                return;
+            }
+
+            // Generate booking ID
+            const bookingId = 'MV' + Math.floor(Math.random() * 10000000).toString().padStart(7, '0');
+            document.getElementById('bookingIdDisplay').textContent = bookingId;
+
+            // Show success modal
+            document.getElementById('successModal').classList.add('show');
+
+            // Save booking to localStorage
+            const booking = {
+                id: bookingId,
+                checkIn,
+                checkOut,
+                guests,
+                roomType,
+                hotelName: 'Mountain View Resort & Spa',
+                date: new Date().toISOString()
+            };
+
+            let bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+            bookings.push(booking);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+        });
+
+        // Close success modal
+        document.getElementById('closeSuccessModal').addEventListener('click', function() {
+            document.getElementById('successModal').classList.remove('show');
+        });
+
+        // Reviews functionality
+        document.getElementById('writeReviewBtn').addEventListener('click', function() {
+            document.getElementById('reviewModal').classList.add('show');
+        });
+
+        document.getElementById('closeModal').addEventListener('click', function() {
+            document.getElementById('reviewModal').classList.remove('show');
+        });
+
+        // Handle review form submission
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const rating = document.querySelector('input[name="rating"]:checked');
+            if (!rating) {
+                showToast('Please select a rating', 'error');
+                return;
+            }
+
+            const reviewerName = document.getElementById('reviewerName').value;
+            const reviewContent = document.getElementById('reviewContent').value;
+
+            // Create review object
+            const review = {
+                name: reviewerName,
+                content: reviewContent,
+                rating: parseInt(rating.value),
+                date: new Date().toISOString(),
+                hotelId: 'mountain-view-resort'
+            };
+
+            // Save to localStorage
+            let reviews = JSON.parse(localStorage.getItem('hotelReviews') || '[]');
+            reviews.push(review);
+            localStorage.setItem('hotelReviews', JSON.stringify(reviews));
+
+            // Add review to page
+            addReviewToPage(review);
+
+            // Reset form and close modal
+            document.getElementById('reviewForm').reset();
+            document.getElementById('reviewModal').classList.remove('show');
+
+            showToast('Your review has been submitted!', 'success');
+        });
+
+        // Add review to page
+        function addReviewToPage(review) {
+            const reviewsList = document.getElementById('reviewsList');
+
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review-card';
+
+            const reviewHeader = document.createElement('div');
+            reviewHeader.className = 'review-header';
+
+            const reviewerInfo = document.createElement('div');
+            reviewerInfo.className = 'reviewer-info';
+
+            const reviewerAvatar = document.createElement('div');
+            reviewerAvatar.className = 'reviewer-avatar';
+            reviewerAvatar.textContent = review.name.split(' ').map(n => n[0]).join('');
+
+            const reviewerDetails = document.createElement('div');
+            const reviewerName = document.createElement('div');
+            reviewerName.className = 'reviewer-name';
+            reviewerName.textContent = review.name;
+
+            const reviewDate = document.createElement('div');
+            reviewDate.className = 'review-date';
+            reviewDate.textContent = new Date(review.date).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            reviewerDetails.appendChild(reviewerName);
+            reviewerDetails.appendChild(reviewDate);
+
+            reviewerInfo.appendChild(reviewerAvatar);
+            reviewerInfo.appendChild(reviewerDetails);
+
+            const reviewRating = document.createElement('div');
+            reviewRating.className = 'review-rating';
+
+            for (let i = 1; i <= 5; i++) {
+                const star = document.createElement('i');
+                star.className = i <= review.rating ? 'fas fa-star star' : 'far fa-star star';
+                reviewRating.appendChild(star);
+            }
+
+            reviewHeader.appendChild(reviewerInfo);
+            reviewHeader.appendChild(reviewRating);
+
+            const reviewContent = document.createElement('div');
+            reviewContent.className = 'review-content';
+            reviewContent.innerHTML = `<p>${review.content}</p>`;
+
+            reviewCard.appendChild(reviewHeader);
+            reviewCard.appendChild(reviewContent);
+
+            reviewsList.insertBefore(reviewCard, reviewsList.firstChild);
+        }
+
+        // Load existing reviews
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem('hotelReviews') || '[]');
+            const hotelReviews = reviews.filter(review => review.hotelId === 'mountain-view-resort');
+
+            hotelReviews.forEach(review => {
+                addReviewToPage(review);
+            });
+        }
+
+        loadReviews();
+
+        // Toast notification function
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+
+            toastContainer.appendChild(toast);
+
+            // Show toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(e) {
+            const reviewModal = document.getElementById('reviewModal');
+            const successModal = document.getElementById('successModal');
+
+            if (e.target === reviewModal) {
+                reviewModal.classList.remove('show');
+            }
+
+            if (e.target === successModal) {
+                successModal.classList.remove('show');
+            }
+        });
+
+        // Add escape key listener for modals
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('reviewModal').classList.remove('show');
+                document.getElementById('successModal').classList.remove('show');
+            }
+        });
+
+        // Handle date input changes
+        document.getElementById('checkInDate').addEventListener('change', function() {
+            updateSelectedDates();
+        });
+
+        document.getElementById('checkOutDate').addEventListener('change', function() {
+            updateSelectedDates();
+        });
+    });
+</script>
+</body>
+</html>
