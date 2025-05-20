@@ -371,13 +371,13 @@
 
     reservations.forEach(reservation => {
     const reservationCard = $(`
-                <div class="reservation-card" data-clientId="${reservation.clientId}">
+                <div class="reservation-card" data-reservation-id="${reservation.id}">
                     <h3 class="reservation-hotel">${reservation.hotelName}</h3>
                     <p class="reservation-details">${reservation.roomType}</p>
                     <p class="reservation-date">Check-in: ${formatDate(reservation.checkinDate)}</p>
                     <p class="reservation-price">$${reservation.price}</p>
                     ${reservation.cancelable ?
-    `<button class="cancel-button" data-clientId="${reservation.clientId}" data-roomTypeId="${reservation.roomTypeId}">Cancel Reservation</button>` :
+    `<button class="cancel-button" data-reservation-id="${reservation.id}">Cancel Reservation</button>` :
     ''}
                 </div>
             `);
@@ -457,7 +457,7 @@
     alert(`Redirecting to hotel details page for hotel ID: ${hotelId}`);
 }
 
-    function cancelReservation(clientId) {
+    function cancelReservation(reservationId) {
     // In a real app, this would be an AJAX call to the backend
     // DELETE /api/reservations/{reservationId}
 
