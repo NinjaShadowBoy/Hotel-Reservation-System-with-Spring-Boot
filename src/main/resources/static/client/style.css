@@ -291,6 +291,9 @@ header:hover {
     border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
+.reviews-title,
+.faqs-title,
+.rooms-title,
 .filter-title,
 .reservation-title {
     font-size: 1.35rem;
@@ -305,6 +308,9 @@ header:hover {
     padding-bottom: 0.5rem;
 }
 
+.reviews-title::after,
+.faqs-title::after,
+.rooms-title::after,
 .filter-title::after,
 .reservation-title::after {
     content: '';
@@ -682,6 +688,7 @@ header:hover {
     color: var(--text-secondary);
 }
 
+.room-services,
 .hotel-services {
     display: flex;
     flex-wrap: wrap;
@@ -722,6 +729,7 @@ header:hover {
     margin-top: auto;
 }
 
+.room-price,
 .hotel-price {
     font-size: 1.6rem;
     font-weight: 700;

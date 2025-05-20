@@ -83,4 +83,8 @@ public class HotelService {
                 .services(amenities)
                 .build();
     }
+
+    public HotelDetailsDTO getHotel(Integer hotelId) {
+        return getHotelDTO(hotelRepo.findById(hotelId).orElseThrow());
+    }
 }

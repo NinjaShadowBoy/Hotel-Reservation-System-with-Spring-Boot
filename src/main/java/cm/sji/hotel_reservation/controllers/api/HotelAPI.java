@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -30,6 +31,17 @@ public class HotelAPI {
         } catch (Exception e){
             logger.error(e.getMessage());
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/api/hotels/{hotelId}")
+    public ResponseEntity<HotelDetailsDTO> getHotel(@PathVariable Integer hotelId) {
+        try {
+            HotelDetailsDTO hotels = hotelService.getHotel(hotelId);
+            return new ResponseEntity<>(hotels, HttpStatus.OK);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(new HotelDetailsDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
