@@ -9,14 +9,19 @@ import cm.sji.hotel_reservation.repositories.HotelRepo;
 import cm.sji.hotel_reservation.repositories.OfferRepo;
 import cm.sji.hotel_reservation.repositories.RoomTypeRepo;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class HotelService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final HotelRepo hotelRepo;
 
@@ -46,12 +51,12 @@ public class HotelService {
     private HotelDetailsDTO getHotelDTO(Hotel hotel) {
         List<RoomType> roomTypes = roomTypeRepo.findByHotel(hotel);
 
-        List<String> amenities = roomTypes.stream().flatMap(roomType ->
+        Set<String> amenities = roomTypes.stream().flatMap(roomType ->
                 offerRepo.findByRoomType(roomType).stream().map(
                         offer -> offer.getRoomService().getLabel() + ":" +
                                 offer.getRoomService().getFontawsome_icon_class()
                 )
-        ).toList();
+        ).collect(Collectors.toSet());
 
         var photo = hotelPhotoRepo.findByHotel(hotel).orElse(null);
 
@@ -61,6 +66,7 @@ public class HotelService {
         }else{
             imageUrl = "/" + hotelphotoDir + "/placeholder.png";
         }
+            imageUrl = "/" + hotelphotoDir + "/placeholder.png";
 
         Double lowestPrice = roomTypes.stream()
                 .map(RoomType::getPrice)

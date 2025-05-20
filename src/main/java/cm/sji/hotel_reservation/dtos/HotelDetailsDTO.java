@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Builder
@@ -24,6 +25,6 @@ public class HotelDetailsDTO {
 
     Float rating;
 
-    List<String> services;
+    Set<String> services;
 }
 

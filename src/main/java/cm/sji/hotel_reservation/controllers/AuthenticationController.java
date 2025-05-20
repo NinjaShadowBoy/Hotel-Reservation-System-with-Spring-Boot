@@ -32,7 +32,7 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private final UserService userService;
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @PostMapping("/login")
     public String checkCredentials(@ModelAttribute("user") AuthenticationRequest request, Model model,

@@ -9,6 +9,8 @@ import cm.sji.hotel_reservation.repositories.HotelRepo;
 import cm.sji.hotel_reservation.repositories.RoomPhotoRepo;
 import cm.sji.hotel_reservation.repositories.RoomTypeRepo;
 import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @Service
 public class PhotoService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final HotelPhotoRepo hotelPhotoRepo;
 

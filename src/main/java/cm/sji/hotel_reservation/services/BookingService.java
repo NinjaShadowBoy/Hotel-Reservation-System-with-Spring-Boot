@@ -4,6 +4,8 @@ import cm.sji.hotel_reservation.dtos.ClientReservationDTO;
 import cm.sji.hotel_reservation.entities.Booking;
 import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.List;
 
 @Service
 public class BookingService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final HotelRepo hotelRepo;
 
@@ -51,8 +54,8 @@ public class BookingService {
         return bookingRepo.findAll().stream().map(this::getReservationDTO).toList();
     }
     private ClientReservationDTO getReservationDTO(Booking booking){
-        Boolean cancelable = booking.getCheckinDate().isBefore(LocalDateTime.now()
-                .minusHours(cancellationDeadline));
+        Boolean cancelable = booking.getCheckinDate().isAfter(LocalDateTime.now()
+                .plusHours(cancellationDeadline));
 
         return ClientReservationDTO
                 .builder()
@@ -61,6 +64,7 @@ public class BookingService {
                 .roomType(booking.getRoomType().getLabel())
                 .price(booking.getRoomType().getPrice())
                 .date(booking.getDate())
+                .checkinDate(booking.getCheckinDate())
                 .hotelName(booking.getRoomType().getHotel().getName())
                 .cancelable(cancelable)
                 .build();

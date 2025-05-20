@@ -108,7 +108,7 @@ header:hover {
     text-decoration: none;
     transition: all var(--transition-medium) cubic-bezier(0.4, 0, 0.2, 1);
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.2);
-    letter-spacing: 0.5px;
+    letter-spacing: -0.5px;
     position: relative;
     padding: 0.25rem 0.5rem;
 }

@@ -19,30 +19,34 @@ import java.io.IOException;
 @RestController
 @AllArgsConstructor
 public class PhotoAPI {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private static final Logger logger = LoggerFactory.getLogger(PhotoAPI.class);
     private final PhotoService photoService;
 
     @PostMapping("/roomphotos/upload/{roomTypeId}")
-    public ResponseEntity<?> uploadRoomPhoto(
-            @RequestParam("photo") MultipartFile file,
-            @PathVariable("roomTypeId") Integer roomTypeId,
-            RedirectAttributes redirectAttributes) throws IOException {
+    public ResponseEntity<?> uploadRoomPhoto(@RequestParam("photo") MultipartFile file, @PathVariable("roomTypeId") Integer roomTypeId, RedirectAttributes redirectAttributes) throws IOException {
+        try {
+            RoomPhoto photo = photoService.saveRoomPhoto(file, roomTypeId);
+            return ResponseEntity.ok().body(photo);
 
-        RoomPhoto photo = photoService.saveRoomPhoto(file, roomTypeId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
 
-        return ResponseEntity.ok().body(photo);
     }
 
     @PostMapping("/hotelphotos/upload/{hotelId}")
-    public ResponseEntity<?> uploadHotelPhoto(
-            @RequestParam("photo") MultipartFile file,
-            @PathVariable("hotelId") Integer hotelId,
-            RedirectAttributes redirectAttributes) throws IOException {
+    public ResponseEntity<?> uploadHotelPhoto(@RequestParam("photo") MultipartFile file, @PathVariable("hotelId") Integer hotelId, RedirectAttributes redirectAttributes) throws IOException {
+        try {
+            HotelPhoto photo = photoService.saveHotelPhoto(file, hotelId);
+            return ResponseEntity.ok().body(photo);
 
-        HotelPhoto photo = photoService.saveHotelPhoto(file, hotelId);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
 
-        return ResponseEntity.ok().body(photo);
     }
 
 }
