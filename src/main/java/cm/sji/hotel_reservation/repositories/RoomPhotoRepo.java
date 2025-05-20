@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface RoomPhotoRepo extends JpaRepository<RoomPhoto, Integer> {
     Optional<RoomPhoto> findByRoomType(RoomType roomType);
+    Optional<RoomPhoto> findByRoomTypeId(Integer roomTypeId);
 }

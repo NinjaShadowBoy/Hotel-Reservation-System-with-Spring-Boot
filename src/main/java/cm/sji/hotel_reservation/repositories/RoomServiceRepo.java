@@ -10,3 +10,4 @@ import java.util.List;
 public interface RoomServiceRepo extends JpaRepository<RoomService, String> {
     List<RoomService> findByLabelContainingIgnoreCase(String keyword);
 }
+

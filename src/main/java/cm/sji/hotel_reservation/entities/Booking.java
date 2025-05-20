@@ -1,8 +1,8 @@
 package cm.sji.hotel_reservation.entities;
 
+
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -13,19 +13,33 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Booking {
-//    @EmbeddedId
-//    private BookingKey id;
+    @Id
+    @Column(name = "client_id", insertable = false, updatable = false)
+    private Integer clientId;
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
-    User client;
+    @Column(name = "room_type_id", insertable = false, updatable = false)
+    private Integer roomTypeId;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "fk_room_type_id", insertable = false, updatable = false)
-    RoomType roomType;
+    @Transient
+    private User client;
 
-    LocalDateTime date;
+    @Transient
+    private RoomType roomType;
 
+    private LocalDateTime bookingTime;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    public enum Status {
+        PENDING, CONFIRMED, CANCELLED, COMPLETED
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.bookingTime = LocalDateTime.now();
+    }
 }

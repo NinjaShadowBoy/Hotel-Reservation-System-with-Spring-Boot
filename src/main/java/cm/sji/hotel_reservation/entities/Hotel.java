@@ -33,7 +33,7 @@ public class Hotel implements Serializable {
     private String description;
 
     @Column(nullable = false)
-    private String owner;
+    private User owner;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

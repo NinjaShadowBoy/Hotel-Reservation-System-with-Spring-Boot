@@ -22,6 +22,22 @@ public class FAQKey implements Serializable {
         this.hotel = hotel;
     }
 
+    public Integer getClient() {
+        return client;
+    }
+
+    public void setClient(Integer client) {
+        this.client = client;
+    }
+
+    public Integer getHotel() {
+        return hotel;
+    }
+
+    public void setHotel(Integer hotel) {
+        this.hotel = hotel;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

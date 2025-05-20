@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface HotelPhotoRepo extends JpaRepository<HotelPhoto, Integer> {
     Optional<HotelPhoto> findByHotel(Hotel hotel);
+    Optional<HotelPhoto> findByHotelId(Integer hotelId);
 }
