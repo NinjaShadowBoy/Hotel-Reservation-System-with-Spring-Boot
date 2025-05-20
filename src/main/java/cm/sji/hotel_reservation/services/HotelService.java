@@ -66,7 +66,6 @@ public class HotelService {
         }else{
             imageUrl = "/" + hotelphotoDir + "/placeholder.png";
         }
-            imageUrl = "/" + hotelphotoDir + "/placeholder.png";
 
         Double lowestPrice = roomTypes.stream()
                 .map(RoomType::getPrice)
