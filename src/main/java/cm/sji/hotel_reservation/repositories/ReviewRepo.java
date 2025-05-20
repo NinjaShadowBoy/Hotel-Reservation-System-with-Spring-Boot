@@ -14,8 +14,8 @@ import java.util.List;
 public interface ReviewRepo extends JpaRepository<Review, FAQKey> {
     List<Review> findByHotel(Hotel hotel);
     List<Review> findByClient(User client);
-    List<Review> findByRatingGreaterThanEqual(int minRating);
+    List<Review> findByRatingGreaterThanEqual(Float rating);
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.hotel.id = :hotelId")
-    Double calculateAverageRatingForHotel(Long hotelId);
+    Double calculateAverageRatingForHotel(Integer hotelId);
 }

@@ -11,26 +11,26 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class BookingKey implements Serializable {
-    private int client;
-    private int room_Type;
+    private Integer client;
+    private Integer roomType;
 
     //Default constructor
     public BookingKey() {}
 
-    public BookingKey(int clientID, int roomTypeID) {
+    public BookingKey(Integer clientID, Integer roomTypeID) {
         this.client = clientID;
-        this.room_Type = roomTypeID;
+        this.roomType = roomTypeID;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BookingKey bookingKey)) return false;
-        return client == bookingKey.client && room_Type == bookingKey.room_Type;
+        return Objects.equals(client, bookingKey.client) && Objects.equals(roomType, bookingKey.roomType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(client, room_Type);
+        return Objects.hash(client, roomType);
     }
 }

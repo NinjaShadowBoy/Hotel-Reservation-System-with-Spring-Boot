@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Application properties ###
+application.properties
+
+### Uploaded photos ###
+uploads/

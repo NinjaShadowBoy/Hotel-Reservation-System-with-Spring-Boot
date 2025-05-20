@@ -11,13 +11,13 @@ import java.util.Objects;
 @Getter
 @Embeddable
 public class FAQKey implements Serializable {
-    private int client;
-    private int hotel;
+    private Integer client;
+    private Integer hotel;
 
     //Default constructor
     public FAQKey() {}
 
-    public FAQKey(int client, int hotel) {
+    public FAQKey(Integer client, Integer hotel) {
         this.client = client;
         this.hotel = hotel;
     }
@@ -26,7 +26,7 @@ public class FAQKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FAQKey faqKey)) return false;
-        return client == faqKey.client && hotel == faqKey.hotel;
+        return Objects.equals(client, faqKey.client) && Objects.equals(hotel, faqKey.hotel);
     }
 
     @Override

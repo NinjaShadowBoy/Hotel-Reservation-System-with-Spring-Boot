@@ -1,38 +1,33 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
 @IdClass(BookingKey.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Booking {
-//    @EmbeddedId
-//    private BookingKey id;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
-    User client;
+    User client = null;
 
     @Id
     @ManyToOne
     @JoinColumn(name = "fk_room_type_id", insertable = false, updatable = false)
-    RoomType room_Type;
+    RoomType roomType = null;
 
-    LocalDate date;
+    LocalDateTime date = null;
 
-    public Booking() {}
-
-    public Booking(User client, RoomType room_Type, LocalDate date) {
-        this.client = client;
-        this.room_Type = room_Type;
-        this.date = date;
-    }
+    LocalDateTime checkinDate = null;
 }

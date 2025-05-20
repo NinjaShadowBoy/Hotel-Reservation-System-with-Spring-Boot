@@ -1,15 +1,14 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
-@Data
 @Entity
+@Data
 @IdClass(OfferKey.class)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Offer {
 
     @Id
@@ -22,10 +21,4 @@ public class Offer {
     @JoinColumn(name = "fk_roomService", insertable = false, updatable = false)
     RoomService roomService;
 
-    public Offer() {}
-
-    public Offer(RoomType roomType, RoomService roomService) {
-        this.roomType = roomType;
-        this.roomService = roomService;
-    }
 }

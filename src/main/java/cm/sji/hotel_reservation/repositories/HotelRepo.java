@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface HotelRepo extends JpaRepository<Hotel, Long> {
+public interface HotelRepo extends JpaRepository<Hotel, Integer> {
     List<Hotel> findByLocation(String location);
-    List<Hotel> findByRatingGreaterThanEqual(Integer rating);
+    List<Hotel> findByRatingGreaterThanEqual(Float rating);
     List<Hotel> findByOwner(String owner);
 
     @Query("SELECT h FROM Hotel h WHERE LOWER(h.name) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(h.location) LIKE LOWER(CONCAT('%', :keyword, '%'))")
