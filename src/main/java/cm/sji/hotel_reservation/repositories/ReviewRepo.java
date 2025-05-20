@@ -18,4 +18,6 @@ public interface ReviewRepo extends JpaRepository<Review, FAQKey> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.hotel.id = :hotelId")
     Double calculateAverageRatingForHotel(Integer hotelId);
+
+    List<Review> findByHotel_Id(Integer hotelId);
 }

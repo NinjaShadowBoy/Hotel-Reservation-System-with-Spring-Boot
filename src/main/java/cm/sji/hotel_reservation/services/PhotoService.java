@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
@@ -52,11 +53,19 @@ public class PhotoService {
 
         Hotel hotel = hotelRepo.findById(hotelId).orElse(null);
 
+
         assert hotel != null;
         // Step 1: Save photo to get ID
-        HotelPhoto photo = new HotelPhoto();
-        photo.setHotel(hotel);
-        photo = hotelPhotoRepo.save(photo);
+        HotelPhoto photo = hotelPhotoRepo.findByHotel(hotel).orElse(null);
+
+        if (photo != null) {
+            // Delete hotel photo if already existing
+            Files.deleteIfExists(Paths.get(photo.getFilename()));
+        } else {
+            photo = new HotelPhoto();
+            photo.setHotel(hotel);
+            photo = hotelPhotoRepo.save(photo);
+        }
 
         // Step 2: Generate filename from ID
         String extension = getFileExtension(file.getOriginalFilename());
@@ -66,7 +75,7 @@ public class PhotoService {
         // Step 3: Save file to disk
         Path filePath = Paths.get(hoteluploadDir, filename);
         Files.createDirectories(filePath.getParent());
-        Files.write(filePath, file.getBytes());
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         photo.setFilename(filename);
 
@@ -79,9 +88,16 @@ public class PhotoService {
 
         assert roomType != null;
         // Step 1: Save photo to get ID
-        RoomPhoto photo = new RoomPhoto();
-        photo.setRoomType(roomType);
-        photo = roomPhotoRepo.save(photo);
+        RoomPhoto photo = roomPhotoRepo.findByRoomType(roomType).orElse(null);
+
+        if (photo != null) {
+            // Delete hotel photo if already existing
+            Files.deleteIfExists(Paths.get(photo.getFilename()));
+        } else {
+            photo = new RoomPhoto();
+            photo.setRoomType(roomType);
+            photo = roomPhotoRepo.save(photo);
+        }
 
         // Step 2: Generate filename from ID
         String extension = getFileExtension(file.getOriginalFilename());
@@ -91,7 +107,7 @@ public class PhotoService {
         // Step 3: Save file to disk
         Path filePath = Paths.get(hoteluploadDir, filename);
         Files.createDirectories(filePath.getParent());
-        Files.write(filePath, file.getBytes());
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         photo.setFilename(filename);
 

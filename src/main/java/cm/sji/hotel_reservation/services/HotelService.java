@@ -66,7 +66,6 @@ public class HotelService {
         }else{
             imageUrl = "/" + hotelphotoDir + "/placeholder.png";
         }
-            imageUrl = "/" + hotelphotoDir + "/placeholder.png";
 
         Double lowestPrice = roomTypes.stream()
                 .map(RoomType::getPrice)
@@ -83,5 +82,9 @@ public class HotelService {
                 .rating(hotel.getRating())
                 .services(amenities)
                 .build();
+    }
+
+    public HotelDetailsDTO getHotel(Integer hotelId) {
+        return getHotelDTO(hotelRepo.findById(hotelId).orElseThrow());
     }
 }

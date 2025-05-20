@@ -16,4 +16,6 @@ public interface RoomTypeRepo extends JpaRepository<RoomType, Integer> {
 
     @Query("SELECT rt FROM RoomType rt WHERE rt.hotel.id = :hotelId AND rt.numberAvailable > 0")
     List<RoomType> findAvailableRoomsByHotelId(Integer hotelId);
+
+    List<RoomType> findByHotel_Id(Integer hotelId);
 }
