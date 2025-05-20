@@ -15,12 +15,14 @@ class HotelDetails {
     String location;
     String desc;
     Number rating;
+    Number lowestPrice;
 
     List<String> services;
 }
 
 class ClientReservation {
-    Number id;
+    Number clientId;
+    Number roomTypeId;
 
     String hotelName;
     String roomType;
@@ -35,7 +37,7 @@ class ClientReservation {
 Directly on page load the front:
 - GET `List<String>` at `/api/services`: Theses are the services that may be offered by a hotel; Used to filter hotels;
 - GET `List<HotelDetails>` at `/api/hotels`: These are the hotels to be displayed for the user to see and they will have a link to their own page for reservation
-- GET `List<ClientReservation>`: This i the list of all reservations made by the client. If the reservation canbe cancelled there will be a button or something to cancel it.
+- GET `List<ClientReservation>` at `/api/bookings/{clientId}` This i the list of all reservations made by the client. If the reservation canbe cancelled there will be a button or something to cancel it.
 
 
 ## 1. Hotel reservation

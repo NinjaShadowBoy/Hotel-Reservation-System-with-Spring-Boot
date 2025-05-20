@@ -21,19 +21,19 @@ public class Hotel implements Serializable {
     private Integer id;
 
     @Column(nullable = false)
-    private String name;
+    private String name = "";
 
     @Column(nullable = false)
-    private String location;
+    private String location = "";
 
     @Column(nullable = false)
-    private Float rating;
+    private Float rating = 0F;
 
     @Column(nullable = false, length = 1000)
-    private String description;
+    private String description = "";
 
     @Column(nullable = false)
-    private String owner;
+    private String owner = "";
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

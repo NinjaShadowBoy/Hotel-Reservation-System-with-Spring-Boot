@@ -18,9 +18,8 @@ public class RoomType {
     @JoinColumn(name = "fk_hotel")
     Hotel hotel;
 
-    String label;
-    Integer totalNumber;
-    Integer numberAvailable;
-    Double price;
-
+    String label = "";
+    Integer totalNumber = 0;
+    Integer numberAvailable = 0;
+    Double price = 0.0;
 }

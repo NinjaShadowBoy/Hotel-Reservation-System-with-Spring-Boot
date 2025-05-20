@@ -13,10 +13,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomTypeDTO {
-    Long id;
+    Integer id;
 
     String label;
     List<String> services;
     Number price;
     String image;
+    Integer numberAvailable;
 }

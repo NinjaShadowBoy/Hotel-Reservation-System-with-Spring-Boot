@@ -17,4 +17,5 @@ public class RoomPhoto {
     @JoinColumn(name = "fk_roomType_id")
     RoomType roomType;
 
+    String filename;
 }

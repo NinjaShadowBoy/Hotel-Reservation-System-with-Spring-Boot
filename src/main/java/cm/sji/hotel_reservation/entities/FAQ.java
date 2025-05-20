@@ -22,7 +22,7 @@ public class FAQ {
     @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
     Hotel hotel;
 
-    String faqQuestion;
-    String faqAnswer;
+    String faqQuestion = "";
+    String faqAnswer = "";
 
 }

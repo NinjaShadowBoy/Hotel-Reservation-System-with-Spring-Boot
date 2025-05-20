@@ -17,5 +17,5 @@ public interface ReviewRepo extends JpaRepository<Review, FAQKey> {
     List<Review> findByRatingGreaterThanEqual(Float rating);
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.hotel.id = :hotelId")
-    Double calculateAverageRatingForHotel(Long hotelId);
+    Double calculateAverageRatingForHotel(Integer hotelId);
 }

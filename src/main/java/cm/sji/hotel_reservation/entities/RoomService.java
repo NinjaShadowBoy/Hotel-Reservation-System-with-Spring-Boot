@@ -12,5 +12,5 @@ import lombok.*;
 public class RoomService {
     @Id
     String label;
-
+    String fontawsome_icon_class = "fa fa-square";
 }

@@ -5,13 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-@Builder
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class ReservationDTO {
-    Integer roomTypeId;
-    Integer clientId;
+@NoArgsConstructor
+
+public class AuthenticationRequest {
+
+    private String username;
+    private String password;
 }

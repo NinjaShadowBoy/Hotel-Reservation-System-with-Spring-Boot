@@ -13,12 +13,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HotelDetailsDTO {
-    Long id;
+    Integer id;
 
     String name;
     String image;
     String location;
     String desc;
+
+    Double lowestPrice;
 
     Float rating;
 
