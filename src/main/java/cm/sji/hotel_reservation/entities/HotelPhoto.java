@@ -17,4 +17,5 @@ public class HotelPhoto {
     @JoinColumn(name = "fk_hotel_id")
     Hotel hotel;
 
+    String filename;
 }

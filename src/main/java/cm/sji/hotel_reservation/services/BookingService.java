@@ -1,122 +1,73 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.dtos.ClientReservationDTO;
 import cm.sji.hotel_reservation.entities.Booking;
-import cm.sji.hotel_reservation.entities.Booking.Status;
-import cm.sji.hotel_reservation.entities.BookingKey;
-import cm.sji.hotel_reservation.entities.RoomType;
-import cm.sji.hotel_reservation.repositories.BookingRepo;
-import cm.sji.hotel_reservation.repositories.RoomTypeRepo;
-import lombok.RequiredArgsConstructor;
+import cm.sji.hotel_reservation.entities.User;
+import cm.sji.hotel_reservation.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class BookingService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final BookingRepo bookingRepository;
-    private final RoomTypeRepo roomTypeRepository;
+    private final HotelRepo hotelRepo;
 
-    @Transactional
-    public Booking createBooking(Integer clientId, Integer roomTypeId,
-                                 LocalDate checkInDate, LocalDate checkOutDate) {
-        // Verify room exists and is available
-        RoomType roomType = roomTypeRepository.findById(roomTypeId)
-                .orElseThrow(() -> new IllegalArgumentException("Room type not found"));
+    private final OfferRepo offerRepo;
 
-        if (roomType.getNumberAvailable() <= 0) {
-            throw new IllegalStateException("No rooms available for selected type");
-        }
+    private final RoomTypeRepo roomTypeRepo;
 
-        // Check for overlapping bookings
-        int overlappingBookings = bookingRepository.countOverlappingBookings(
-                roomTypeId, checkInDate, checkOutDate);
+    private final HotelPhotoRepo hotelPhotoRepo;
 
-        if (overlappingBookings >= roomType.getNumberAvailable()) {
-            throw new IllegalStateException("No rooms available for selected dates");
-        }
+    private final BookingRepo bookingRepo;
 
-        // Create booking
-        Booking booking = Booking.builder()
-                .clientId(clientId)
-                .roomTypeId(roomTypeId)
-                .checkInDate(checkInDate)
-                .checkOutDate(checkOutDate)
-                .status(Status.PENDING)
+    private final UserRepo userRepo;
+
+    @Value("${system.default.cancellation.deadline.hours}")
+    private Short cancellationDeadline;
+
+    public BookingService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, HotelPhotoRepo hotelPhotoRepo, BookingRepo bookingRepo, UserRepo userRepo) {
+        this.hotelRepo = hotelRepo;
+        this.offerRepo = offerRepo;
+        this.roomTypeRepo = roomTypeRepo;
+        this.hotelPhotoRepo = hotelPhotoRepo;
+        this.bookingRepo = bookingRepo;
+        this.userRepo = userRepo;
+    }
+
+    public List<ClientReservationDTO> getClientReservations(Integer clientId) {
+        return bookingRepo.findByClient_Id(clientId).stream()
+                .map(this::getReservationDTO).toList();
+    }
+
+    public List<ClientReservationDTO> getClientReservations(User client){
+        return bookingRepo.findByClient(client).stream()
+                .map(this::getReservationDTO).toList();
+    }
+
+    public List<ClientReservationDTO> getAllClientReservations() {
+        return bookingRepo.findAll().stream().map(this::getReservationDTO).toList();
+    }
+    private ClientReservationDTO getReservationDTO(Booking booking){
+        Boolean cancelable = booking.getCheckinDate().isAfter(LocalDateTime.now()
+                .plusHours(cancellationDeadline));
+
+        return ClientReservationDTO
+                .builder()
+                .clientId(booking.getClient().getId())
+                .roomTypeId(booking.getRoomType().getId())
+                .roomType(booking.getRoomType().getLabel())
+                .price(booking.getRoomType().getPrice())
+                .date(booking.getDate())
+                .checkinDate(booking.getCheckinDate())
+                .hotelName(booking.getRoomType().getHotel().getName())
+                .cancelable(cancelable)
                 .build();
-
-        // Update room availability
-        roomType.setNumberAvailable(roomType.getNumberAvailable() - 1);
-        roomTypeRepository.save(roomType);
-
-        return bookingRepository.save(booking);
     }
 
-    public Optional<Booking> findById(Integer clientId, Integer roomTypeId) {
-        BookingKey id = new BookingKey(clientId, roomTypeId);
-        return bookingRepository.findById(id);
-    }
-
-    public List<Booking> findByClientId(Integer clientId) {
-        return bookingRepository.findByClientId(clientId);
-    }
-
-    public List<Booking> findByHotelId(Integer hotelId) {
-        return bookingRepository.findByHotelId(hotelId);
-    }
-
-    public List<Booking> findByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
-        return bookingRepository.findByDateRange(startDate, endDate);
-    }
-
-    public List<Booking> findAll() {
-        return bookingRepository.findAll();
-    }
-
-    @Transactional
-    public Booking updateBookingStatus(Integer clientId, Integer roomTypeId, Status newStatus) {
-        BookingKey id = new BookingKey(clientId, roomTypeId);
-        Booking booking = bookingRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
-
-        Status oldStatus = booking.getStatus();
-
-        // If cancelling an active booking, increment room availability
-        if (newStatus == Status.CANCELLED &&
-                (oldStatus == Status.CONFIRMED || oldStatus == Status.PENDING)) {
-            RoomType roomType = roomTypeRepository.findById(roomTypeId)
-                    .orElseThrow(() -> new IllegalArgumentException("Room type not found"));
-            roomType.setNumberAvailable(roomType.getNumberAvailable() + 1);
-            roomTypeRepository.save(roomType);
-        }
-
-        booking.setStatus(newStatus);
-        return bookingRepository.save(booking);
-    }
-
-    @Transactional
-    public void deleteBooking(Integer clientId, Integer roomTypeId) {
-        BookingKey id = new BookingKey(clientId, roomTypeId);
-        Optional<Booking> optionalBooking = bookingRepository.findById(id);
-
-        if (optionalBooking.isPresent()) {
-            Booking booking = optionalBooking.get();
-
-            // If deleting an active booking, increment room availability
-            if (booking.getStatus() == Status.CONFIRMED ||
-                    booking.getStatus() == Status.PENDING) {
-                RoomType roomType = roomTypeRepository.findById(roomTypeId)
-                        .orElseThrow(() -> new IllegalArgumentException("Room type not found"));
-                roomType.setNumberAvailable(roomType.getNumberAvailable() + 1);
-                roomTypeRepository.save(roomType);
-            }
-
-            bookingRepository.deleteById(id);
-        }
-    }
 }

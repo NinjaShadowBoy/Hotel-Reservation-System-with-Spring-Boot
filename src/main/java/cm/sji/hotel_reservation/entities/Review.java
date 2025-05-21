@@ -23,8 +23,7 @@ public class Review {
     @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
     Hotel hotel;
 
-    String reviewText;
+    String reviewText = "";
     LocalDateTime reviewDate;
-    Float rating;
-
+    Float rating = 0.0f;
 }

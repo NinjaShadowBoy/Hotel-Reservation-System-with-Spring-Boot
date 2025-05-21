@@ -1,53 +1,39 @@
 package cm.sji.hotel_reservation.services;
 
-import cm.sji.hotel_reservation.entities.FAQKey;
-import cm.sji.hotel_reservation.entities.Hotel;
+import cm.sji.hotel_reservation.dtos.ReviewDTO;
 import cm.sji.hotel_reservation.entities.Review;
 import cm.sji.hotel_reservation.repositories.ReviewRepo;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import cm.sji.hotel_reservation.entities.User;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ReviewService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final ReviewRepo reviewRepository;
+    private final ReviewRepo reviewRepo;
 
-    public Review createReview(Review review) {
-        review.setReviewDate(LocalDateTime.now());
-        return reviewRepository.save(review);
+    public List<ReviewDTO> getHotelReviews(int hotelId) {
+        // Get the reviews for the particular hotel.
+        List<Review> reviews = reviewRepo.findByHotel_Id(hotelId);
+
+        // Convert to dto and return.
+        return reviews.stream().map(this::getReviewDTO).toList();
     }
 
-    public Optional<Review> findById(User client, Hotel hotel) {
-        return reviewRepository.findById(new FAQKey(client.getId(), hotel.getId()));
-    }
-
-    public List<Review> findByHotelId(Integer hotelId) {
-        return reviewRepository.findByHotelId(hotelId);
-    }
-
-    public List<Review> findByClientId(Integer clientId) {
-        return reviewRepository.findByClientId(clientId);
-    }
-
-    public List<Review> findAll() {
-        return reviewRepository.findAll();
-    }
-
-    public Review updateReview(Review review) {
-        return reviewRepository.save(review);
-    }
-
-    public void deleteReview(User client, Hotel hotel) {
-        reviewRepository.deleteById(new FAQKey(client.getId(), hotel.getId()));
-    }
-
-    public Double getAverageRatingForHotel(Integer hotelId) {
-        return reviewRepository.calculateAverageRatingForHotel(hotelId);
+    // Helper function to get ReviewDTO.
+    private ReviewDTO getReviewDTO(Review review) {
+        return ReviewDTO.builder()
+                .author(
+                        review.getClient().getLastName()
+                + " " + review.getClient().getFirstName())
+                .date(review.getReviewDate())
+                .text(review.getReviewText())
+                .rating(review.getRating())
+                .build();
     }
 }

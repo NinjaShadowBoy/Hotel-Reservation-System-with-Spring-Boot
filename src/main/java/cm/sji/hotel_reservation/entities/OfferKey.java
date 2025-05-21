@@ -26,7 +26,7 @@ public class OfferKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof OfferKey offerKey)) return false;
-        return roomType == offerKey.roomType && Objects.equals(roomService, offerKey.roomService);
+        return Objects.equals(roomType, offerKey.roomType) && Objects.equals(roomService, offerKey.roomService);
     }
 
     @Override

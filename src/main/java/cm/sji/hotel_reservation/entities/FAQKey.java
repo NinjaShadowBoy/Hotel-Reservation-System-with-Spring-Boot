@@ -42,7 +42,7 @@ public class FAQKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FAQKey faqKey)) return false;
-        return client == faqKey.client && hotel == faqKey.hotel;
+        return Objects.equals(client, faqKey.client) && Objects.equals(hotel, faqKey.hotel);
     }
 
     @Override

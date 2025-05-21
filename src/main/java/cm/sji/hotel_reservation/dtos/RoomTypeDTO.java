@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Builder
@@ -13,10 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomTypeDTO {
-    Long id;
+    Integer id;
 
     String label;
-    List<String> services;
+    Set<String> services;
     Number price;
     String image;
+    Integer numberAvailable;
 }

@@ -1,74 +1,36 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.dtos.FAQDTO;
 import cm.sji.hotel_reservation.entities.FAQ;
-import cm.sji.hotel_reservation.entities.FAQKey;
-import cm.sji.hotel_reservation.entities.Hotel;
-import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.repositories.FAQRepo;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class FAQService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final FAQRepo faqRepository;
+    private final FAQRepo faqRepo;
 
-    public FAQ createFAQ(FAQ faq) {
-        return faqRepository.save(faq);
+    public List<FAQDTO> getFaqs(Integer hotelId) {
+        // Get faqs of a particular hotel.
+        List<FAQ> faqs = faqRepo.findByHotel_Id(hotelId);
+
+        // Convert to dto and return.
+        return faqs.stream().map(this::getFAQDTO).toList();
     }
 
-    public Optional<FAQ> findById(User client, Hotel hotel) {
-        FAQKey id = new FAQKey(client.getId(), hotel.getId());
-        return faqRepository.findById(id);
-    }
-
-    public List<FAQ> findByHotelId(Long hotelId) {
-        return faqRepository.findByHotelId(hotelId);
-    }
-
-    public List<FAQ> findAnsweredFAQsByHotelId(Long hotelId) {
-        return faqRepository.findAnsweredFAQsByHotelId(hotelId);
-    }
-
-    public List<FAQ> findUnansweredFAQsByHotelId(Long hotelId) {
-        return faqRepository.findUnansweredFAQsByHotelId(hotelId);
-    }
-
-    public List<FAQ> findByClientId(Long clientId) {
-        return faqRepository.findByClientId(clientId);
-    }
-
-    public List<FAQ> findAll() {
-        return faqRepository.findAll();
-    }
-
-    public FAQ updateFAQ(FAQ faq) {
-        return faqRepository.save(faq);
-    }
-
-    public FAQ answerFAQ(User client, Hotel hotel, String answer) {
-        FAQKey id = new FAQKey(client.getId(), hotel.getId());
-        Optional<FAQ> optionalFAQ = faqRepository.findById(id);
-
-        if (optionalFAQ.isPresent()) {
-            FAQ faq = optionalFAQ.get();
-            faq.setFaqAnswer(answer);
-            return faqRepository.save(faq);
-        }
-        throw new IllegalArgumentException(
-                "FAQ not found for client ID: " + client.getId() +
-                        " and hotel ID: " + hotel.getId()
-        );
-    }
-
-
-    public void deleteFAQ(User client, Hotel hotel) {
-        FAQKey id = new FAQKey(client.getId(), hotel.getId());
-        faqRepository.deleteById(id);
+    // Helper functions to get FAQDTO.
+    private FAQDTO getFAQDTO(FAQ faq) {
+        return FAQDTO.builder()
+                .question(faq.getFaqQuestion())
+                .answer(faq.getFaqAnswer())
+                .build();
     }
 }

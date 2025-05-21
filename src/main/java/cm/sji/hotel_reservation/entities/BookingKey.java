@@ -26,7 +26,7 @@ public class BookingKey implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BookingKey bookingKey)) return false;
-        return client == bookingKey.client && roomType == bookingKey.roomType;
+        return Objects.equals(client, bookingKey.client) && Objects.equals(roomType, bookingKey.roomType);
     }
 
     @Override

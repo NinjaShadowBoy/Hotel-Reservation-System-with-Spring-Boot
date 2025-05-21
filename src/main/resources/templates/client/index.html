@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Hotel Browsing System</title>
+    <link href="/fontawesome-free-6.7.2-web/css/fontawesome.min.css" rel="stylesheet">
+    <link href="/fontawesome-free-6.7.2-web/css/all.min.css" rel="stylesheet">
+
+    <script defer src="/fontawesome-free-6.7.2-web/js/fontawesome.min.js"></script>
+    <script defer src="/fontawesome-free-6.7.2-web/js/all.min.js"></script>
+
+    <link href="/client/style.css" rel="stylesheet">
+</head>
+
+<body>
+<header>
+    <div class="header-container">
+        <a class="logo" href="#">HotelFinder</a>
+        <nav class="nav-links">
+            <a href="#">Home</a>
+            <a href="#">Destinations</a>
+            <a href="#">Deals</a>
+            <a href="#">About</a>
+        </nav>
+        <div class="auth-buttons" id="authButtons">
+            <button class="btn btn-outline" id="loginBtn">Login</button>
+            <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+        </div>
+        <div class="user-profile hidden" id="userProfile">
+            <span id="welcomeUser">Welcome, </span>
+            <button class="btn btn-outline" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Left sidebar for filters -->
+    <div class="filter-sidebar">
+        <h2 class="filter-title">Filter Hotels</h2>
+        <div class="filter-group">
+            <h3 class="filter-subtitle">Amenities</h3>
+            <div class="checkbox-container" id="amenitiesFilters">
+                <!-- Service checkboxes will be added here via JavaScript -->
+                <div class="loader" id="amenitiesLoader">
+                    <div class="loader-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content area -->
+    <div class="main-content">
+        <div class="search-container">
+            <input class="search-input" id="hotelSearch" placeholder="Search hotels by name or location..."
+                   type="text">
+            <button class="btn btn-primary" id="searchBtn">Search</button>
+        </div>
+
+        <div class="hotel-cards" id="hotelCards">
+            <div class="loader" id="hotelsLoader">
+                <div class="loader-spinner"></div>
+            </div>
+            <!-- Hotel cards will be added here via JavaScript -->
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- Pagination will be added here via JavaScript -->
+        </div>
+    </div>
+
+    <!-- Right sidebar for reservations -->
+    <div class="reservation-sidebar">
+        <h2 class="reservation-title">Your Reservations</h2>
+        <div id="reservationsContent">
+            <div class="login-message" id="loginMessage">
+                <p>Please login to view your reservations</p>
+                <button class="btn btn-primary" id="sidebarLoginBtn">Login</button>
+            </div>
+            <div class="loader hidden" id="reservationsLoader">
+                <div class="loader-spinner"></div>
+            </div>
+            <div class="reservation-cards hidden" id="reservationCards">
+                <!-- Reservation cards will be added here via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/jquery.js"></script>
+<script src="/client/index.js"></script>
+</body>

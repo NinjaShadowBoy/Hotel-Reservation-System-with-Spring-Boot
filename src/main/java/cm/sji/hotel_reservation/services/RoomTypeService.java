@@ -1,68 +1,69 @@
 package cm.sji.hotel_reservation.services;
 
-import cm.sji.hotel_reservation.entities.Hotel;
+import cm.sji.hotel_reservation.dtos.RoomTypeDTO;
 import cm.sji.hotel_reservation.entities.RoomType;
+import cm.sji.hotel_reservation.repositories.OfferRepo;
+import cm.sji.hotel_reservation.repositories.RoomPhotoRepo;
 import cm.sji.hotel_reservation.repositories.RoomTypeRepo;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class RoomTypeService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final RoomTypeRepo roomTypeRepository;
+    private final RoomTypeRepo roomTypeRepo;
 
-    public RoomType createRoomType(RoomType roomType) {
-        return roomTypeRepository.save(roomType);
+    private final RoomPhotoRepo roomPhotoRepo;
+
+    private final OfferRepo offerRepo;
+
+    @Value("${roomphoto.upload.dir}")
+    private String roomphotoDir;
+
+    public RoomTypeService(RoomTypeRepo roomTypeRepo, RoomPhotoRepo roomPhotoRepo, OfferRepo offerRepo) {
+        this.roomTypeRepo = roomTypeRepo;
+        this.roomPhotoRepo = roomPhotoRepo;
+        this.offerRepo = offerRepo;
     }
 
-    public Optional<RoomType> findById(Integer id) {
-        return roomTypeRepository.findById(id);
+    public List<RoomTypeDTO> getRoomTypes(Integer hotelId) {
+        List<RoomType> roomTypes = roomTypeRepo.findByHotel_Id(hotelId);
+        return roomTypes.stream().map(this::getRoomTypeDTO).collect(Collectors.toList());
     }
 
-    public List<RoomType> findByHotelId(Integer hotelId) {
-        return roomTypeRepository.findByHotelId(hotelId);
-    }
+    private RoomTypeDTO getRoomTypeDTO(RoomType roomType) {
+        // Find the room photo
+        var photo = roomPhotoRepo.findByRoomType(roomType).orElse(null);
 
-    public List<RoomType> findByHotel(Hotel hotel) {
-        return roomTypeRepository.findByHotel(hotel);
-    }
+        // Get the amenities of a room formated correctly.
+        Set<String> amenities = offerRepo.findByRoomType(roomType).stream().map(
+                offer -> offer.getRoomService().getLabel() + ":" +
+                        offer.getRoomService().getFontawsome_icon_class()
+        ).collect(Collectors.toSet());
 
-    public List<RoomType> findAvailableRoomsByHotelId(Integer hotelId) {
-        return roomTypeRepository.findAvailableRoomsByHotelId(hotelId);
-    }
-
-    public List<RoomType> findByPriceLessThanEqual(Double maxPrice) {
-        return roomTypeRepository.findByPriceLessThanEqual(maxPrice);
-    }
-
-    public List<RoomType> findAll() {
-        return roomTypeRepository.findAll();
-    }
-
-    public RoomType updateRoomType(RoomType roomType) {
-        return roomTypeRepository.save(roomType);
-    }
-
-    public void deleteRoomType(Integer id) {
-        roomTypeRepository.deleteById(id);
-    }
-
-    public boolean isRoomAvailable(Integer roomTypeId, int numberOfRooms) {
-        Optional<RoomType> roomTypeOpt = roomTypeRepository.findById(roomTypeId);
-        return roomTypeOpt.filter(roomType -> roomType.getNumberAvailable() >= numberOfRooms).isPresent();
-    }
-
-    public void updateRoomAvailability(Integer roomTypeId, int change) {
-        Optional<RoomType> roomTypeOpt = roomTypeRepository.findById(roomTypeId);
-        if (roomTypeOpt.isPresent()) {
-            RoomType roomType = roomTypeOpt.get();
-            roomType.setNumberAvailable(roomType.getNumberAvailable() + change);
-            roomTypeRepository.save(roomType);
+        // Construct the photo link.
+        String imageUrl;
+        if (photo != null) {
+            imageUrl = "/" + roomphotoDir + "/" + photo.getFilename();
+        }else{
+            imageUrl = "/" + roomphotoDir + "/placeholder.png";
         }
+
+        // Build the dto and return it.
+        return RoomTypeDTO.builder()
+                .id(roomType.getId())
+                .image(imageUrl)
+                .label(roomType.getLabel())
+                .services(amenities)
+                .price(roomType.getPrice())
+                .build();
     }
 }

@@ -1,65 +1,90 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
 import cm.sji.hotel_reservation.entities.Hotel;
-import cm.sji.hotel_reservation.entities.User;
+import cm.sji.hotel_reservation.entities.HotelPhoto;
+import cm.sji.hotel_reservation.entities.RoomType;
+import cm.sji.hotel_reservation.repositories.HotelPhotoRepo;
 import cm.sji.hotel_reservation.repositories.HotelRepo;
-import lombok.RequiredArgsConstructor;
+import cm.sji.hotel_reservation.repositories.OfferRepo;
+import cm.sji.hotel_reservation.repositories.RoomTypeRepo;
+import lombok.AllArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class HotelService {
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final HotelRepo hotelRepository;
-    private final ReviewService reviewService;
+    private final HotelRepo hotelRepo;
 
-    public Hotel createHotel(Hotel hotel) {
-        return hotelRepository.save(hotel);
+    private final OfferRepo offerRepo;
+
+    private final RoomTypeRepo roomTypeRepo;
+
+    private final HotelPhotoRepo hotelPhotoRepo;
+
+    @Value("${hotelphoto.upload.dir}")
+    private String hotelphotoDir;
+
+    @Value("${roomphoto.upload.dir}")
+    private String roomphotoDir;
+
+    public HotelService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, HotelPhotoRepo hotelPhotoRepo) {
+        this.hotelRepo = hotelRepo;
+        this.offerRepo = offerRepo;
+        this.roomTypeRepo = roomTypeRepo;
+        this.hotelPhotoRepo = hotelPhotoRepo;
     }
 
-    public Optional<Hotel> findById(Integer id) {
-        return hotelRepository.findById(id);
+    public List<HotelDetailsDTO> getAllHotels() {
+        return hotelRepo.findAll().stream().map(this::getHotelDTO).toList();
     }
 
-    public List<Hotel> findByOwner(String owner) {
-        return hotelRepository.findByOwner(owner);
-    }
+    private HotelDetailsDTO getHotelDTO(Hotel hotel) {
+        List<RoomType> roomTypes = roomTypeRepo.findByHotel(hotel);
 
-    public List<Hotel> findByName(String name) {
-        return hotelRepository.findByNameContainingIgnoreCase(name);
-    }
+        Set<String> amenities = roomTypes.stream().flatMap(roomType ->
+                offerRepo.findByRoomType(roomType).stream().map(
+                        offer -> offer.getRoomService().getLabel() + ":" +
+                                offer.getRoomService().getFontawsome_icon_class()
+                )
+        ).collect(Collectors.toSet());
 
-    public List<Hotel> findByLocation(String location) {
-        return hotelRepository.findByLocationContainingIgnoreCase(location);
-    }
+        var photo = hotelPhotoRepo.findByHotel(hotel).orElse(null);
 
-    public List<Hotel> findByMinRating(Double minRating) {
-        return hotelRepository.findByRatingGreaterThanEqual(minRating);
-    }
-
-    public List<Hotel> findAll() {
-        return hotelRepository.findAll();
-    }
-
-    public Hotel updateHotel(Hotel hotel) {
-        // Update hotel rating based on reviews
-        Double avgRating = reviewService.getAverageRatingForHotel(hotel.getId());
-        if (avgRating != null) {
-            hotel.setRating(avgRating.floatValue());
+        String imageUrl = null;
+        if (photo != null) {
+            imageUrl = "/" + hotelphotoDir + "/" + photo.getFilename();
+        }else{
+            imageUrl = "/" + hotelphotoDir + "/placeholder.png";
         }
-        return hotelRepository.save(hotel);
+
+        Double lowestPrice = roomTypes.stream()
+                .map(RoomType::getPrice)
+                .min(Double::compare)
+                .orElse(100.0);
+
+        return HotelDetailsDTO.builder()
+                .id(hotel.getId())
+                .name(hotel.getName())
+                .image(imageUrl)
+                .location(hotel.getLocation())
+                .lowestPrice(lowestPrice)
+                .desc(hotel.getDescription())
+                .rating(hotel.getRating())
+                .services(amenities)
+                .build();
     }
 
-    public void deleteHotel(Integer id) {
-        hotelRepository.deleteById(id);
-    }
-
-    public boolean isHotelOwner(Integer hotelId,Integer userId) {
-        return hotelRepository.findById(hotelId)
-                .map(hotel -> hotel.getOwner().getId().equals(userId))
-                .orElse(false);
+    public HotelDetailsDTO getHotel(Integer hotelId) {
+        return getHotelDTO(hotelRepo.findById(hotelId).orElseThrow());
     }
 }

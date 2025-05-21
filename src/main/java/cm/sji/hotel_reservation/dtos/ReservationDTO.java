@@ -12,8 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReservationDTO {
-    String author;
-    LocalDateTime date;
-    String text;
-    Float rating;
+    Integer roomTypeId;
+    Integer clientId;
 }
