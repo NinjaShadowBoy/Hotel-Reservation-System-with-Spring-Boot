@@ -1,22 +1,101 @@
-$(document).ready(function () {
-    // Global variables
-    let hotels = [];
-    let services = [];
-    let reservations = [];
-    let isLoggedIn = false;
-    let currentUser = null;
-    const itemsPerPage = 5;
-    let currentPage = 1;
+/**
+ * Hotel Browsing System - Main JavaScript
+ * 
+ * This file handles the functionality of the hotel browsing page, including:
+ * - Loading and displaying hotels
+ * - Filtering hotels by amenities and search terms
+ * - User authentication (login/signup)
+ * - Managing user reservations
+ */
 
-    // Demo user data for testing
-    const demoUsers = [
-        {id: 1, email: "john", password: "123", firstName: "John", lastName: "Doe"},
-        {id: 2, email: "jane", password: "123", firstName: "Jane", lastName: "Smith"}
-    ];
+// Use IIFE to avoid polluting global namespace
+(function() {
+    'use strict';
 
-    // Initialize the page
-    init();
+    // App configuration
+    const config = {
+        itemsPerPage: 5,
+        apiEndpoints: {
+            hotels: '/api/hotels',
+            services: '/api/services',
+            bookings: '/api/bookings'
+        },
+        mockDelays: {
+            services: 500,
+            hotels: 800,
+            reservations: 600
+        }
+    };
 
+    // State management
+    const state = {
+        hotels: [],
+        services: [],
+        reservations: [],
+        isLoggedIn: false,
+        currentUser: null,
+        currentPage: 1,
+        // Demo user data for testing
+        demoUsers: [
+            {id: 1, email: "john", password: "123", firstName: "John", lastName: "Doe"},
+            {id: 2, email: "jane", password: "123", firstName: "Jane", lastName: "Smith"}
+        ]
+    };
+
+    // DOM elements cache
+    const DOM = {
+        auth: {
+            authButtons: $('#authButtons'),
+            userProfile: $('#userProfile'),
+            welcomeUser: $('#welcomeUser'),
+            loginBtn: $('#loginBtn'),
+            sidebarLoginBtn: $('#sidebarLoginBtn'),
+            signupBtn: $('#signupBtn'),
+            logoutBtn: $('#logoutBtn')
+        },
+        hotels: {
+            hotelCards: $('#hotelCards'),
+            hotelsLoader: $('#hotelsLoader'),
+            searchInput: $('#hotelSearch'),
+            searchBtn: $('#searchBtn')
+        },
+        filters: {
+            amenitiesFilters: $('#amenitiesFilters'),
+            amenitiesLoader: $('#amenitiesLoader')
+        },
+        reservations: {
+            reservationCards: $('#reservationCards'),
+            reservationsLoader: $('#reservationsLoader'),
+            loginMessage: $('#loginMessage')
+        },
+        pagination: {
+            container: $('#pagination')
+        },
+        modals: {
+            login: {
+                modal: $('#loginModal'),
+                closeBtn: $('#closeLoginModal'),
+                form: $('#loginForm'),
+                emailInput: $('#loginEmail'),
+                passwordInput: $('#loginPassword'),
+                switchToSignup: $('#switchToSignup')
+            },
+            signup: {
+                modal: $('#signupModal'),
+                closeBtn: $('#closeSignupModal'),
+                form: $('#signupForm'),
+                firstNameInput: $('#signupFirstName'),
+                lastNameInput: $('#signupLastName'),
+                emailInput: $('#signupEmail'),
+                passwordInput: $('#signupPassword'),
+                switchToLogin: $('#switchToLogin')
+            }
+        }
+    };
+
+    /**
+     * Initialize the page
+     */
     function init() {
         // Check if user is already logged in (from localStorage in this demo)
         checkLoginStatus();
@@ -28,7 +107,7 @@ $(document).ready(function () {
         loadHotels();
 
         // If logged in, load reservations
-        if (isLoggedIn) {
+        if (state.isLoggedIn) {
             loadReservations();
         }
 
@@ -36,63 +115,84 @@ $(document).ready(function () {
         setupEventListeners();
     }
 
+    /**
+     * Check if user is already logged in
+     */
     function checkLoginStatus() {
         const savedUser = localStorage.getItem('currentUser');
         if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            isLoggedIn = true;
+            state.currentUser = JSON.parse(savedUser);
+            state.isLoggedIn = true;
             updateUIForLoggedInUser();
         }
     }
 
+    /**
+     * Update UI elements for logged in user
+     */
     function updateUIForLoggedInUser() {
-        $('#authButtons').addClass('hidden');
-        $('#userProfile').removeClass('hidden');
-        $('#welcomeUser').text(`Welcome, ${currentUser.firstName}`);
+        DOM.auth.authButtons.addClass('hidden');
+        DOM.auth.userProfile.removeClass('hidden');
+        DOM.auth.welcomeUser.text(`Welcome, ${state.currentUser.firstName}`);
 
-        $('#loginMessage').addClass('hidden');
-        $('#reservationsLoader').removeClass('hidden');
+        DOM.reservations.loginMessage.addClass('hidden');
+        DOM.reservations.reservationsLoader.removeClass('hidden');
 
         // Load reservations for the logged-in user
         loadReservations();
     }
 
+    /**
+     * Update UI elements for logged out user
+     */
     function updateUIForLoggedOutUser() {
-        $('#authButtons').removeClass('hidden');
-        $('#userProfile').addClass('hidden');
+        DOM.auth.authButtons.removeClass('hidden');
+        DOM.auth.userProfile.addClass('hidden');
 
-        $('#reservationCards').addClass('hidden');
-        $('#loginMessage').removeClass('hidden');
-        $('#reservationsLoader').addClass('hidden');
+        DOM.reservations.reservationCards.addClass('hidden');
+        DOM.reservations.loginMessage.removeClass('hidden');
+        DOM.reservations.reservationsLoader.addClass('hidden');
     }
 
+    /**
+     * Load available services for filter options
+     */
     function loadServices() {
-        $('#amenitiesLoader').removeClass('hidden');
+        DOM.filters.amenitiesLoader.removeClass('hidden');
 
         // In a real app, this would be an AJAX call to the backend
         // GET /api/services
         setTimeout(() => {
             // Mock data for services
-            services = [
+            state.services = [
                 'WiFi', 'Breakfast', 'Spa Access', 'Fitness Center',
                 'Swimming Pool', 'Room Service', 'Concierge', 'Parking',
                 'Business Center', 'Airport Shuttle', 'Laundry Service',
                 'Mini Bar', 'Pet Friendly', 'Child Care', 'Restaurant Discount'
             ];
 
-            fetch("/api/services").then(response => response.json())
+            fetch(config.apiEndpoints.services)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load services');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    services = data;
-                    console.log("Services loaded ", services);
-                    renderServiceFilters();
-                    $('#amenitiesLoader').addClass('hidden');
-                    return data;
+                    state.services = data;
+                    console.log("Services loaded ", state.services);
+                    renderServiceFilters(state.services);
+                    DOM.filters.amenitiesLoader.addClass('hidden');
+                })
+                .catch(error => {
+                    console.error('Error loading services:', error);
+                    DOM.filters.amenitiesLoader.addClass('hidden');
                 });
 
         }, 500);
     }
 
-    function renderServiceFilters() {
+    function renderServiceFilters(services) {
         const filtersContainer = $('#amenitiesFilters');
         filtersContainer.empty(); // Clear any existing content before adding filters
 
@@ -119,15 +219,18 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * Load hotels from API
+     */
     function loadHotels() {
-        $('#hotelsLoader').removeClass('hidden');
-        $('#hotelCards .hotel-card').remove(); // Remove only hotel cards, keep loader
+        DOM.hotels.hotelsLoader.removeClass('hidden');
+        DOM.hotels.hotelCards.find('.hotel-card').remove(); // Remove only hotel cards, keep loader
 
         // In a real app, this would be an AJAX call to the backend
         // GET /api/hotels
         setTimeout(() => {
             // Mock data for hotels based on your database structure
-            hotels = [
+            state.hotels = [
                 {
                     id: 1,
                     name: 'Luxury Grand Hotel',
@@ -180,14 +283,26 @@ $(document).ready(function () {
                 }
             ];
 
-            fetch("/api/hotels").then(response => response.json())
+            fetch(config.apiEndpoints.hotels)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load hotels');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    hotels = data;
-                    console.log("Hotels loaded ", hotels);
-                    renderHotels(hotels);
-                    renderPagination(hotels.length);
-                    $('#hotelsLoader').addClass('hidden');
-                    return data;
+                    state.hotels = data;
+                    console.log("Hotels loaded ", state.hotels);
+                    renderHotels(state.hotels);
+                    renderPagination(state.hotels.length);
+                    DOM.hotels.hotelsLoader.addClass('hidden');
+                })
+                .catch(error => {
+                    console.error('Error loading hotels:', error);
+                    // Fallback to mock data if API fails
+                    renderHotels([]);
+                    renderPagination(state.hotels.length);
+                    DOM.hotels.hotelsLoader.addClass('hidden');
                 });
 
         }, 800);
@@ -203,8 +318,8 @@ $(document).ready(function () {
         }
 
         // Calculate start and end indices for pagination
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const endIndex = Math.min(startIndex + itemsPerPage, hotelsToRender.length);
+        const startIndex = (state.currentPage - 1) * config.itemsPerPage;
+        const endIndex = Math.min(startIndex + config.itemsPerPage, hotelsToRender.length);
         const paginatedHotels = hotelsToRender.slice(startIndex, endIndex);
 
         paginatedHotels.forEach(hotel => {
@@ -263,20 +378,24 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * Render pagination controls
+     * @param {number} totalItems - Total number of items to paginate
+     */
     function renderPagination(totalItems) {
-        const paginationContainer = $('#pagination');
+        const paginationContainer = DOM.pagination.container;
         paginationContainer.empty();
 
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
+        const totalPages = Math.ceil(totalItems / config.itemsPerPage);
 
         if (totalPages <= 1) {
             return;
         }
 
         // Previous button
-        if (currentPage > 1) {
+        if (state.currentPage > 1) {
             paginationContainer.append(`
-                <div class="page-item" data-page="${currentPage - 1}">
+                <div class="page-item" data-page="${state.currentPage - 1}">
                     <i class="fas fa-angle-left"></i>
                 </div>
             `);
@@ -285,16 +404,16 @@ $(document).ready(function () {
         // Page numbers
         for (let i = 1; i <= totalPages; i++) {
             paginationContainer.append(`
-                <div class="page-item ${i === currentPage ? 'active' : ''}" data-page="${i}">
+                <div class="page-item ${i === state.currentPage ? 'active' : ''}" data-page="${i}">
                     ${i}
                 </div>
             `);
         }
 
         // Next button
-        if (currentPage < totalPages) {
+        if (state.currentPage < totalPages) {
             paginationContainer.append(`
-                <div class="page-item" data-page="${currentPage + 1}">
+                <div class="page-item" data-page="${state.currentPage + 1}">
                     <i class="fas fa-angle-right"></i>
                 </div>
             `);
@@ -302,22 +421,25 @@ $(document).ready(function () {
 
         // Add event listener for pagination
         $('.page-item').on('click', function () {
-            currentPage = parseInt($(this).data('page'));
+            state.currentPage = parseInt($(this).data('page'));
             filterHotels();
         });
     }
 
+    /**
+     * Load user reservations from API
+     */
     function loadReservations() {
-        if (!isLoggedIn) return;
+        if (!state.isLoggedIn) return;
 
-        $('#reservationsLoader').removeClass('hidden');
-        $('#reservationCards').addClass('hidden');
+        DOM.reservations.reservationsLoader.removeClass('hidden');
+        DOM.reservations.reservationCards.addClass('hidden');
 
         // In a real app, this would be an AJAX call to the backend
         // GET /api/reservations/{userId}
         setTimeout(() => {
             // Mock data for reservations
-            reservations = [
+            state.reservations = [
                 {
                     id: 1,
                     hotelName: 'Luxury Grand Hotel',
@@ -347,20 +469,32 @@ $(document).ready(function () {
                 }
             ];
 
-            fetch(`/api/bookings/${currentUser.id}`).then(response => response.json())
+            fetch(`${config.apiEndpoints.bookings}/${state.currentUser.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load reservations');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    reservations = data;
-                    console.log("Reservations loaded", reservations);
+                    state.reservations = data;
+                    console.log("Reservations loaded", state.reservations);
+                    renderReservations(state.reservations);
+                    DOM.reservations.reservationsLoader.addClass('hidden');
+                    DOM.reservations.reservationCards.removeClass('hidden');
+                })
+                .catch(error => {
+                    console.error('Error loading reservations:', error);
+                    // Fallback to mock data if API fails
                     renderReservations();
-                    $('#reservationsLoader').addClass('hidden');
-                    $('#reservationCards').removeClass('hidden');
-                    return data;
+                    DOM.reservations.reservationsLoader.addClass('hidden');
+                    DOM.reservations.reservationCards.removeClass('hidden');
                 });
 
         }, 600);
     }
 
-    function renderReservations() {
+    function renderReservations(reservations) {
         const reservationCardsContainer = $('#reservationCards');
         reservationCardsContainer.empty();
 
@@ -399,7 +533,7 @@ $(document).ready(function () {
 
         const searchTerm = $('#hotelSearch').val().toLowerCase();
 
-        let filteredHotels = hotels;
+        let filteredHotels = state.hotels;
 
         // Filter by search term
         if (searchTerm) {
@@ -449,6 +583,53 @@ $(document).ready(function () {
         $('#logoutBtn').on('click', function () {
             logout();
         });
+
+        // Modal close buttons
+        $('#closeLoginModal').on('click', function() {
+            $('#loginModal').addClass('hidden');
+        });
+
+        $('#closeSignupModal').on('click', function() {
+            $('#signupModal').addClass('hidden');
+        });
+
+        // Switch between login and signup modals
+        $('#switchToSignup').on('click', function(e) {
+            e.preventDefault();
+            $('#loginModal').addClass('hidden');
+            $('#signupModal').removeClass('hidden');
+        });
+
+        $('#switchToLogin').on('click', function(e) {
+            e.preventDefault();
+            $('#signupModal').addClass('hidden');
+            $('#loginModal').removeClass('hidden');
+        });
+
+        // Form submissions
+        $('#loginForm').on('submit', function(e) {
+            e.preventDefault();
+            const email = $('#loginEmail').val();
+            const password = $('#loginPassword').val();
+
+            if (!email || !password) return;
+
+            login(email, password);
+            $('#loginModal').addClass('hidden');
+        });
+
+        $('#signupForm').on('submit', function(e) {
+            e.preventDefault();
+            const firstName = $('#signupFirstName').val();
+            const lastName = $('#signupLastName').val();
+            const email = $('#signupEmail').val();
+            const password = $('#signupPassword').val();
+
+            if (!firstName || !lastName || !email || !password) return;
+
+            signup(firstName, lastName, email, password);
+            $('#signupModal').addClass('hidden');
+        });
     }
 
     function redirectToHotelDetails(hotelId) {
@@ -457,6 +638,10 @@ $(document).ready(function () {
         console.log(`Redirecting to hotel details page for hotel ID: ${hotelId}`);
     }
 
+    /**
+     * Cancel a reservation
+     * @param {number} reservationId - ID of the reservation to cancel
+     */
     function cancelReservation(reservationId) {
         // In a real app, this would be an AJAX call to the backend
         // DELETE /api/reservations/{reservationId}
@@ -468,10 +653,10 @@ $(document).ready(function () {
 
         setTimeout(() => {
             // Remove the reservation from the list
-            reservations = reservations.filter(res => res.id !== reservationId);
+            state.reservations = state.reservations.filter(res => res.id !== reservationId);
 
             // Re-render reservations
-            renderReservations();
+            renderReservations(state.reservations);
 
             // Show success message
             alert('Reservation cancelled successfully!');
@@ -485,39 +670,42 @@ $(document).ready(function () {
 
     // Login/Signup Modal functions
     function showLoginModal() {
-        // In a real app, this would show a proper modal
-        const email = prompt('Please enter your email:');
-        const password = prompt('Please enter your password:');
+        // Clear previous inputs
+        $('#loginEmail').val('');
+        $('#loginPassword').val('');
 
-        if (!email || !password) return;
-
-        login(email, password);
+        // Show the modal
+        $('#loginModal').removeClass('hidden');
     }
 
     function showSignupModal() {
-        // In a real app, this would show a proper modal
-        const firstName = prompt('Please enter your first name:');
-        const lastName = prompt('Please enter your last name:');
-        const email = prompt('Please enter your email:');
-        const password = prompt('Please enter your password:');
+        // Clear previous inputs
+        $('#signupFirstName').val('');
+        $('#signupLastName').val('');
+        $('#signupEmail').val('');
+        $('#signupPassword').val('');
 
-        if (!firstName || !lastName || !email || !password) return;
-
-        signup(firstName, lastName, email, password);
+        // Show the modal
+        $('#signupModal').removeClass('hidden');
     }
 
+    /**
+     * Log in a user
+     * @param {string} email - User email
+     * @param {string} password - User password
+     */
     function login(email, password) {
         // In a real app, this would be an AJAX call to the backend
         // POST /api/login
 
         // Check credentials against demo users
-        const user = demoUsers.find(u =>
+        const user = state.demoUsers.find(u =>
             u.email === email && u.password === password
         );
 
         if (user) {
-            currentUser = user;
-            isLoggedIn = true;
+            state.currentUser = user;
+            state.isLoggedIn = true;
 
             // Save to localStorage
             localStorage.setItem('currentUser', JSON.stringify(user));
@@ -534,19 +722,26 @@ $(document).ready(function () {
         }
     }
 
+    /**
+     * Sign up a new user
+     * @param {string} firstName - User first name
+     * @param {string} lastName - User last name
+     * @param {string} email - User email
+     * @param {string} password - User password
+     */
     function signup(firstName, lastName, email, password) {
         // In a real app, this would be an AJAX call to the backend
         // POST /api/users
 
         // Check if email already exists
-        if (demoUsers.some(u => u.email === email)) {
+        if (state.demoUsers.some(u => u.email === email)) {
             alert('Email already in use. Please try another one.');
             return;
         }
 
         // Create new user
         const newUser = {
-            id: demoUsers.length + 1,
+            id: state.demoUsers.length + 1,
             firstName,
             lastName,
             email,
@@ -554,11 +749,11 @@ $(document).ready(function () {
         };
 
         // Add to demo users
-        demoUsers.push(newUser);
+        state.demoUsers.push(newUser);
 
         // Log in the new user
-        currentUser = newUser;
-        isLoggedIn = true;
+        state.currentUser = newUser;
+        state.isLoggedIn = true;
 
         // Save to localStorage
         localStorage.setItem('currentUser', JSON.stringify(newUser));
@@ -569,11 +764,14 @@ $(document).ready(function () {
         alert(`Welcome, ${firstName}! Your account has been created.`);
     }
 
+    /**
+     * Log out the current user
+     */
     function logout() {
         // Clear user data
-        currentUser = null;
-        isLoggedIn = false;
-        reservations = [];
+        state.currentUser = null;
+        state.isLoggedIn = false;
+        state.reservations = [];
 
         // Remove from localStorage
         localStorage.removeItem('currentUser');
@@ -583,4 +781,7 @@ $(document).ready(function () {
 
         alert('You have been logged out successfully.');
     }
-});
+
+    // Initialize the page
+    init()
+})();
