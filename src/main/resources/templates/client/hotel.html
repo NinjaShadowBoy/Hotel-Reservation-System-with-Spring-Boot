@@ -157,9 +157,114 @@
         </div>
 
         <form id="paymentForm">
+            <div class="form-group">
+                <label class="form-label" for="checkinDatetime">Check-in Date and Time</label>
+                <input 
+                    class="form-input" 
+                    id="checkinDatetime" 
+                    type="datetime-local" 
+                    required
+                    aria-required="true"
+                >
+                <small class="form-hint">Check-in date must be within 1 month from today</small>
+            </div>
             <div id="cardElement" aria-label="Credit card input"></div>
             <button class="btn btn-primary" type="submit">Pay Now</button>
         </form>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal hidden" id="loginModal" role="dialog" aria-labelledby="login-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeLoginModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="login-modal-title">Login to Your Account</h3>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="loginEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="loginPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <p class="modal-footer-text">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal hidden" id="signupModal" role="dialog" aria-labelledby="signup-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeSignupModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="signup-modal-title">Create an Account</h3>
+        <form id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="signupFirstName">First Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupFirstName" 
+                    type="text" 
+                    placeholder="Enter your first name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupLastName">Last Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupLastName" 
+                    type="text" 
+                    placeholder="Enter your last name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="signupEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="signupPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Sign Up</button>
+        </form>
+        <p class="modal-footer-text">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
     </div>
 </div>
 

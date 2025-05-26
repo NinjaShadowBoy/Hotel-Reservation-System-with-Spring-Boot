@@ -1,6 +1,6 @@
 /**
  * Hotel Details Page JavaScript
- * 
+ *
  * This file handles the functionality of the hotel details page, including:
  * - Loading and displaying hotel information
  * - Displaying room types, reviews, and FAQs
@@ -9,7 +9,7 @@
  */
 
 // Use IIFE to avoid polluting global namespace
-(function() {
+(function () {
     'use strict';
 
     // App configuration
@@ -51,15 +51,31 @@
         forms: {
             review: $('#reviewForm'),
             faq: $('#faqForm'),
-            payment: $('#paymentForm')
+            payment: $('#paymentForm'),
+            login: $('#loginForm'),
+            signup: $('#signupForm')
         },
         modals: {
             payment: $('#paymentModal'),
-            closePayment: $('#closePaymentModal')
+            closePayment: $('#closePaymentModal'),
+            login: $('#loginModal'),
+            closeLogin: $('#closeLoginModal'),
+            signup: $('#signupModal'),
+            closeSignup: $('#closeSignupModal')
         },
         buttons: {
             leaveReview: $('#leaveReview'),
-            writeFAQ: $('#writeFAQ')
+            writeFAQ: $('#writeFAQ'),
+            login: $('#loginBtn'),
+            signup: $('#signupBtn'),
+            logout: $('#logoutBtn'),
+            switchToSignup: $('#switchToSignup'),
+            switchToLogin: $('#switchToLogin')
+        },
+        auth: {
+            authButtons: $('#authButtons'),
+            userProfile: $('#userProfile'),
+            welcomeUser: $('#welcomeUser')
         }
     };
 
@@ -91,9 +107,32 @@
         if (savedUser) {
             state.currentUser = JSON.parse(savedUser);
             state.isLoggedIn = true;
+            updateUIForLoggedInUser();
         } else {
-            state.isLoggedIn = true; // Default to true for now (should be properly implemented)
+            state.isLoggedIn = false;
+            updateUIForLoggedOutUser();
         }
+    }
+
+    /**
+     * Update UI for logged in user
+     */
+    function updateUIForLoggedInUser() {
+        DOM.auth.authButtons.addClass('hidden');
+        DOM.auth.userProfile.removeClass('hidden');
+        DOM.auth.welcomeUser.text(`Welcome, ${state.currentUser.firstName}`);
+        DOM.forms.review.removeClass('hidden');
+        DOM.forms.faq.removeClass('hidden');
+        DOM.buttons.leaveReview.removeClass('hidden');
+        DOM.buttons.writeFAQ.removeClass('hidden');
+    }
+
+    /**
+     * Update UI for logged out user
+     */
+    function updateUIForLoggedOutUser() {
+        DOM.auth.authButtons.removeClass('hidden');
+        DOM.auth.userProfile.addClass('hidden');
     }
 
     /**
@@ -135,6 +174,66 @@
 
         // FAQ form submission
         DOM.forms.faq.submit(handleFAQSubmission);
+
+        // Login button click
+        DOM.buttons.login.on('click', function () {
+            showLoginModal();
+        });
+
+        // Signup button click
+        DOM.buttons.signup.on('click', function () {
+            showSignupModal();
+        });
+
+        // Logout button click
+        DOM.buttons.logout.on('click', function () {
+            logout();
+        });
+
+        // Login modal close
+        DOM.modals.closeLogin.on('click', function () {
+            DOM.modals.login.addClass('hidden');
+        });
+
+        // Signup modal close
+        DOM.modals.closeSignup.on('click', function () {
+            DOM.modals.signup.addClass('hidden');
+        });
+
+        // Switch between login and signup modals
+        DOM.buttons.switchToSignup.on('click', function (e) {
+            e.preventDefault();
+            DOM.modals.login.addClass('hidden');
+            DOM.modals.signup.removeClass('hidden');
+        });
+
+        DOM.buttons.switchToLogin.on('click', function (e) {
+            e.preventDefault();
+            DOM.modals.signup.addClass('hidden');
+            DOM.modals.login.removeClass('hidden');
+        });
+
+        // Login form submission
+        DOM.forms.login.on('submit', function (e) {
+            e.preventDefault();
+            const email = $('#loginEmail').val();
+            const password = $('#loginPassword').val();
+
+            login(email, password);
+            DOM.modals.login.addClass('hidden');
+        });
+
+        // Signup form submission
+        DOM.forms.signup.on('submit', function (e) {
+            e.preventDefault();
+            const firstName = $('#signupFirstName').val();
+            const lastName = $('#signupLastName').val();
+            const email = $('#signupEmail').val();
+            const password = $('#signupPassword').val();
+
+            signup(firstName, lastName, email, password);
+            DOM.modals.signup.addClass('hidden');
+        });
     }
 
     /**
@@ -146,13 +245,13 @@
         const $ratingStars = $('#reviewForm .rating-stars');
 
         // Hover effect
-        $ratingStars.on('mouseover', 'svg', function() {
-            const rating = $ratingStars.find('svg').index(this) + 1;
+        $ratingStars.on('mouseover', 'i', function () {
+            const rating = $ratingStars.find('i').index(this) + 1;
             highlightStars(rating);
         });
 
         // Click to select
-        $ratingStars.on('click', 'svg', function() {
+        $ratingStars.on('click', 'i', function () {
             const $star = $(this);
             state.currentRating = $star.index() + 1;
             setRating(state.currentRating);
@@ -160,7 +259,7 @@
         });
 
         // Reset on mouse leave
-        $ratingStars.on('mouseleave', function() {
+        $ratingStars.on('mouseleave', function () {
             if (state.currentRating > 0) {
                 setRating(state.currentRating);
             } else {
@@ -174,8 +273,8 @@
      * @param {number} rating - Rating value (1-5)
      */
     function highlightStars(rating) {
-        $('#reviewForm .rating-stars svg').removeClass('active preview');
-        $('#reviewForm .rating-stars svg').slice(0, rating).addClass('preview');
+        $('#reviewForm .rating-stars i').removeClass('active preview');
+        $('#reviewForm .rating-stars i').slice(0, rating).addClass('preview');
     }
 
     /**
@@ -183,15 +282,15 @@
      * @param {number} rating - Rating value (1-5)
      */
     function setRating(rating) {
-        $('#reviewForm .rating-stars svg').removeClass('active preview');
-        $('#reviewForm .rating-stars svg').slice(0, rating).addClass('active');
+        $('#reviewForm .rating-stars i').removeClass('active preview');
+        $('#reviewForm .rating-stars i').slice(0, rating).addClass('active');
     }
 
     /**
      * Clear star highlighting
      */
     function clearHighlight() {
-        $('#reviewForm .rating-stars svg').removeClass('active preview');
+        $('#reviewForm .rating-stars i').removeClass('active preview');
     }
 
     /**
@@ -218,11 +317,11 @@
      * Handle booking button click
      */
     function handleBookingClick() {
-        // Check login status (commented out for now)
-        // if (!state.isLoggedIn) {
-        //     showLoginModal();
-        //     return;
-        // }
+        // Check login status
+        if (!state.isLoggedIn) {
+            showLoginModal();
+            return;
+        }
 
         const roomId = $(this).data('room-id');
         state.selectedRoomType = roomId;
@@ -237,6 +336,19 @@
         $('#roomInfoType').text(roomType);
         $('#roomInfoPrice').text(roomPrice);
         $('#roomInfoServices').html(roomServices);
+
+        // Set min and max dates for check-in datetime
+        const today = new Date();
+        const oneMonthLater = new Date();
+        oneMonthLater.setMonth(today.getMonth() + 1);
+
+        // Format dates for datetime-local input
+        const todayStr = today.toISOString().slice(0, 16);
+        const oneMonthLaterStr = oneMonthLater.toISOString().slice(0, 16);
+
+        $('#checkinDatetime').attr('min', todayStr);
+        $('#checkinDatetime').attr('max', oneMonthLaterStr);
+        $('#checkinDatetime').val(todayStr);
 
         // Show the modal
         DOM.modals.payment.removeClass('hidden');
@@ -253,12 +365,44 @@
     async function handlePaymentSubmission(e) {
         e.preventDefault();
 
+        // Disable submit button to prevent double submissions
+        $('#submit').prop('disabled', true);
+
         if (!state.stripe || !state.cardElement) {
             showError('Payment processing is not available');
+            $('#submit').prop('disabled', false);
+            return;
+        }
+
+        // Validate check-in datetime
+        const checkinDatetime = $('#checkinDatetime').val();
+        if (!checkinDatetime) {
+            showError('Please select a check-in date and time');
+            $('#submit').prop('disabled', false);
+            return;
+        }
+
+        const checkinDate = new Date(checkinDatetime);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+
+        const oneMonthLater = new Date();
+        oneMonthLater.setMonth(today.getMonth() + 1);
+
+        if (checkinDate < today) {
+            showError('Check-in date cannot be in the past');
+            $('#submit').prop('disabled', false);
+            return;
+        }
+
+        if (checkinDate > oneMonthLater) {
+            showError('Check-in date cannot be more than 1 month ahead');
+            $('#submit').prop('disabled', false);
             return;
         }
 
         try {
+            // Create payment method
             const {error, paymentMethod} = await state.stripe.createPaymentMethod({
                 type: 'card',
                 card: state.cardElement
@@ -266,30 +410,76 @@
 
             if (error) {
                 showError(error.message);
+                $('#submit').prop('disabled', false);
                 return;
             }
 
-            // Process reservation
-            $.ajax({
-                url: `${config.apiEndpoints.reservation}/${state.currentUser.id}`,
-                type: 'POST',
-                data: {
+            // Create PaymentIntent on backend
+            const response = await $.ajax({
+                url: '/create-payment-intent',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
                     roomTypeId: state.selectedRoomType,
-                    clientId: state.currentUser.id
-                },
-                success: () => {
-                    showSuccess('Booking successful!');
-                    DOM.modals.payment.addClass('hidden');
-                },
-                error: (xhr) => {
-                    showError('Failed to complete booking. Please try again.');
-                    console.error('Booking error:', xhr.responseText);
+                    clientId: state.currentUser.id,
+                    checkinDatetime: checkinDatetime,
+                })
+            });
+
+            const clientSecret = response.clientSecret;
+            console.log(`Client secret: ${clientSecret}`);
+
+            // Confirm the payment
+            const paymentResult = await state.stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: state.cardElement,
+                    billing_details: {
+                        name: 'Customer Name' // Consider getting this from a form field
+                    }
                 }
             });
+
+            if (paymentResult.error) {
+                showError(paymentResult.error.message);
+                $('#submit').prop('disabled', false);
+                return;
+            }
+
+            if (paymentResult.paymentIntent.status === 'succeeded') {
+                // Payment successful, now create the reservation
+                try {
+                    // await $.ajax({
+                    //     url: `${config.apiEndpoints.reservation}/${state.currentUser.id}`,
+                    //     type: 'POST',
+                    //     contentType: 'application/json',
+                    //     data: JSON.stringify({
+                    //         roomTypeId: state.selectedRoomType,
+                    //         clientId: state.currentUser.id,
+                    //         checkinDatetime: checkinDatetime,
+                    //         paymentIntentId: paymentResult.paymentIntent.id
+                    //     })
+                    // });
+
+                    showSuccess('Booking successful!');
+                    DOM.modals.payment.addClass('hidden');
+
+                    // Optional: Reset form or redirect
+                    // resetBookingForm();
+
+                } catch (reservationError) {
+                    // Payment succeeded but reservation failed
+                    // You may want to implement a refund mechanism here
+                    showError('Payment processed but booking failed. Please contact support.');
+                    console.error('Reservation error:', reservationError.responseText || reservationError);
+                }
+            }
+
         } catch (err) {
-            showError('Payment processing failed');
+            showError('Payment processing failed. Please try again.');
             console.error('Payment error:', err);
+            $('#submit').prop('disabled', false);
         }
+
     }
 
     /**
@@ -583,6 +773,90 @@
      */
     function showSuccess(message) {
         alert(message); // Replace with a better UI notification in production
+    }
+
+    /**
+     * Show login modal
+     */
+    function showLoginModal() {
+        $('#loginEmail').val('');
+        $('#loginPassword').val('');
+
+        DOM.modals.login.removeClass('hidden');
+    }
+
+    /**
+     * Show signup modal
+     */
+    function showSignupModal() {
+        $('#signupFirstName').val('');
+        $('#signupLastName').val('');
+        $('#signupEmail').val('');
+        $('#signupPassword').val('');
+
+        DOM.modals.signup.removeClass('hidden');
+    }
+
+    /**
+     * Login user
+     * @param {string} email - User email
+     * @param {string} password - User password
+     */
+    function login(email, password) {
+        // In a real application, this would make an API call to authenticate the user
+        // For now, we'll simulate a successful login
+
+        const user = {
+            id: 1,
+            firstName: 'John',
+            lastName: 'Doe',
+            email: email
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        state.currentUser = user;
+        state.isLoggedIn = true;
+
+        updateUIForLoggedInUser();
+        showSuccess('Login successful!');
+    }
+
+    /**
+     * Signup user
+     * @param {string} firstName - User first name
+     * @param {string} lastName - User last name
+     * @param {string} email - User email
+     * @param {string} password - User password
+     */
+    function signup(firstName, lastName, email, password) {
+        // In a real application, this would make an API call to register the user
+        // For now, we'll simulate a successful signup
+
+        const user = {
+            id: 1,
+            firstName: firstName,
+            lastName: lastName,
+            email: email
+        };
+
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        state.currentUser = user;
+        state.isLoggedIn = true;
+
+        updateUIForLoggedInUser();
+        showSuccess('Signup successful!');
+    }
+
+    /**
+     * Logout user
+     */
+    function logout() {
+        localStorage.removeItem('currentUser');
+        state.currentUser = null;
+        state.isLoggedIn = false;
+
+        updateUIForLoggedOutUser();
+        showSuccess('Logout successful!');
     }
 
     // Initialize when document is ready

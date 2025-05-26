@@ -670,7 +670,7 @@ header:hover {
     transform: translateX(4px);
 }
 
-.hotel-location svg {
+.hotel-location i {
     color: var(--luxury-gold);
     filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.3));
 }
@@ -1555,7 +1555,7 @@ header:hover {
     padding: 0.5rem 0;
 }
 
-.rating-stars svg {
+.rating-stars i {
     font-size: 1.5rem;
     color: rgba(255, 255, 255, 0.3);
     cursor: pointer;
@@ -1564,36 +1564,36 @@ header:hover {
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
-.rating-stars svg:hover {
+.rating-stars i:hover {
     transform: scale(1.15);
     color: var(--luxury-gold);
     filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
 }
 
-.rating-stars svg.active {
+.rating-stars i.active {
     color: var(--rich-gold);
     transform: scale(1.1);
     filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.6));
     text-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
 }
 
-.rating-stars svg.active:hover {
+.rating-stars i.active:hover {
     transform: scale(1.2);
     color: var(--luxury-gold);
 }
 
 /* Hover effect for rating preview */
-.rating-stars:hover svg {
+.rating-stars:hover i {
     color: rgba(255, 255, 255, 0.2);
 }
 
-.rating-stars svg:hover,
-.rating-stars svg:hover ~ svg {
+.rating-stars i:hover,
+.rating-stars i:hover ~ i {
     color: rgba(255, 255, 255, 0.2);
 }
 
-.rating-stars svg:hover,
-.rating-stars svg.preview {
+.rating-stars i:hover,
+.rating-stars i.preview {
     color: var(--soft-gold);
     transform: scale(1.1);
     filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
@@ -1606,7 +1606,7 @@ header:hover {
     100% { transform: scale(1.1); }
 }
 
-.rating-stars svg.selected {
+.rating-stars i.preview {
     animation: starPulse 0.3s ease-in-out;
 }
 

@@ -14,4 +14,5 @@ import java.time.LocalDateTime;
 public class ReservationDTO {
     Integer roomTypeId;
     Integer clientId;
+    LocalDateTime checkinDatetime;
 }
