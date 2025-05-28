@@ -499,10 +499,11 @@
         $.ajax({
             url: `${config.apiEndpoints.reviews}/${state.hotelId}/${state.currentUser.id}`,
             type: 'POST',
-            data: {
+            contentType: 'application/json',
+            data: JSON.stringify({
                 text: reviewText,
                 rating: state.currentRating
-            },
+            }),
             success: () => {
                 showSuccess('Review submitted!');
                 DOM.forms.review.find('textarea').val('');
@@ -534,9 +535,10 @@
         $.ajax({
             url: `${config.apiEndpoints.faq}/${state.hotelId}/${state.currentUser.id}`,
             type: 'POST',
-            data: {
+            contentType: 'application/json',
+            data: JSON.stringify({
                 question: question
-            },
+            }),
             success: () => {
                 showSuccess('Question submitted!');
                 DOM.forms.faq.find('input').val('');
@@ -803,22 +805,33 @@
      * @param {string} password - User password
      */
     function login(email, password) {
-        // In a real application, this would make an API call to authenticate the user
-        // For now, we'll simulate a successful login
+        // Make an API call to authenticate the user
 
-        const user = {
-            id: 1,
-            firstName: 'John',
-            lastName: 'Doe',
-            email: email
-        };
+        $.ajax({
+            url: `/api/login`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({username: email, password: password}),
+            success: (user) => {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                state.currentUser = user;
+                state.isLoggedIn = true;
 
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        state.currentUser = user;
-        state.isLoggedIn = true;
+                updateUIForLoggedInUser();
+                showSuccess('Login successful!');
+            },
+            error: (xhr, status, error) => {
+                if (xhr.status === 500) {
+                    console.error("Server Error:", xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 400) {
+                    showError('Wrong credentials. Please try again');
+                    console.error("Unhandled Error:", xhr.status, xhr.responseText);
+                }
 
-        updateUIForLoggedInUser();
-        showSuccess('Login successful!');
+                showError('Failed to submit review. Please try again.');
+                console.error('Review submission error:', xhr.responseText);
+            }
+        });
     }
 
     /**
@@ -832,19 +845,35 @@
         // In a real application, this would make an API call to register the user
         // For now, we'll simulate a successful signup
 
-        const user = {
-            id: 1,
-            firstName: firstName,
-            lastName: lastName,
-            email: email
-        };
+        $.ajax({
+            url: `/api/register`,
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password
+            }),
+            success: (user) => {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                state.currentUser = user;
+                state.isLoggedIn = true;
 
-        localStorage.setItem('currentUser', JSON.stringify(user));
-        state.currentUser = user;
-        state.isLoggedIn = true;
+                updateUIForLoggedInUser();
+                showSuccess('SignUp & Login successful!');
+            },
+            error: (xhr, status, error) => {
+                if (xhr.status === 500) {
+                    console.error("Server Error:", xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 400) {
+                    console.error("Unhandled Error:", xhr.status, xhr.responseText);
+                }
 
-        updateUIForLoggedInUser();
-        showSuccess('Signup successful!');
+                showError('Error creating your account. Please try again');
+            }
+        });
     }
 
     /**

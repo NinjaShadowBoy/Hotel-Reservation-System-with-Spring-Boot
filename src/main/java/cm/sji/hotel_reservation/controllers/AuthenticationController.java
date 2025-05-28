@@ -45,22 +45,13 @@ public class AuthenticationController {
             logger.info("Attempting to authenticate user: {}, {}", usernameOrEmail,
                     SecurityContextHolder.getContext().getAuthentication());
 
-            AuthenticationResponse authResponse = authenticationService.authenticate(request);
+            AuthenticationResponse authResponse = authenticationService.authenticate(request, response);
             User user = authResponse.getUser();
             logger.info("Authentication successful for user: {}", user.getUsername());
 
             redirectAttributes.addFlashAttribute("token", authResponse.getToken());
             redirectAttributes.addFlashAttribute("user", user);
             model.addAttribute("user", user);
-
-            // Set the token in HttpOnly cookie
-            Cookie cookie = new Cookie("JWT", authResponse.getToken());
-            cookie.setHttpOnly(true);
-            cookie.setPath("/");
-            cookie.setMaxAge(30 * 60); // Cookie expires in 30 minutes
-
-            response.addCookie(cookie);
-            response.addHeader("Authorization", "Bearer " + authResponse.getToken());
 
             logger.info("JWT Token set for user: {}", user.getUsername());
 

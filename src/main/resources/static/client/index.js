@@ -439,58 +439,55 @@
         // GET /api/reservations/{userId}
         setTimeout(() => {
             // Mock data for reservations
-            state.reservations = [
-                {
-                    id: 1,
-                    hotelName: 'Luxury Grand Hotel',
-                    roomType: 'Executive Suite',
-                    price: 450,
-                    date: '2025-05-10',
-                    checkinDate: '2025-06-15',
-                    cancelable: true
-                },
-                {
-                    id: 2,
-                    hotelName: 'Seaside Resort & Spa',
-                    roomType: 'Beach Front Suite',
-                    price: 500,
-                    date: '2025-04-25',
-                    checkinDate: '2025-07-03',
-                    cancelable: true
-                },
-                {
-                    id: 3,
-                    hotelName: 'Mountain Retreat Lodge',
-                    roomType: 'Premium Lodge',
-                    price: 650,
-                    date: '2025-03-10',
-                    checkinDate: '2025-05-20',
-                    cancelable: false
-                }
-            ];
+            // state.reservations = [
+            //     {
+            //         id: 1,
+            //         hotelName: 'Luxury Grand Hotel',
+            //         roomType: 'Executive Suite',
+            //         price: 450,
+            //         date: '2025-05-10',
+            //         checkinDate: '2025-06-15',
+            //         cancelable: true
+            //     },
+            //     {
+            //         id: 2,
+            //         hotelName: 'Seaside Resort & Spa',
+            //         roomType: 'Beach Front Suite',
+            //         price: 500,
+            //         date: '2025-04-25',
+            //         checkinDate: '2025-07-03',
+            //         cancelable: true
+            //     },
+            //     {
+            //         id: 3,
+            //         hotelName: 'Mountain Retreat Lodge',
+            //         roomType: 'Premium Lodge',
+            //         price: 650,
+            //         date: '2025-03-10',
+            //         checkinDate: '2025-05-20',
+            //         cancelable: false
+            //     }
+            // ];
 
-            fetch(`${config.apiEndpoints.bookings}/${state.currentUser.id}`)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to load reservations');
-                    }
-                    return response.json();
-                })
-                .then(data => {
+            $.ajax({
+                url: `${config.apiEndpoints.bookings}/${state.currentUser.id}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function(data) {
                     state.reservations = data;
                     console.log("Reservations loaded", state.reservations);
                     renderReservations(state.reservations);
                     DOM.reservations.reservationsLoader.addClass('hidden');
                     DOM.reservations.reservationCards.removeClass('hidden');
-                })
-                .catch(error => {
-                    console.error('Error loading reservations:', error);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Error loading reservations:', textStatus, errorThrown);
                     // Fallback to mock data if API fails
                     renderReservations();
                     DOM.reservations.reservationsLoader.addClass('hidden');
                     DOM.reservations.reservationCards.removeClass('hidden');
-                });
-
+                }
+            });
         }, 600);
     }
 
@@ -695,31 +692,34 @@
      * @param {string} password - User password
      */
     function login(email, password) {
-        // In a real app, this would be an AJAX call to the backend
-        // POST /api/login
+        // Make an API call to authenticate the user
 
-        // Check credentials against demo users
-        const user = state.demoUsers.find(u =>
-            u.email === email && u.password === password
-        );
+        $.ajax({
+            url: `/api/login`,
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({username: email, password: password}),
+            success: (user) => {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                state.currentUser = user;
+                state.isLoggedIn = true;
 
-        if (user) {
-            state.currentUser = user;
-            state.isLoggedIn = true;
+                updateUIForLoggedInUser();
+                alert('Login successful!');
+            },
+            error: (xhr, status, error) => {
+                if (xhr.status === 500) {
+                    console.error("Server Error:", xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 400) {
+                    alert('Wrong credentials. Please try again');
+                    console.error("Unhandled Error:", xhr.status, xhr.responseText);
+                }
 
-            // Save to localStorage
-            localStorage.setItem('currentUser', JSON.stringify(user));
-
-            // Update UI
-            updateUIForLoggedInUser();
-
-            // Load reservations
-            loadReservations();
-
-            alert(`Welcome back, ${user.firstName}!`);
-        } else {
-            alert('Invalid credentials. Please try again.');
-        }
+                alert('Failed to submit review. Please try again.');
+                console.error('Review submission error:', xhr.responseText);
+            }
+        });
     }
 
     /**
@@ -730,39 +730,40 @@
      * @param {string} password - User password
      */
     function signup(firstName, lastName, email, password) {
-        // In a real app, this would be an AJAX call to the backend
-        // POST /api/users
+        // In a real application, this would make an API call to register the user
+        // For now, we'll simulate a successful signup
 
-        // Check if email already exists
-        if (state.demoUsers.some(u => u.email === email)) {
-            alert('Email already in use. Please try another one.');
-            return;
-        }
+        $.ajax({
+            url: `/api/register`,
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: password
+            }),
+            success: (user) => {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                state.currentUser = user;
+                state.isLoggedIn = true;
 
-        // Create new user
-        const newUser = {
-            id: state.demoUsers.length + 1,
-            firstName,
-            lastName,
-            email,
-            password
-        };
+                updateUIForLoggedInUser();
+                alert('SignUp & Login successful!');
+            },
+            error: (xhr, status, error) => {
+                if (xhr.status === 500) {
+                    console.error("Server Error:", xhr.responseText);
+                } else if (xhr.status === 401 || xhr.status === 400) {
+                    console.error("Unhandled Error:", xhr.status, xhr.responseText);
+                }
 
-        // Add to demo users
-        state.demoUsers.push(newUser);
-
-        // Log in the new user
-        state.currentUser = newUser;
-        state.isLoggedIn = true;
-
-        // Save to localStorage
-        localStorage.setItem('currentUser', JSON.stringify(newUser));
-
-        // Update UI
-        updateUIForLoggedInUser();
-
-        alert(`Welcome, ${firstName}! Your account has been created.`);
+                alert('Error creating your account. Please try again');
+            }
+        });
     }
+
 
     /**
      * Log out the current user

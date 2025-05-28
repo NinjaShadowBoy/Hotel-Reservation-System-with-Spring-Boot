@@ -67,6 +67,7 @@ public class BookingService {
 
         return ClientReservationDTO
                 .builder()
+                .id(booking.getId())
                 .clientId(booking.getClient().getId())
                 .roomTypeId(booking.getRoomType().getId())
                 .roomType(booking.getRoomType().getLabel())
