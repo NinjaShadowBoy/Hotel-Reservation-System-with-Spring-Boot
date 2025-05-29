@@ -1,11 +1,15 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.config.JwtService;
+import cm.sji.hotel_reservation.dtos.AuthenticationRequest;
+import cm.sji.hotel_reservation.dtos.AuthenticationResponse;
 import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.repositories.UserRepo;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -14,11 +18,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import cm.sji.hotel_reservation.config.JwtService;
-import cm.sji.hotel_reservation.dtos.AuthenticationRequest;
-import cm.sji.hotel_reservation.dtos.AuthenticationResponse;
-import lombok.RequiredArgsConstructor;
 
 @Service
 @AllArgsConstructor
@@ -35,7 +34,7 @@ public class AuthenticationService {
 
     private final UserService userService;
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request)
+    public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletResponse response)
             throws AuthenticationException {
         authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
@@ -48,6 +47,17 @@ public class AuthenticationService {
         // Do not include the password in the payload
         user.setPassword(null);
         var jwtToken = jwtService.generateToken(user);
+
+        // Set the token in HttpOnly cookie
+        Cookie cookie = new Cookie("JWT", jwtToken);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(30 * 60); // Cookie expires in 30 minutes
+
+        response.addCookie(cookie);
+
+        // Set the token in Authorization header
+        response.addHeader("Authorization", "Bearer " + jwtToken);
 
         return AuthenticationResponse
                 .builder()

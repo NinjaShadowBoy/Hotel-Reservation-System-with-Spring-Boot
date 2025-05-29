@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Hotel Browsing System</title>
-    <link href="/fontawesome-free-6.7.2-web/css/fontawesome.min.css" rel="stylesheet">
-    <link href="/fontawesome-free-6.7.2-web/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and filter hotels, view your reservations, and book your perfect stay with HotelFinder.">
+    <meta name="keywords" content="hotel, booking, reservation, accommodation, travel">
+    <meta name="author" content="HotelFinder">
 
-    <script defer src="/fontawesome-free-6.7.2-web/js/fontawesome.min.js"></script>
-    <script defer src="/fontawesome-free-6.7.2-web/js/all.min.js"></script>
+    <title>Hotel Browsing System - HotelFinder</title>
 
-    <link href="/client/style.css" rel="stylesheet">
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" integrity="sha512-P9pgMgcSNlLb4Z2WAB2sH5KBKGnBfyJnq+bhcfLCFusrRc4XdXrhfDluBl/usq75NF5gTDIMcwI1GaG5gju+Mw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/client/style.css">
+    <link rel="stylesheet" href="/client/index.css">
+    <link rel="stylesheet" href="/client/hotel-details.css">
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://js.stripe.com">
 </head>
-
 <body>
-<header>
+<header class="site-header">
     <div class="header-container">
-        <a class="logo" href="#">HotelFinder</a>
-        <nav class="nav-links">
-            <a href="#">Home</a>
-            <a href="#">Destinations</a>
-            <a href="#">Deals</a>
-            <a href="#">About</a>
+        <a class="logo" href="/">HotelFinder</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/destinations">Destinations</a>
+            <a href="/deals">Deals</a>
+            <a href="/about">About</a>
         </nav>
         <div class="auth-buttons" id="authButtons">
             <button class="btn btn-outline" id="loginBtn">Login</button>
@@ -35,59 +40,186 @@
     </div>
 </header>
 
-<div class="container">
+<main class="container">
     <!-- Left sidebar for filters -->
-    <div class="filter-sidebar">
-        <h2 class="filter-title">Filter Hotels</h2>
+    <aside class="filter-sidebar" aria-labelledby="filter-title">
+        <h2 class="filter-title" id="filter-title">Filter Hotels</h2>
         <div class="filter-group">
-            <h3 class="filter-subtitle">Amenities</h3>
-            <div class="checkbox-container" id="amenitiesFilters">
+            <h3 class="filter-subtitle" id="amenities-title">Amenities</h3>
+            <div class="checkbox-container" id="amenitiesFilters" aria-labelledby="amenities-title">
                 <!-- Service checkboxes will be added here via JavaScript -->
-                <div class="loader" id="amenitiesLoader">
+                <div class="loader" id="amenitiesLoader" aria-label="Loading amenities">
                     <div class="loader-spinner"></div>
                 </div>
             </div>
         </div>
-    </div>
+    </aside>
 
     <!-- Main content area -->
-    <div class="main-content">
+    <section class="main-content">
         <div class="search-container">
-            <input class="search-input" id="hotelSearch" placeholder="Search hotels by name or location..."
-                   type="text">
-            <button class="btn btn-primary" id="searchBtn">Search</button>
+            <label for="hotelSearch" class="visually-hidden">Search hotels</label>
+            <input 
+                class="search-input" 
+                id="hotelSearch" 
+                placeholder="Search hotels by name or location..." 
+                type="text"
+                aria-label="Search hotels by name or location"
+            >
+            <button class="btn btn-primary" id="searchBtn" type="button">Search</button>
         </div>
 
         <div class="hotel-cards" id="hotelCards">
-            <div class="loader" id="hotelsLoader">
+            <div class="loader" id="hotelsLoader" aria-label="Loading hotels">
                 <div class="loader-spinner"></div>
             </div>
             <!-- Hotel cards will be added here via JavaScript -->
         </div>
 
-        <div class="pagination" id="pagination">
+        <nav class="pagination" id="pagination" aria-label="Pagination">
             <!-- Pagination will be added here via JavaScript -->
-        </div>
-    </div>
+        </nav>
+    </section>
 
     <!-- Right sidebar for reservations -->
-    <div class="reservation-sidebar">
-        <h2 class="reservation-title">Your Reservations</h2>
+    <aside class="reservation-sidebar" aria-labelledby="reservation-title">
+        <h2 class="reservation-title" id="reservation-title">Your Reservations</h2>
         <div id="reservationsContent">
             <div class="login-message" id="loginMessage">
                 <p>Please login to view your reservations</p>
-                <button class="btn btn-primary" id="sidebarLoginBtn">Login</button>
+                <button class="btn btn-primary" id="sidebarLoginBtn" type="button">Login</button>
             </div>
-            <div class="loader hidden" id="reservationsLoader">
+            <div class="loader hidden" id="reservationsLoader" aria-label="Loading reservations">
                 <div class="loader-spinner"></div>
             </div>
             <div class="reservation-cards hidden" id="reservationCards">
                 <!-- Reservation cards will be added here via JavaScript -->
             </div>
         </div>
+    </aside>
+</main>
+
+<!-- Login Modal -->
+<div class="modal hidden" id="loginModal" role="dialog" aria-labelledby="login-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeLoginModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="login-modal-title">Login to Your Account</h3>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="loginEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="loginPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <p class="modal-footer-text">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
     </div>
 </div>
 
-<script src="/js/jquery.js"></script>
-<script src="/client/index.js"></script>
+<!-- Signup Modal -->
+<div class="modal hidden" id="signupModal" role="dialog" aria-labelledby="signup-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeSignupModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="signup-modal-title">Create an Account</h3>
+        <form id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="signupFirstName">First Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupFirstName" 
+                    type="text" 
+                    placeholder="Enter your first name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupLastName">Last Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupLastName" 
+                    type="text" 
+                    placeholder="Enter your last name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="signupEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="signupPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Sign Up</button>
+        </form>
+        <p class="modal-footer-text">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>HotelFinder</h3>
+            <p>Find your perfect stay with us.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/terms">Terms & Conditions</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope" aria-hidden="true"></i> info@hotelfinder.com</p>
+            <p><i class="fas fa-phone" aria-hidden="true"></i> +1 (555) 123-4567</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 HotelFinder. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Scripts -->
+<script src="/js/jquery.js" defer></script>
+<script src="/client/index.js" defer></script>
 </body>

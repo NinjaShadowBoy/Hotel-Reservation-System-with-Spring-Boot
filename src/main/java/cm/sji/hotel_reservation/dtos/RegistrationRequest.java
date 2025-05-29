@@ -1,20 +1,18 @@
 package cm.sji.hotel_reservation.dtos;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
-
-@Builder
 @Data
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
-public class ReviewDTO {
-    String author;
-    LocalDateTime date;
-    String text;
-    Float rating;
+@NoArgsConstructor
+public class RegistrationRequest {
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
 }

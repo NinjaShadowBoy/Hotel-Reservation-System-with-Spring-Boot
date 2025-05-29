@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -32,8 +33,9 @@ public class Hotel implements Serializable {
     @Column(nullable = false, length = 1000)
     private String description = "";
 
-    @Column(nullable = false)
-    private String owner = "";
+    @JoinColumn(nullable = true)
+    @ManyToOne
+    private User owner;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

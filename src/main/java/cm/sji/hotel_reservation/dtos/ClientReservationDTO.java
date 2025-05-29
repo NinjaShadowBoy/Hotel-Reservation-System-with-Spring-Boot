@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientReservationDTO {
+    Integer id;
     Integer clientId;
     Integer roomTypeId;
 

@@ -8,9 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +28,16 @@ public class ReviewAPI {
         }catch (Exception e){
             logger.error(e.getMessage());
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/api/reviews/{hotelId}/{clientId}")
+    public ResponseEntity<ReviewDTO> leaveReview(@RequestBody ReviewDTO review, @PathVariable Integer clientId, @PathVariable Integer hotelId){
+        try{
+            return ResponseEntity.status(HttpStatus.CREATED).body(reviewService.saveReview(review, hotelId, clientId));
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 }

@@ -1,8 +1,10 @@
 package cm.sji.hotel_reservation.config;
 
-import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.repositories.UserRepo;
+import com.stripe.Stripe;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -25,6 +27,9 @@ public class ApplicationConfig {
 
     @Autowired
     private final UserRepo userRepository;
+
+    @Value("${stripe.secret.server.key}")
+    private String apiKey;
 
     // UserDetailsService is used to load the user details
     @Bean
@@ -55,4 +60,10 @@ public class ApplicationConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @PostConstruct
+    public void setup() {
+        Stripe.apiKey = apiKey; // Secret key
+    }
+
 }
