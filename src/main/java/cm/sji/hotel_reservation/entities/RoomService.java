@@ -1,6 +1,8 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -11,6 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 public class RoomService {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
     String label;
     String fontawsome_icon_class = "fa fa-square";
 }

@@ -36,47 +36,64 @@
         cardElement: null
     };
 
-    // DOM elements cache
+    // DOM elements cache - using function-based style to avoid stale references
     const DOM = {
         hotelInfo: {
-            name: $('#hotelName'),
-            rating: $('#hotelRating'),
-            image: $('#hotelImage'),
-            description: $('#hotelDescription'),
-            location: $('#hotelLocation')
+            name: () => $('#hotelName'),
+            rating: () => $('#hotelRating'),
+            image: () => $('#hotelImage'),
+            description: () => $('#hotelDescription'),
+            location: () => $('#hotelLocation')
         },
-        roomGrid: $('#roomGrid'),
-        reviewsList: $('#reviewsList'),
-        faqList: $('#faqList'),
+        roomGrid: () => $('#roomGrid'),
+        reviewsList: () => $('#reviewsList'),
+        faqList: () => $('#faqList'),
         forms: {
-            review: $('#reviewForm'),
-            faq: $('#faqForm'),
-            payment: $('#paymentForm'),
-            login: $('#loginForm'),
-            signup: $('#signupForm')
+            review: () => $('#reviewForm'),
+            faq: () => $('#faqForm'),
+            payment: () => $('#paymentForm'),
+            login: () => $('#loginForm'),
+            signup: () => $('#signupForm')
         },
         modals: {
-            payment: $('#paymentModal'),
-            closePayment: $('#closePaymentModal'),
-            login: $('#loginModal'),
-            closeLogin: $('#closeLoginModal'),
-            signup: $('#signupModal'),
-            closeSignup: $('#closeSignupModal')
+            payment: () => $('#paymentModal'),
+            closePayment: () => $('#closePaymentModal'),
+            login: () => $('#loginModal'),
+            closeLogin: () => $('#closeLoginModal'),
+            signup: () => $('#signupModal'),
+            closeSignup: () => $('#closeSignupModal'),
+            notification: () => $('#notificationModal'),
+            closeNotification: () => $('#closeNotificationModal'),
+            notificationOk: () => $('#notificationOkBtn')
         },
         buttons: {
-            leaveReview: $('#leaveReview'),
-            writeFAQ: $('#writeFAQ'),
-            login: $('#loginBtn'),
-            signup: $('#signupBtn'),
-            logout: $('#logoutBtn'),
-            switchToSignup: $('#switchToSignup'),
-            switchToLogin: $('#switchToLogin')
+            leaveReview: () => $('#leaveReview'),
+            writeFAQ: () => $('#writeFAQ'),
+            login: () => $('#loginBtn'),
+            signup: () => $('#signupBtn'),
+            logout: () => $('#logoutBtn'),
+            switchToSignup: () => $('#switchToSignup'),
+            switchToLogin: () => $('#switchToLogin')
         },
         auth: {
-            authButtons: $('#authButtons'),
-            userProfile: $('#userProfile'),
-            welcomeUser: $('#welcomeUser')
-        }
+            authButtons: () => $('#authButtons'),
+            userProfile: () => $('#userProfile'),
+            welcomeUser: () => $('#welcomeUser')
+        },
+        // Additional selectors that were previously direct in the code
+        ratingStars: () => $('#reviewForm .rating-stars'),
+        checkinDatetime: () => $('#checkinDatetime'),
+        submit: () => $('#submit'),
+        cardElement: () => $('#cardElement'),
+        roomInfoType: () => $('#roomInfoType'),
+        roomInfoPrice: () => $('#roomInfoPrice'),
+        roomInfoServices: () => $('#roomInfoServices'),
+        loginEmail: () => $('#loginEmail'),
+        loginPassword: () => $('#loginPassword'),
+        signupFirstName: () => $('#signupFirstName'),
+        signupLastName: () => $('#signupLastName'),
+        signupEmail: () => $('#signupEmail'),
+        signupPassword: () => $('#signupPassword')
     };
 
     /**
@@ -118,21 +135,25 @@
      * Update UI for logged in user
      */
     function updateUIForLoggedInUser() {
-        DOM.auth.authButtons.addClass('hidden');
-        DOM.auth.userProfile.removeClass('hidden');
-        DOM.auth.welcomeUser.text(`Welcome, ${state.currentUser.firstName}`);
-        DOM.forms.review.removeClass('hidden');
-        DOM.forms.faq.removeClass('hidden');
-        DOM.buttons.leaveReview.removeClass('hidden');
-        DOM.buttons.writeFAQ.removeClass('hidden');
+        DOM.auth.authButtons().addClass('hidden');
+        DOM.auth.userProfile().removeClass('hidden');
+        DOM.auth.welcomeUser().text(`Welcome, ${state.currentUser.firstName}`);
+        DOM.forms.review().removeClass('hidden');
+        DOM.forms.faq().removeClass('hidden');
+        DOM.buttons.leaveReview().removeClass('hidden');
+        DOM.buttons.writeFAQ().removeClass('hidden');
     }
 
     /**
      * Update UI for logged out user
      */
     function updateUIForLoggedOutUser() {
-        DOM.auth.authButtons.removeClass('hidden');
-        DOM.auth.userProfile.addClass('hidden');
+        DOM.auth.authButtons().removeClass('hidden');
+        DOM.auth.userProfile().addClass('hidden');
+        DOM.forms.faq().addClass('hidden');
+        DOM.forms.review().addClass('hidden');
+        DOM.buttons.leaveReview().addClass('hidden');
+        DOM.buttons.writeFAQ().addClass('hidden');
     }
 
     /**
@@ -162,77 +183,87 @@
         $(document).on('click', '.book-btn', handleBookingClick);
 
         // Payment form submission
-        DOM.forms.payment.submit(handlePaymentSubmission);
+        DOM.forms.payment().submit(handlePaymentSubmission);
 
         // Payment modal close
-        DOM.modals.closePayment.on('click', () => {
-            DOM.modals.payment.addClass('hidden');
+        DOM.modals.closePayment().on('click', () => {
+            DOM.modals.payment().addClass('hidden');
         });
 
         // Review form submission
-        DOM.forms.review.submit(handleReviewSubmission);
+        DOM.forms.review().submit(handleReviewSubmission);
 
         // FAQ form submission
-        DOM.forms.faq.submit(handleFAQSubmission);
+        DOM.forms.faq().submit(handleFAQSubmission);
 
         // Login button click
-        DOM.buttons.login.on('click', function () {
+        DOM.buttons.login().on('click', function () {
             showLoginModal();
         });
 
         // Signup button click
-        DOM.buttons.signup.on('click', function () {
+        DOM.buttons.signup().on('click', function () {
             showSignupModal();
         });
 
         // Logout button click
-        DOM.buttons.logout.on('click', function () {
+        DOM.buttons.logout().on('click', function () {
             logout();
         });
 
         // Login modal close
-        DOM.modals.closeLogin.on('click', function () {
-            DOM.modals.login.addClass('hidden');
+        DOM.modals.closeLogin().on('click', function () {
+            DOM.modals.login().addClass('hidden');
         });
 
         // Signup modal close
-        DOM.modals.closeSignup.on('click', function () {
-            DOM.modals.signup.addClass('hidden');
+        DOM.modals.closeSignup().on('click', function () {
+            DOM.modals.signup().addClass('hidden');
+        });
+
+        // Notification modal close
+        DOM.modals.closeNotification().on('click', function () {
+            DOM.modals.notification().addClass('hidden');
+        });
+
+        // Notification modal OK button
+        DOM.modals.notificationOk().on('click', function () {
+            DOM.modals.notification().addClass('hidden');
         });
 
         // Switch between login and signup modals
-        DOM.buttons.switchToSignup.on('click', function (e) {
+        DOM.buttons.switchToSignup().on('click', function (e) {
             e.preventDefault();
-            DOM.modals.login.addClass('hidden');
-            DOM.modals.signup.removeClass('hidden');
+            DOM.modals.login().addClass('hidden');
+            DOM.modals.signup().removeClass('hidden');
         });
 
-        DOM.buttons.switchToLogin.on('click', function (e) {
+        DOM.buttons.switchToLogin().on('click', function (e) {
             e.preventDefault();
-            DOM.modals.signup.addClass('hidden');
-            DOM.modals.login.removeClass('hidden');
+            DOM.modals.signup().addClass('hidden');
+            DOM.modals.login().removeClass('hidden');
         });
 
         // Login form submission
-        DOM.forms.login.on('submit', function (e) {
+        DOM.forms.login().on('submit', function (e) {
             e.preventDefault();
-            const email = $('#loginEmail').val();
-            const password = $('#loginPassword').val();
+            const email = DOM.loginEmail().val();
+            const password = DOM.loginPassword().val();
 
             login(email, password);
-            DOM.modals.login.addClass('hidden');
+            DOM.modals.login().addClass('hidden');
         });
 
         // Signup form submission
-        DOM.forms.signup.on('submit', function (e) {
+        DOM.forms.signup().on('submit', function (e) {
             e.preventDefault();
-            const firstName = $('#signupFirstName').val();
-            const lastName = $('#signupLastName').val();
-            const email = $('#signupEmail').val();
-            const password = $('#signupPassword').val();
+            const firstName = DOM.signupFirstName().val();
+            const lastName = DOM.signupLastName().val();
+            const email = DOM.signupEmail().val();
+            const password = DOM.signupPassword().val();
 
             signup(firstName, lastName, email, password);
-            DOM.modals.signup.addClass('hidden');
+            DOM.modals.signup().addClass('hidden');
         });
     }
 
@@ -242,16 +273,16 @@
     function setupRatingStars() {
         if (!state.isLoggedIn) return;
 
-        const $ratingStars = $('#reviewForm .rating-stars');
+        const $ratingStars = DOM.ratingStars;
 
         // Hover effect
-        $ratingStars.on('mouseover', 'i', function () {
-            const rating = $ratingStars.find('i').index(this) + 1;
+        $ratingStars().on('mouseover', 'i', function () {
+            const rating = $ratingStars().find('i').index(this) + 1;
             highlightStars(rating);
         });
 
         // Click to select
-        $ratingStars.on('click', 'i', function () {
+        $ratingStars().on('click', 'i', function () {
             const $star = $(this);
             state.currentRating = $star.index() + 1;
             setRating(state.currentRating);
@@ -259,7 +290,7 @@
         });
 
         // Reset on mouse leave
-        $ratingStars.on('mouseleave', function () {
+        $ratingStars().on('mouseleave', function () {
             if (state.currentRating > 0) {
                 setRating(state.currentRating);
             } else {
@@ -273,8 +304,8 @@
      * @param {number} rating - Rating value (1-5)
      */
     function highlightStars(rating) {
-        $('#reviewForm .rating-stars i').removeClass('active preview');
-        $('#reviewForm .rating-stars i').slice(0, rating).addClass('preview');
+        DOM.ratingStars().find('i').removeClass('active preview');
+        DOM.ratingStars().find('i').slice(0, rating).addClass('preview');
     }
 
     /**
@@ -282,15 +313,15 @@
      * @param {number} rating - Rating value (1-5)
      */
     function setRating(rating) {
-        $('#reviewForm .rating-stars i').removeClass('active preview');
-        $('#reviewForm .rating-stars i').slice(0, rating).addClass('active');
+        DOM.ratingStars().find('i').removeClass('active preview');
+        DOM.ratingStars().find('i').slice(0, rating).addClass('active');
     }
 
     /**
      * Clear star highlighting
      */
     function clearHighlight() {
-        $('#reviewForm .rating-stars i').removeClass('active preview');
+        DOM.ratingStars().find('i').removeClass('active preview');
     }
 
     /**
@@ -299,7 +330,7 @@
      */
     function updateRatingInput(rating) {
         const $form = DOM.forms.review;
-        let $ratingInput = $form.find('input[name="rating"]');
+        let $ratingInput = $form().find('input[name="rating"]');
 
         // Create hidden input if it doesn't exist
         if ($ratingInput.length === 0) {
@@ -307,7 +338,7 @@
                 type: 'hidden',
                 name: 'rating'
             });
-            $form.append($ratingInput);
+            $form().append($ratingInput);
         }
 
         $ratingInput.val(rating);
@@ -333,9 +364,9 @@
         const roomServices = $roomCard.find('.room-services').html();
 
         // Populate room info in the payment modal
-        $('#roomInfoType').text(roomType);
-        $('#roomInfoPrice').text(roomPrice);
-        $('#roomInfoServices').html(roomServices);
+        DOM.roomInfoType().text(roomType);
+        DOM.roomInfoPrice().text(roomPrice);
+        DOM.roomInfoServices().html(roomServices);
 
         // Set min and max dates for check-in datetime
         const today = new Date();
@@ -346,15 +377,15 @@
         const todayStr = today.toISOString().slice(0, 16);
         const oneMonthLaterStr = oneMonthLater.toISOString().slice(0, 16);
 
-        $('#checkinDatetime').attr('min', todayStr);
-        $('#checkinDatetime').attr('max', oneMonthLaterStr);
-        $('#checkinDatetime').val(todayStr);
+        DOM.checkinDatetime().attr('min', todayStr);
+        DOM.checkinDatetime().attr('max', oneMonthLaterStr);
+        DOM.checkinDatetime().val(todayStr);
 
         // Show the modal
-        DOM.modals.payment.removeClass('hidden');
+        DOM.modals.payment().removeClass('hidden');
 
         if (state.cardElement) {
-            state.cardElement.mount('#cardElement');
+            state.cardElement.mount(DOM.cardElement().attr('id'));
         }
     }
 
@@ -366,19 +397,19 @@
         e.preventDefault();
 
         // Disable submit button to prevent double submissions
-        $('#submit').prop('disabled', true);
+        DOM.submit().prop('disabled', true);
 
         if (!state.stripe || !state.cardElement) {
             showError('Payment processing is not available');
-            $('#submit').prop('disabled', false);
+            DOM.submit().prop('disabled', false);
             return;
         }
 
         // Validate check-in datetime
-        const checkinDatetime = $('#checkinDatetime').val();
+        const checkinDatetime = DOM.checkinDatetime().val();
         if (!checkinDatetime) {
             showError('Please select a check-in date and time');
-            $('#submit').prop('disabled', false);
+            DOM.submit().prop('disabled', false);
             return;
         }
 
@@ -391,13 +422,13 @@
 
         if (checkinDate < today) {
             showError('Check-in date cannot be in the past');
-            $('#submit').prop('disabled', false);
+            DOM.submit().prop('disabled', false);
             return;
         }
 
         if (checkinDate > oneMonthLater) {
             showError('Check-in date cannot be more than 1 month ahead');
-            $('#submit').prop('disabled', false);
+            DOM.submit().prop('disabled', false);
             return;
         }
 
@@ -410,7 +441,7 @@
 
             if (error) {
                 showError(error.message);
-                $('#submit').prop('disabled', false);
+                DOM.submit().prop('disabled', false);
                 return;
             }
 
@@ -441,7 +472,7 @@
 
             if (paymentResult.error) {
                 showError(paymentResult.error.message);
-                $('#submit').prop('disabled', false);
+                DOM.submit().prop('disabled', false);
                 return;
             }
 
@@ -461,7 +492,7 @@
                     // });
 
                     showSuccess('Booking successful!');
-                    DOM.modals.payment.addClass('hidden');
+                    DOM.modals.payment().addClass('hidden');
 
                     // Optional: Reset form or redirect
                     // resetBookingForm();
@@ -477,7 +508,7 @@
         } catch (err) {
             showError('Payment processing failed. Please try again.');
             console.error('Payment error:', err);
-            $('#submit').prop('disabled', false);
+            DOM.submit().prop('disabled', false);
         }
 
     }
@@ -489,7 +520,7 @@
     function handleReviewSubmission(e) {
         e.preventDefault();
 
-        const reviewText = DOM.forms.review.find('textarea').val();
+        const reviewText = DOM.forms.review().find('textarea').val();
 
         if (!reviewText || state.currentRating === 0) {
             showError('Please provide both a review text and rating');
@@ -506,7 +537,7 @@
             }),
             success: () => {
                 showSuccess('Review submitted!');
-                DOM.forms.review.find('textarea').val('');
+                DOM.forms.review().find('textarea').val('');
                 state.currentRating = 0;
                 clearHighlight();
                 loadReviews();
@@ -525,7 +556,7 @@
     function handleFAQSubmission(e) {
         e.preventDefault();
 
-        const question = DOM.forms.faq.find('input').val();
+        const question = DOM.forms.faq().find('input').val();
 
         if (!question) {
             showError('Please enter your question');
@@ -541,7 +572,7 @@
             }),
             success: () => {
                 showSuccess('Question submitted!');
-                DOM.forms.faq.find('input').val('');
+                DOM.forms.faq().find('input').val('');
                 loadFAQs();
             },
             error: (xhr) => {
@@ -583,18 +614,18 @@
      * @param {Object} hotel - Hotel data
      */
     function updateHotelUI(hotel) {
-        DOM.hotelInfo.name.text(hotel.name);
-        DOM.hotelInfo.rating.text(hotel.rating.toFixed(1));
-        DOM.hotelInfo.image.attr('src', hotel.image);
-        DOM.hotelInfo.description.text(hotel.desc);
-        DOM.hotelInfo.location.text(hotel.location);
+        DOM.hotelInfo.name().text(hotel.name);
+        DOM.hotelInfo.rating().text(hotel.rating.toFixed(1));
+        DOM.hotelInfo.image().attr('src', hotel.image);
+        DOM.hotelInfo.description().text(hotel.desc);
+        DOM.hotelInfo.location().text(hotel.location);
 
         // Show forms if logged in
         if (state.isLoggedIn) {
-            DOM.forms.review.removeClass('hidden');
-            DOM.forms.faq.removeClass('hidden');
-            DOM.buttons.leaveReview.removeClass('hidden');
-            DOM.buttons.writeFAQ.removeClass('hidden');
+            DOM.forms.review().removeClass('hidden');
+            DOM.forms.faq().removeClass('hidden');
+            DOM.buttons.leaveReview().removeClass('hidden');
+            DOM.buttons.writeFAQ().removeClass('hidden');
         }
     }
 
@@ -620,10 +651,10 @@
      * @param {Array} rooms - Room types data
      */
     function renderRoomTypes(rooms) {
-        DOM.roomGrid.empty();
+        DOM.roomGrid().empty();
 
         rooms.forEach(room => {
-            DOM.roomGrid.append(createRoomCard(room));
+            DOM.roomGrid().append(createRoomCard(room));
         });
     }
 
@@ -686,11 +717,11 @@
      */
     function renderReviews(reviews) {
         // Clear existing reviews but keep the "Leave a review" button
-        const leaveReviewBtn = DOM.buttons.leaveReview.detach();
-        DOM.reviewsList.empty().append(leaveReviewBtn);
+        const leaveReviewBtn = DOM.buttons.leaveReview().detach();
+        DOM.reviewsList().empty().append(leaveReviewBtn);
 
         reviews.forEach(review => {
-            DOM.reviewsList.append(createReviewCard(review));
+            DOM.reviewsList().append(createReviewCard(review));
         });
     }
 
@@ -738,11 +769,11 @@
      */
     function renderFAQs(faqs) {
         // Clear existing FAQs but keep the "Write FAQ" button
-        const writeFAQBtn = DOM.buttons.writeFAQ.detach();
-        DOM.faqList.empty().append(writeFAQBtn);
+        const writeFAQBtn = DOM.buttons.writeFAQ().detach();
+        DOM.faqList().empty().append(writeFAQBtn);
 
         faqs.forEach(faq => {
-            DOM.faqList.append(createFAQCard(faq));
+            DOM.faqList().append(createFAQCard(faq));
         });
     }
 
@@ -766,7 +797,10 @@
      * @param {string} message - Error message
      */
     function showError(message) {
-        alert(message); // Replace with a better UI notification in production
+        // Show error notification using the modal
+        $('#notificationTitle').text('Error');
+        $('#notificationMessage').text(message);
+        $('#notificationModal').removeClass('hidden');
     }
 
     /**
@@ -774,7 +808,10 @@
      * @param {string} message - Success message
      */
     function showSuccess(message) {
-        alert(message); // Replace with a better UI notification in production
+        // Show success notification using the modal
+        $('#notificationTitle').text('Success');
+        $('#notificationMessage').text(message);
+        $('#notificationModal').removeClass('hidden');
     }
 
     /**
@@ -784,7 +821,7 @@
         $('#loginEmail').val('');
         $('#loginPassword').val('');
 
-        DOM.modals.login.removeClass('hidden');
+        DOM.modals.login().removeClass('hidden');
     }
 
     /**
@@ -796,7 +833,7 @@
         $('#signupEmail').val('');
         $('#signupPassword').val('');
 
-        DOM.modals.signup.removeClass('hidden');
+        DOM.modals.signup().removeClass('hidden');
     }
 
     /**

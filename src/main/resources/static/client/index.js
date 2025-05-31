@@ -21,9 +21,9 @@
             bookings: '/api/bookings'
         },
         mockDelays: {
-            services: 500,
-            hotels: 800,
-            reservations: 600
+            services: 100,
+            hotels: 200,
+            reservations: 100
         }
     };
 
@@ -42,53 +42,58 @@
         ]
     };
 
-    // DOM elements cache
+    // DOM elements cache - using function-based style to avoid stale references
     const DOM = {
         auth: {
-            authButtons: $('#authButtons'),
-            userProfile: $('#userProfile'),
-            welcomeUser: $('#welcomeUser'),
-            loginBtn: $('#loginBtn'),
-            sidebarLoginBtn: $('#sidebarLoginBtn'),
-            signupBtn: $('#signupBtn'),
-            logoutBtn: $('#logoutBtn')
+            authButtons: () => $('#authButtons'),
+            userProfile: () => $('#userProfile'),
+            welcomeUser: () => $('#welcomeUser'),
+            loginBtn: () => $('#loginBtn'),
+            sidebarLoginBtn: () => $('#sidebarLoginBtn'),
+            signupBtn: () => $('#signupBtn'),
+            logoutBtn: () => $('#logoutBtn')
         },
         hotels: {
-            hotelCards: $('#hotelCards'),
-            hotelsLoader: $('#hotelsLoader'),
-            searchInput: $('#hotelSearch'),
-            searchBtn: $('#searchBtn')
+            hotelCards: () => $('#hotelCards'),
+            hotelsLoader: () => $('#hotelsLoader'),
+            searchInput: () => $('#hotelSearch'),
+            searchBtn: () => $('#searchBtn')
         },
         filters: {
-            amenitiesFilters: $('#amenitiesFilters'),
-            amenitiesLoader: $('#amenitiesLoader')
+            amenitiesFilters: () => $('#amenitiesFilters'),
+            amenitiesLoader: () => $('#amenitiesLoader')
         },
         reservations: {
-            reservationCards: $('#reservationCards'),
-            reservationsLoader: $('#reservationsLoader'),
-            loginMessage: $('#loginMessage')
+            reservationCards: () => $('#reservationCards'),
+            reservationsLoader: () => $('#reservationsLoader'),
+            loginMessage: () => $('#loginMessage')
         },
         pagination: {
-            container: $('#pagination')
+            container: () => $('#pagination')
         },
         modals: {
             login: {
-                modal: $('#loginModal'),
-                closeBtn: $('#closeLoginModal'),
-                form: $('#loginForm'),
-                emailInput: $('#loginEmail'),
-                passwordInput: $('#loginPassword'),
-                switchToSignup: $('#switchToSignup')
+                modal: () => $('#loginModal'),
+                closeBtn: () => $('#closeLoginModal'),
+                form: () => $('#loginForm'),
+                emailInput: () => $('#loginEmail'),
+                passwordInput: () => $('#loginPassword'),
+                switchToSignup: () => $('#switchToSignup')
             },
             signup: {
-                modal: $('#signupModal'),
-                closeBtn: $('#closeSignupModal'),
-                form: $('#signupForm'),
-                firstNameInput: $('#signupFirstName'),
-                lastNameInput: $('#signupLastName'),
-                emailInput: $('#signupEmail'),
-                passwordInput: $('#signupPassword'),
-                switchToLogin: $('#switchToLogin')
+                modal: () => $('#signupModal'),
+                closeBtn: () => $('#closeSignupModal'),
+                form: () => $('#signupForm'),
+                firstNameInput: () => $('#signupFirstName'),
+                lastNameInput: () => $('#signupLastName'),
+                emailInput: () => $('#signupEmail'),
+                passwordInput: () => $('#signupPassword'),
+                switchToLogin: () => $('#switchToLogin')
+            },
+            notification: {
+                modal: () => $('#notificationModal'),
+                closeBtn: () => $('#closeNotificationModal'),
+                okBtn: () => $('#notificationOkBtn')
             }
         }
     };
@@ -131,12 +136,12 @@
      * Update UI elements for logged in user
      */
     function updateUIForLoggedInUser() {
-        DOM.auth.authButtons.addClass('hidden');
-        DOM.auth.userProfile.removeClass('hidden');
-        DOM.auth.welcomeUser.text(`Welcome, ${state.currentUser.firstName}`);
+        DOM.auth.authButtons().addClass('hidden');
+        DOM.auth.userProfile().removeClass('hidden');
+        DOM.auth.welcomeUser().text(`Welcome, ${state.currentUser.firstName}`);
 
-        DOM.reservations.loginMessage.addClass('hidden');
-        DOM.reservations.reservationsLoader.removeClass('hidden');
+        DOM.reservations.loginMessage().addClass('hidden');
+        DOM.reservations.reservationsLoader().removeClass('hidden');
 
         // Load reservations for the logged-in user
         loadReservations();
@@ -146,170 +151,163 @@
      * Update UI elements for logged out user
      */
     function updateUIForLoggedOutUser() {
-        DOM.auth.authButtons.removeClass('hidden');
-        DOM.auth.userProfile.addClass('hidden');
+        DOM.auth.authButtons().removeClass('hidden');
+        DOM.auth.userProfile().addClass('hidden');
 
-        DOM.reservations.reservationCards.addClass('hidden');
-        DOM.reservations.loginMessage.removeClass('hidden');
-        DOM.reservations.reservationsLoader.addClass('hidden');
+        DOM.reservations.reservationCards().addClass('hidden');
+        DOM.reservations.loginMessage().removeClass('hidden');
+        DOM.reservations.reservationsLoader().addClass('hidden');
     }
 
     /**
      * Load available services for filter options
      */
     function loadServices() {
-        DOM.filters.amenitiesLoader.removeClass('hidden');
+        DOM.filters.amenitiesLoader().removeClass('hidden');
 
-        // In a real app, this would be an AJAX call to the backend
-        // GET /api/services
-        setTimeout(() => {
-            // Mock data for services
-            state.services = [
-                'WiFi', 'Breakfast', 'Spa Access', 'Fitness Center',
-                'Swimming Pool', 'Room Service', 'Concierge', 'Parking',
-                'Business Center', 'Airport Shuttle', 'Laundry Service',
-                'Mini Bar', 'Pet Friendly', 'Child Care', 'Restaurant Discount'
-            ];
+        // Fallback mock data in case the API fails
+        const fallbackServices = [
+            'WiFi', 'Breakfast', 'Spa Access', 'Fitness Center',
+            'Swimming Pool', 'Room Service', 'Concierge', 'Parking',
+            'Business Center', 'Airport Shuttle', 'Laundry Service',
+            'Mini Bar', 'Pet Friendly', 'Child Care', 'Restaurant Discount'
+        ];
 
-            fetch(config.apiEndpoints.services)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to load services');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    state.services = data;
-                    console.log("Services loaded ", state.services);
-                    renderServiceFilters(state.services);
-                    DOM.filters.amenitiesLoader.addClass('hidden');
-                })
-                .catch(error => {
-                    console.error('Error loading services:', error);
-                    DOM.filters.amenitiesLoader.addClass('hidden');
-                });
-
-        }, 500);
+        fetch(config.apiEndpoints.services)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load services');
+                }
+                return response.json();
+            })
+            .then(data => {
+                state.services = data;
+                renderServiceFilters(state.services);
+                DOM.filters.amenitiesLoader().addClass('hidden');
+            })
+            .catch(error => {
+                console.error('Error loading services:', error);
+                // Use fallback data if API fails
+                state.services = fallbackServices;
+                renderServiceFilters(state.services);
+                DOM.filters.amenitiesLoader().addClass('hidden');
+            });
     }
 
     function renderServiceFilters(services) {
-        const filtersContainer = $('#amenitiesFilters');
+        const filtersContainer = DOM.filters.amenitiesFilters();
         filtersContainer.empty(); // Clear any existing content before adding filters
 
+        // Build HTML string for better performance
+        let filtersHtml = '';
+
         services.forEach(service => {
-            service = service.toString().split(':')
-            console.log(service)
-            const iconClass = service[1]
-            service = service[0]
-            const serviceId = service.toLowerCase().replace(/\s+/g, '-');
+            const parts = service.toString().split(':');
+            const serviceName = parts[0];
+            const iconClass = parts[1] || 'fas fa-check'; // Default icon if none provided
+            const serviceId = `amenity-${parts[2] || serviceName.toLowerCase().replace(/\s+/g, '-')}`;
 
-            const checkboxItem = $(`
+            filtersHtml += `
                 <div class="checkbox-item">
-                    <input type="checkbox" id="${serviceId}" name="amenity" value="${service}">
-                    <label for="${serviceId}"><i class="${iconClass}"></i>  ${service}</label>
+                    <input type="checkbox" id="${serviceId}" name="amenity" value="${serviceName}">
+                    <label for="${serviceId}"><i class="${iconClass}"></i>  ${serviceName}</label>
                 </div>
-            `);
-
-            filtersContainer.append(checkboxItem);
+            `;
         });
 
-        // Add event listener for filter changes
-        $('input[name="amenity"]').on('change', function () {
-            filterHotels();
-        });
+        // Set HTML content once (more efficient than multiple appends)
+        filtersContainer.html(filtersHtml);
+
+        // Use event delegation for better performance
+        filtersContainer.off('change', 'input[name="amenity"]').on('change', 'input[name="amenity"]', filterHotels);
     }
 
     /**
      * Load hotels from API
      */
     function loadHotels() {
-        DOM.hotels.hotelsLoader.removeClass('hidden');
-        DOM.hotels.hotelCards.find('.hotel-card').remove(); // Remove only hotel cards, keep loader
+        DOM.hotels.hotelsLoader().removeClass('hidden');
+        DOM.hotels.hotelCards().find('.hotel-card').remove(); // Remove only hotel cards, keep loader
 
-        // In a real app, this would be an AJAX call to the backend
-        // GET /api/hotels
-        setTimeout(() => {
-            // Mock data for hotels based on your database structure
-            state.hotels = [
-                {
-                    id: 1,
-                    name: 'Luxury Grand Hotel',
-                    image: '/api/placeholder/800/600',
-                    location: 'New York, NY',
-                    desc: 'Luxury Hotel offers an unparalleled experience with panoramic city views. Our elegant rooms are designed for comfort and style, featuring premium amenities and modern conveniences.',
-                    rating: 4.8,
-                    services: ['WiFi', 'Breakfast', 'Spa Access', 'Room Service', 'Concierge'],
-                    lowestPrice: 150
-                },
-                {
-                    id: 2,
-                    name: 'Seaside Resort & Spa',
-                    image: '/api/placeholder/800/600',
-                    location: 'Miami Beach, FL',
-                    desc: 'Seaside Resort & Spa is a beachfront paradise where relaxation meets luxury. Wake up to stunning ocean views from your private balcony.',
-                    rating: 4.7,
-                    services: ['WiFi', 'Breakfast', 'Swimming Pool', 'Spa Access', 'Room Service', 'Child Care'],
-                    lowestPrice: 300
-                },
-                {
-                    id: 3,
-                    name: 'Mountain Retreat Lodge',
-                    image: '/api/placeholder/800/600',
-                    location: 'Aspen, CO',
-                    desc: 'Mountain Retreat Lodge is nestled among towering pines with breathtaking views of snow-capped peaks. Our rustic-chic accommodations blend natural elements with modern luxury.',
-                    rating: 4.9,
-                    services: ['WiFi', 'Breakfast', 'Parking', 'Fitness Center', 'Pet Friendly', 'Restaurant Discount'],
-                    lowestPrice: 280
-                },
-                {
-                    id: 4,
-                    name: 'City Center Suites',
-                    image: '/api/placeholder/800/600',
-                    location: 'Chicago, IL',
-                    desc: 'City Center Suites offers sophisticated accommodations for business and leisure travelers alike. Our spacious suite-style rooms include fully equipped kitchenettes.',
-                    rating: 4.6,
-                    services: ['WiFi', 'Breakfast', 'Business Center', 'Fitness Center', 'Laundry Service', 'Room Service'],
-                    lowestPrice: 200
-                },
-                {
-                    id: 5,
-                    name: 'Vintage Boutique Inn',
-                    image: '/api/placeholder/800/600',
-                    location: 'Charleston, SC',
-                    desc: 'Vintage Boutique Inn is housed in a meticulously restored 19th-century mansion, offering a charming blend of historic character and modern comforts.',
-                    rating: 4.9,
-                    services: ['WiFi', 'Breakfast', 'Room Service', 'Concierge', 'Restaurant Discount'],
-                    lowestPrice: 220
+        // Fallback mock data in case the API fails
+        const fallbackHotels = [
+            {
+                id: 1,
+                name: 'Luxury Grand Hotel',
+                image: '/api/placeholder/800/600',
+                location: 'New York, NY',
+                desc: 'Luxury Hotel offers an unparalleled experience with panoramic city views. Our elegant rooms are designed for comfort and style, featuring premium amenities and modern conveniences.',
+                rating: 4.8,
+                services: ['WiFi', 'Breakfast', 'Spa Access', 'Room Service', 'Concierge'],
+                lowestPrice: 150
+            },
+            {
+                id: 2,
+                name: 'Seaside Resort & Spa',
+                image: '/api/placeholder/800/600',
+                location: 'Miami Beach, FL',
+                desc: 'Seaside Resort & Spa is a beachfront paradise where relaxation meets luxury. Wake up to stunning ocean views from your private balcony.',
+                rating: 4.7,
+                services: ['WiFi', 'Breakfast', 'Swimming Pool', 'Spa Access', 'Room Service', 'Child Care'],
+                lowestPrice: 300
+            },
+            {
+                id: 3,
+                name: 'Mountain Retreat Lodge',
+                image: '/api/placeholder/800/600',
+                location: 'Aspen, CO',
+                desc: 'Mountain Retreat Lodge is nestled among towering pines with breathtaking views of snow-capped peaks. Our rustic-chic accommodations blend natural elements with modern luxury.',
+                rating: 4.9,
+                services: ['WiFi', 'Breakfast', 'Parking', 'Fitness Center', 'Pet Friendly', 'Restaurant Discount'],
+                lowestPrice: 280
+            },
+            {
+                id: 4,
+                name: 'City Center Suites',
+                image: '/api/placeholder/800/600',
+                location: 'Chicago, IL',
+                desc: 'City Center Suites offers sophisticated accommodations for business and leisure travelers alike. Our spacious suite-style rooms include fully equipped kitchenettes.',
+                rating: 4.6,
+                services: ['WiFi', 'Breakfast', 'Business Center', 'Fitness Center', 'Laundry Service', 'Room Service'],
+                lowestPrice: 200
+            },
+            {
+                id: 5,
+                name: 'Vintage Boutique Inn',
+                image: '/api/placeholder/800/600',
+                location: 'Charleston, SC',
+                desc: 'Vintage Boutique Inn is housed in a meticulously restored 19th-century mansion, offering a charming blend of historic character and modern comforts.',
+                rating: 4.9,
+                services: ['WiFi', 'Breakfast', 'Room Service', 'Concierge', 'Restaurant Discount'],
+                lowestPrice: 220
+            }
+        ];
+
+        fetch(config.apiEndpoints.hotels)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load hotels');
                 }
-            ];
-
-            fetch(config.apiEndpoints.hotels)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Failed to load hotels');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    state.hotels = data;
-                    console.log("Hotels loaded ", state.hotels);
-                    renderHotels(state.hotels);
-                    renderPagination(state.hotels.length);
-                    DOM.hotels.hotelsLoader.addClass('hidden');
-                })
-                .catch(error => {
-                    console.error('Error loading hotels:', error);
-                    // Fallback to mock data if API fails
-                    renderHotels([]);
-                    renderPagination(state.hotels.length);
-                    DOM.hotels.hotelsLoader.addClass('hidden');
-                });
-
-        }, 800);
+                return response.json();
+            })
+            .then(data => {
+                state.hotels = data;
+                renderHotels(state.hotels);
+                renderPagination(state.hotels.length);
+                DOM.hotels.hotelsLoader().addClass('hidden');
+            })
+            .catch(error => {
+                console.error('Error loading hotels:', error);
+                // Fallback to mock data if API fails
+                state.hotels = fallbackHotels;
+                renderHotels(state.hotels);
+                renderPagination(state.hotels.length);
+                DOM.hotels.hotelsLoader().addClass('hidden');
+            });
     }
 
     function renderHotels(hotelsToRender) {
-        const hotelCardsContainer = $('#hotelCards');
+        const hotelCardsContainer = DOM.hotels.hotelCards();
         hotelCardsContainer.empty();
 
         if (hotelsToRender.length === 0) {
@@ -322,10 +320,22 @@
         const endIndex = Math.min(startIndex + config.itemsPerPage, hotelsToRender.length);
         const paginatedHotels = hotelsToRender.slice(startIndex, endIndex);
 
+        // Build HTML string for better performance
+        let hotelsHtml = '';
+
         paginatedHotels.forEach(hotel => {
-            const hotelCard = $(`
+            // Process services once
+            const servicesHtml = hotel.services.map(service => {
+                const parts = service.toString().split(':');
+                const serviceName = parts[0];
+                const iconClass = parts[1] || 'fas fa-check'; // Default icon if none provided
+
+                return `<span class="service-tag"><i class="${iconClass}"></i> ${serviceName}</span>`;
+            }).join('');
+
+            hotelsHtml += `
                 <div class="hotel-card" data-hotel-id="${hotel.id}">
-                    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image">
+                    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image" loading="lazy" width="350" height="250">
                     <div class="hotel-details">
                         <div class="hotel-header">
                             <h2 class="hotel-name">${hotel.name}</h2>
@@ -340,14 +350,7 @@
                         </div>
                         <p class="hotel-description">${hotel.desc}</p>
                         <div class="hotel-services">
-                            ${hotel.services.slice(0).map(service => {
-                    service = service.toString().split(':')
-                    const iconClass = service[1]
-                    service = service[0];
-
-                    return `<span class="service-tag"><i class="${iconClass}"></i>  ${service}</span>`
-                }
-            ).join('')}
+                            ${servicesHtml}
                         </div>
                         <div class="hotel-footer">
                             <div class="hotel-price">
@@ -357,20 +360,23 @@
                         </div>
                     </div>
                 </div>
-            `);
-
-            hotelCardsContainer.append(hotelCard);
+            `;
         });
 
-        // Add event listener for view details buttons
-        $('.view-details-btn').on('click', function () {
+        // Set HTML content once (more efficient than multiple appends)
+        hotelCardsContainer.html(hotelsHtml);
+
+        // Use event delegation for better performance
+        // Handle view details button clicks
+        hotelCardsContainer.off('click', '.view-details-btn').on('click', '.view-details-btn', function(e) {
+            e.stopPropagation(); // Prevent the hotel card click from triggering
             const hotelId = $(this).data('hotel-id');
             redirectToHotelDetails(hotelId);
         });
 
         // Make the entire hotel card clickable
-        $('.hotel-card').on('click', function (e) {
-            // Prevent triggering if clicking on the button
+        hotelCardsContainer.off('click', '.hotel-card').on('click', '.hotel-card', function(e) {
+            // Only trigger if not clicking on the button (handled above)
             if (!$(e.target).closest('.view-details-btn').length) {
                 const hotelId = $(this).data('hotel-id');
                 redirectToHotelDetails(hotelId);
@@ -383,7 +389,7 @@
      * @param {number} totalItems - Total number of items to paginate
      */
     function renderPagination(totalItems) {
-        const paginationContainer = DOM.pagination.container;
+        const paginationContainer = DOM.pagination.container();
         paginationContainer.empty();
 
         const totalPages = Math.ceil(totalItems / config.itemsPerPage);
@@ -392,35 +398,72 @@
             return;
         }
 
+        // Build HTML string for better performance
+        let paginationHtml = '';
+
         // Previous button
         if (state.currentPage > 1) {
-            paginationContainer.append(`
+            paginationHtml += `
                 <div class="page-item" data-page="${state.currentPage - 1}">
                     <i class="fas fa-angle-left"></i>
                 </div>
-            `);
+            `;
         }
 
         // Page numbers
-        for (let i = 1; i <= totalPages; i++) {
-            paginationContainer.append(`
-                <div class="page-item ${i === state.currentPage ? 'active' : ''}" data-page="${i}">
-                    ${i}
-                </div>
-            `);
+        // Limit visible page numbers for better performance with large page counts
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, state.currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+        // Adjust start page if we're near the end
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+
+        // Add first page and ellipsis if needed
+        if (startPage > 1) {
+            paginationHtml += `
+                <div class="page-item ${1 === state.currentPage ? 'active' : ''}" data-page="1">1</div>
+            `;
+
+            if (startPage > 2) {
+                paginationHtml += `<div class="page-item-ellipsis">...</div>`;
+            }
+        }
+
+        // Add page numbers
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `
+                <div class="page-item ${i === state.currentPage ? 'active' : ''}" data-page="${i}">${i}</div>
+            `;
+        }
+
+        // Add last page and ellipsis if needed
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                paginationHtml += `<div class="page-item-ellipsis">...</div>`;
+            }
+
+            paginationHtml += `
+                <div class="page-item ${totalPages === state.currentPage ? 'active' : ''}" data-page="${totalPages}">${totalPages}</div>
+            `;
         }
 
         // Next button
         if (state.currentPage < totalPages) {
-            paginationContainer.append(`
+            paginationHtml += `
                 <div class="page-item" data-page="${state.currentPage + 1}">
                     <i class="fas fa-angle-right"></i>
                 </div>
-            `);
+            `;
         }
 
-        // Add event listener for pagination
-        $('.page-item').on('click', function () {
+        // Set HTML content once (more efficient than multiple appends)
+        paginationContainer.html(paginationHtml);
+
+        // Use event delegation for better performance
+        paginationContainer.off('click', '.page-item').on('click', '.page-item', function() {
             state.currentPage = parseInt($(this).data('page'));
             filterHotels();
         });
@@ -432,76 +475,75 @@
     function loadReservations() {
         if (!state.isLoggedIn) return;
 
-        DOM.reservations.reservationsLoader.removeClass('hidden');
-        DOM.reservations.reservationCards.addClass('hidden');
+        DOM.reservations.reservationsLoader().removeClass('hidden');
+        DOM.reservations.reservationCards().addClass('hidden');
 
-        // In a real app, this would be an AJAX call to the backend
-        // GET /api/reservations/{userId}
-        setTimeout(() => {
-            // Mock data for reservations
-            // state.reservations = [
-            //     {
-            //         id: 1,
-            //         hotelName: 'Luxury Grand Hotel',
-            //         roomType: 'Executive Suite',
-            //         price: 450,
-            //         date: '2025-05-10',
-            //         checkinDate: '2025-06-15',
-            //         cancelable: true
-            //     },
-            //     {
-            //         id: 2,
-            //         hotelName: 'Seaside Resort & Spa',
-            //         roomType: 'Beach Front Suite',
-            //         price: 500,
-            //         date: '2025-04-25',
-            //         checkinDate: '2025-07-03',
-            //         cancelable: true
-            //     },
-            //     {
-            //         id: 3,
-            //         hotelName: 'Mountain Retreat Lodge',
-            //         roomType: 'Premium Lodge',
-            //         price: 650,
-            //         date: '2025-03-10',
-            //         checkinDate: '2025-05-20',
-            //         cancelable: false
-            //     }
-            // ];
+        // Fallback mock data in case the API fails
+        const fallbackReservations = [
+            {
+                id: 1,
+                hotelName: 'Luxury Grand Hotel',
+                roomType: 'Executive Suite',
+                price: 450,
+                date: '2025-05-10',
+                checkinDate: '2025-06-15',
+                cancelable: true
+            },
+            {
+                id: 2,
+                hotelName: 'Seaside Resort & Spa',
+                roomType: 'Beach Front Suite',
+                price: 500,
+                date: '2025-04-25',
+                checkinDate: '2025-07-03',
+                cancelable: true
+            },
+            {
+                id: 3,
+                hotelName: 'Mountain Retreat Lodge',
+                roomType: 'Premium Lodge',
+                price: 650,
+                date: '2025-03-10',
+                checkinDate: '2025-05-20',
+                cancelable: false
+            }
+        ];
 
-            $.ajax({
-                url: `${config.apiEndpoints.bookings}/${state.currentUser.id}`,
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    state.reservations = data;
-                    console.log("Reservations loaded", state.reservations);
-                    renderReservations(state.reservations);
-                    DOM.reservations.reservationsLoader.addClass('hidden');
-                    DOM.reservations.reservationCards.removeClass('hidden');
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    console.error('Error loading reservations:', textStatus, errorThrown);
-                    // Fallback to mock data if API fails
-                    renderReservations();
-                    DOM.reservations.reservationsLoader.addClass('hidden');
-                    DOM.reservations.reservationCards.removeClass('hidden');
-                }
-            });
-        }, 600);
+        $.ajax({
+            url: `${config.apiEndpoints.bookings}/${state.currentUser.id}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                state.reservations = data;
+                renderReservations(state.reservations);
+                DOM.reservations.reservationsLoader().addClass('hidden');
+                DOM.reservations.reservationCards().removeClass('hidden');
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error loading reservations:', textStatus, errorThrown);
+                // Fallback to mock data if API fails
+                state.reservations = fallbackReservations;
+                renderReservations(state.reservations);
+                DOM.reservations.reservationsLoader().addClass('hidden');
+                DOM.reservations.reservationCards().removeClass('hidden');
+            }
+        });
     }
 
     function renderReservations(reservations) {
-        const reservationCardsContainer = $('#reservationCards');
+        const reservationCardsContainer = DOM.reservations.reservationCards();
         reservationCardsContainer.empty();
 
-        if (reservations.length === 0) {
+        if (!reservations || reservations.length === 0) {
             reservationCardsContainer.html('<p class="no-reservations">You have no reservations yet.</p>');
             return;
         }
 
+        // Build HTML string for better performance
+        let reservationsHtml = '';
+
         reservations.forEach(reservation => {
-            const reservationCard = $(`
+            reservationsHtml += `
                 <div class="reservation-card" data-reservation-id="${reservation.id}">
                     <h3 class="reservation-hotel">${reservation.hotelName}</h3>
                     <p class="reservation-details">${reservation.roomType}</p>
@@ -511,13 +553,14 @@
                 `<button class="cancel-button" data-reservation-id="${reservation.id}">Cancel Reservation</button>` :
                 ''}
                 </div>
-            `);
-
-            reservationCardsContainer.append(reservationCard);
+            `;
         });
 
-        // Add event listener for cancel buttons
-        $('.cancel-button').on('click', function () {
+        // Set HTML content once (more efficient than multiple appends)
+        reservationCardsContainer.html(reservationsHtml);
+
+        // Use event delegation for better performance
+        reservationCardsContainer.off('click', '.cancel-button').on('click', '.cancel-button', function() {
             const reservationId = $(this).data('reservation-id');
             cancelReservation(reservationId);
         });
@@ -528,7 +571,7 @@
             return $(this).val();
         }).get();
 
-        const searchTerm = $('#hotelSearch').val().toLowerCase();
+        const searchTerm = DOM.hotels.searchInput().val().toLowerCase();
 
         let filteredHotels = state.hotels;
 
@@ -555,77 +598,91 @@
 
     function setupEventListeners() {
         // Search button click
-        $('#searchBtn').on('click', function () {
+        DOM.hotels.searchBtn().on('click', function () {
             filterHotels();
         });
 
         // Enter key on search input
-        $('#hotelSearch').on('keyup', function (e) {
+        DOM.hotels.searchInput().on('keyup', function (e) {
             if (e.key === 'Enter') {
                 filterHotels();
             }
         });
 
         // Login button click
-        $('#loginBtn, #sidebarLoginBtn').on('click', function () {
+        DOM.auth.loginBtn().on('click', function () {
+            showLoginModal();
+        });
+
+        DOM.auth.sidebarLoginBtn().on('click', function () {
             showLoginModal();
         });
 
         // Sign up button click
-        $('#signupBtn').on('click', function () {
+        DOM.auth.signupBtn().on('click', function () {
             showSignupModal();
         });
 
         // Logout button click
-        $('#logoutBtn').on('click', function () {
+        DOM.auth.logoutBtn().on('click', function () {
             logout();
         });
 
         // Modal close buttons
-        $('#closeLoginModal').on('click', function() {
-            $('#loginModal').addClass('hidden');
+        DOM.modals.login.closeBtn().on('click', function() {
+            DOM.modals.login.modal().addClass('hidden');
         });
 
-        $('#closeSignupModal').on('click', function() {
-            $('#signupModal').addClass('hidden');
+        DOM.modals.signup.closeBtn().on('click', function() {
+            DOM.modals.signup.modal().addClass('hidden');
+        });
+
+        // Notification modal close button
+        DOM.modals.notification.closeBtn().on('click', function() {
+            DOM.modals.notification.modal().addClass('hidden');
+        });
+
+        // Notification modal OK button
+        DOM.modals.notification.okBtn().on('click', function() {
+            DOM.modals.notification.modal().addClass('hidden');
         });
 
         // Switch between login and signup modals
-        $('#switchToSignup').on('click', function(e) {
+        DOM.modals.login.switchToSignup().on('click', function(e) {
             e.preventDefault();
-            $('#loginModal').addClass('hidden');
-            $('#signupModal').removeClass('hidden');
+            DOM.modals.login.modal().addClass('hidden');
+            DOM.modals.signup.modal().removeClass('hidden');
         });
 
-        $('#switchToLogin').on('click', function(e) {
+        DOM.modals.signup.switchToLogin().on('click', function(e) {
             e.preventDefault();
-            $('#signupModal').addClass('hidden');
-            $('#loginModal').removeClass('hidden');
+            DOM.modals.signup.modal().addClass('hidden');
+            DOM.modals.login.modal().removeClass('hidden');
         });
 
         // Form submissions
-        $('#loginForm').on('submit', function(e) {
+        DOM.modals.login.form().on('submit', function(e) {
             e.preventDefault();
-            const email = $('#loginEmail').val();
-            const password = $('#loginPassword').val();
+            const email = DOM.modals.login.emailInput().val();
+            const password = DOM.modals.login.passwordInput().val();
 
             if (!email || !password) return;
 
             login(email, password);
-            $('#loginModal').addClass('hidden');
+            DOM.modals.login.modal().addClass('hidden');
         });
 
-        $('#signupForm').on('submit', function(e) {
+        DOM.modals.signup.form().on('submit', function(e) {
             e.preventDefault();
-            const firstName = $('#signupFirstName').val();
-            const lastName = $('#signupLastName').val();
-            const email = $('#signupEmail').val();
-            const password = $('#signupPassword').val();
+            const firstName = DOM.modals.signup.firstNameInput().val();
+            const lastName = DOM.modals.signup.lastNameInput().val();
+            const email = DOM.modals.signup.emailInput().val();
+            const password = DOM.modals.signup.passwordInput().val();
 
             if (!firstName || !lastName || !email || !password) return;
 
             signup(firstName, lastName, email, password);
-            $('#signupModal').addClass('hidden');
+            DOM.modals.signup.modal().addClass('hidden');
         });
     }
 
@@ -640,15 +697,21 @@
      * @param {number} reservationId - ID of the reservation to cancel
      */
     function cancelReservation(reservationId) {
-        // In a real app, this would be an AJAX call to the backend
-        // DELETE /api/reservations/{reservationId}
-
         // Show loading or disable button
         const cancelButton = $(`.cancel-button[data-reservation-id="${reservationId}"]`)
             .text('Cancelling...')
             .prop('disabled', true);
 
-        setTimeout(() => {
+        // In a real app, this would be an AJAX call to the backend
+        // Here we'll use fetch for better performance
+        fetch(`${config.apiEndpoints.bookings}/${reservationId}`, {
+            method: 'DELETE',
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to cancel reservation');
+            }
+
             // Remove the reservation from the list
             state.reservations = state.reservations.filter(res => res.id !== reservationId);
 
@@ -656,8 +719,17 @@
             renderReservations(state.reservations);
 
             // Show success message
-            alert('Reservation cancelled successfully!');
-        }, 500);
+            showSuccess('Reservation cancelled successfully!');
+        })
+        .catch(error => {
+            console.error('Error cancelling reservation:', error);
+
+            // Re-enable the button
+            cancelButton.text('Cancel Reservation').prop('disabled', false);
+
+            // Show error message
+            showError('Failed to cancel reservation. Please try again.');
+        });
     }
 
     function formatDate(dateString) {
@@ -665,25 +737,47 @@
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 
+    /**
+     * Show error message
+     * @param {string} message - Error message
+     */
+    function showError(message) {
+        // Show error notification using the modal
+        $('#notificationTitle').text('Error');
+        $('#notificationMessage').text(message);
+        $('#notificationModal').removeClass('hidden');
+    }
+
+    /**
+     * Show success message
+     * @param {string} message - Success message
+     */
+    function showSuccess(message) {
+        // Show success notification using the modal
+        $('#notificationTitle').text('Success');
+        $('#notificationMessage').text(message);
+        $('#notificationModal').removeClass('hidden');
+    }
+
     // Login/Signup Modal functions
     function showLoginModal() {
         // Clear previous inputs
-        $('#loginEmail').val('');
-        $('#loginPassword').val('');
+        DOM.modals.login.emailInput().val('');
+        DOM.modals.login.passwordInput().val('');
 
         // Show the modal
-        $('#loginModal').removeClass('hidden');
+        DOM.modals.login.modal().removeClass('hidden');
     }
 
     function showSignupModal() {
         // Clear previous inputs
-        $('#signupFirstName').val('');
-        $('#signupLastName').val('');
-        $('#signupEmail').val('');
-        $('#signupPassword').val('');
+        DOM.modals.signup.firstNameInput().val('');
+        DOM.modals.signup.lastNameInput().val('');
+        DOM.modals.signup.emailInput().val('');
+        DOM.modals.signup.passwordInput().val('');
 
         // Show the modal
-        $('#signupModal').removeClass('hidden');
+        DOM.modals.signup.modal().removeClass('hidden');
     }
 
     /**
@@ -706,17 +800,17 @@
                 state.isLoggedIn = true;
 
                 updateUIForLoggedInUser();
-                alert('Login successful!');
+                showSuccess('Login successful!');
             },
             error: (xhr, status, error) => {
                 if (xhr.status === 500) {
                     console.error("Server Error:", xhr.responseText);
                 } else if (xhr.status === 401 || xhr.status === 400) {
-                    alert('Wrong credentials. Please try again');
+                    showError('Wrong credentials. Please try again');
                     console.error("Unhandled Error:", xhr.status, xhr.responseText);
                 }
 
-                alert('Failed to submit review. Please try again.');
+                showError('Failed to submit review. Please try again.');
                 console.error('Review submission error:', xhr.responseText);
             }
         });
@@ -750,7 +844,7 @@
                 state.isLoggedIn = true;
 
                 updateUIForLoggedInUser();
-                alert('SignUp & Login successful!');
+                showSuccess('SignUp & Login successful!');
             },
             error: (xhr, status, error) => {
                 if (xhr.status === 500) {
@@ -759,7 +853,7 @@
                     console.error("Unhandled Error:", xhr.status, xhr.responseText);
                 }
 
-                alert('Error creating your account. Please try again');
+                showError('Error creating your account. Please try again');
             }
         });
     }
@@ -780,7 +874,7 @@
         // Update UI
         updateUIForLoggedOutUser();
 
-        alert('You have been logged out successfully.');
+        showSuccess('You have been logged out successfully.');
     }
 
     // Initialize the page

@@ -18,6 +18,10 @@
 }
 
 /* Room grid */
+.room-types {
+    width: 100%;
+}
+
 .room-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
