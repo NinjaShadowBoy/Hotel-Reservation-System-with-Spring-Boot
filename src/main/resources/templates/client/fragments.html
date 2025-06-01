@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragments</title>
+</head>
+<body>
+
+<!-- Notification Modal Fragment -->
+<div th:fragment="notificationModal" class="modal hidden" id="notificationModal" role="dialog" aria-labelledby="notification-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeNotificationModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <div id="notificationContent">
+            <h3 id="notification-modal-title"></h3>
+            <p id="notificationMessage"></p>
+            <button class="btn btn-primary" id="notificationOkBtn">OK</button>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
