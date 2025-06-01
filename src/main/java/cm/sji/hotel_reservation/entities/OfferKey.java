@@ -12,12 +12,12 @@ import java.util.Objects;
 @Embeddable
 public class OfferKey implements Serializable {
     private Integer roomType;
-    private String roomService;
+    private Integer roomService;
 
     //Default constructor
     public OfferKey() {}
 
-    public OfferKey(Integer roomTypeID, String roomService) {
+    public OfferKey(Integer roomTypeID, Integer roomService) {
         this.roomType = roomTypeID;
         this.roomService = roomService;
     }

@@ -9,15 +9,76 @@
 
     <title>Hotel Browsing System - HotelFinder</title>
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" integrity="sha512-P9pgMgcSNlLb4Z2WAB2sH5KBKGnBfyJnq+bhcfLCFusrRc4XdXrhfDluBl/usq75NF5gTDIMcwI1GaG5gju+Mw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link rel="stylesheet" href="/client/style.css">
-    <link rel="stylesheet" href="/client/index.css">
-    <link rel="stylesheet" href="/client/hotel-details.css">
+    <!-- Critical CSS inlined for faster rendering -->
+    <style>
+        /* Critical CSS for above-the-fold content */
+        :root {
+            --primary-color: #283593;
+            --glass-bg: rgba(10, 17, 40, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f5f5f5;
+            --blur-amount: 18px;
+        }
+        body {
+            font-family: "Product Sans", "Poppins", "Inter", 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #0a1128 0%, #1a237e 50%, #283593 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            margin: 0;
+        }
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 2.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 
     <!-- Preload critical resources -->
     <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" href="/client/style.css" as="style">
+    <link rel="preload" href="/client/index.css" as="style">
+    <link rel="preload" href="/js/jquery.js" as="script">
+    <link rel="preload" href="/client/index.js" as="script">
+    <link rel="preload" href="/api/placeholder/800/600" as="image" fetchpriority="high">
+
+    <!-- Font Awesome with reduced CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" integrity="sha512-P9pgMgcSNlLb4Z2WAB2sH5KBKGnBfyJnq+bhcfLCFusrRc4XdXrhfDluBl/usq75NF5gTDIMcwI1GaG5gju+Mw==" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
+
+    <!-- Critical CSS first, others async -->
+    <link rel="stylesheet" href="/client/style.css">
+    <link rel="stylesheet" href="/client/index.css">
+    <link rel="stylesheet" href="/client/hotel-details.css" media="print" onload="this.media='all'">
 </head>
 <body>
 <header class="site-header">
@@ -219,7 +280,22 @@
     </div>
 </footer>
 
+<!-- Notification Modal -->
+<div th:replace="client/fragments :: notificationModal"></div>
+
 <!-- Scripts -->
 <script src="/js/jquery.js" defer></script>
 <script src="/client/index.js" defer></script>
+
+<!-- Inline script for immediate UI feedback -->
+<script>
+    // Show loading indicators immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set initial loading states
+        const loaders = document.querySelectorAll('.loader:not(.hidden)');
+        loaders.forEach(loader => {
+            loader.style.display = 'flex';
+        });
+    });
+</script>
 </body>
