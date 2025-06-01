@@ -384,9 +384,12 @@
         // Show the modal
         DOM.modals.payment().removeClass('hidden');
 
-        if (state.cardElement) {
-            state.cardElement.mount(DOM.cardElement().attr('id'));
-        }
+        // Give the modal time to render before mounting the card element
+        setTimeout(() => {
+            if (state.cardElement) {
+                state.cardElement.mount('#cardElement');
+            }
+        }, 100);
     }
 
     /**

@@ -2,6 +2,10 @@ package cm.sji.hotel_reservation.config;
 
 import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.services.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -47,30 +51,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+        try {
+            String jwt = extractJwtFromRequest(request);
 
-        String jwt = extractJwtFromRequest(request);
+            // If request does not have authorization but has a token, check validity of token and generate authorization.
+            if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                String username = jwtService.extractUsername(jwt);
 
-        // If request does not have authorization but has a token, check validity of token and generate authorization.
-        if (jwt != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            String username = jwtService.extractUsername(jwt);
+                if (username != null) {
+                    User user = userService.findByEmail(username).orElse(null);
 
-            if (username != null) {
-                User user = userService.findByEmail(username).orElse(null);
+                    if (user == null) throw new AssertionError("User not found for token");
+                    if (jwtService.isTokenValid(jwt, user)) {
+                        // The authorization contains the whole user information.
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(user,null, user.getAuthorities());
 
-                if (user == null) throw new AssertionError();
-                if (jwtService.isTokenValid(jwt, user)) {
-                    // The authorization contains the whole user information.
-                    UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(user,null, user.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
-        }
 
-        filterChain.doFilter(request, response);
+            filterChain.doFilter(request, response);
+        } catch (AssertionError | JwtException e) {
+            // Redirect to root path when assertion error or JWT-related exceptions occur
+            response.sendRedirect("/");
+        }
     }
 
     /**

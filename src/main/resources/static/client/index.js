@@ -21,9 +21,9 @@
             bookings: '/api/bookings'
         },
         mockDelays: {
-            services: 100,
-            hotels: 200,
-            reservations: 100
+            services: 2000,
+            hotels: 2200,
+            reservations: 2000
         }
     };
 
@@ -181,16 +181,16 @@
                 return response.json();
             })
             .then(data => {
+                DOM.filters.amenitiesLoader().addClass('hidden');
                 state.services = data;
                 renderServiceFilters(state.services);
-                DOM.filters.amenitiesLoader().addClass('hidden');
             })
             .catch(error => {
+                DOM.filters.amenitiesLoader().addClass('hidden');
                 console.error('Error loading services:', error);
                 // Use fallback data if API fails
                 state.services = fallbackServices;
                 renderServiceFilters(state.services);
-                DOM.filters.amenitiesLoader().addClass('hidden');
             });
     }
 
@@ -291,18 +291,18 @@
                 return response.json();
             })
             .then(data => {
+                DOM.hotels.hotelsLoader().addClass('hidden');
                 state.hotels = data;
                 renderHotels(state.hotels);
                 renderPagination(state.hotels.length);
-                DOM.hotels.hotelsLoader().addClass('hidden');
             })
             .catch(error => {
+                DOM.hotels.hotelsLoader().addClass('hidden');
                 console.error('Error loading hotels:', error);
                 // Fallback to mock data if API fails
                 state.hotels = fallbackHotels;
                 renderHotels(state.hotels);
                 renderPagination(state.hotels.length);
-                DOM.hotels.hotelsLoader().addClass('hidden');
             });
     }
 
@@ -514,17 +514,18 @@
             method: 'GET',
             dataType: 'json',
             success: function(data) {
+                DOM.reservations.reservationsLoader().addClass('hidden');
                 state.reservations = data;
                 renderReservations(state.reservations);
-                DOM.reservations.reservationsLoader().addClass('hidden');
+                console.log('Loaded reservations:', state.reservations);
                 DOM.reservations.reservationCards().removeClass('hidden');
             },
             error: function(jqXHR, textStatus, errorThrown) {
+                DOM.reservations.reservationsLoader().addClass('hidden');
                 console.error('Error loading reservations:', textStatus, errorThrown);
                 // Fallback to mock data if API fails
                 state.reservations = fallbackReservations;
                 renderReservations(state.reservations);
-                DOM.reservations.reservationsLoader().addClass('hidden');
                 DOM.reservations.reservationCards().removeClass('hidden');
             }
         });
@@ -878,5 +879,8 @@
     }
 
     // Initialize the page
-    init()
+    init();
+
+    // Expose loadReservations function to global scope for mobile button
+    window.loadReservations = loadReservations;
 })();
