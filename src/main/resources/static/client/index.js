@@ -811,8 +811,6 @@
                     console.error("Unhandled Error:", xhr.status, xhr.responseText);
                 }
 
-                showError('Failed to submit review. Please try again.');
-                console.error('Review submission error:', xhr.responseText);
             }
         });
     }
