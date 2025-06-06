@@ -39,19 +39,24 @@ public class BookingService {
 
     private final UserRepo userRepo;
 
+    private final EmailService emailService;
+
     @Value("${system.default.cancellation.deadline.hours}")
     private Short cancellationDeadline;
 
     @Value("${system.commission.percentage:5.0}")
     private Double commissionPercentage;
 
-    public BookingService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, HotelPhotoRepo hotelPhotoRepo, BookingRepo bookingRepo, UserRepo userRepo) {
+    public BookingService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, 
+                         HotelPhotoRepo hotelPhotoRepo, BookingRepo bookingRepo, 
+                         UserRepo userRepo, EmailService emailService) {
         this.hotelRepo = hotelRepo;
         this.offerRepo = offerRepo;
         this.roomTypeRepo = roomTypeRepo;
         this.hotelPhotoRepo = hotelPhotoRepo;
         this.bookingRepo = bookingRepo;
         this.userRepo = userRepo;
+        this.emailService = emailService;
     }
 
     // Calculate commission amount
