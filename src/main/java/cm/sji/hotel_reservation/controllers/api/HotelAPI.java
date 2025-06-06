@@ -2,7 +2,6 @@ package cm.sji.hotel_reservation.controllers.api;
 
 
 import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
-import cm.sji.hotel_reservation.entities.Hotel;
 import cm.sji.hotel_reservation.services.HotelService;
 import cm.sji.hotel_reservation.services.RoomServiceService;
 import lombok.AllArgsConstructor;

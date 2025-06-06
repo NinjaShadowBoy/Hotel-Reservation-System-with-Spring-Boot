@@ -28,7 +28,20 @@ public class Booking {
     @JoinColumn(name = "fk_room_type_id", updatable = false)
     RoomType roomType = null;
 
-    LocalDateTime date = null;
-
+    LocalDateTime date = null;  // Booking creation date
     LocalDateTime checkinDate = null;
+
+    // Payment and commission fields
+    Double totalAmount = 0.0;  // Total amount paid
+    Double commissionAmount = 0.0;  // 5% commission amount
+
+    @Enumerated(EnumType.STRING)
+    BookingStatus status = BookingStatus.PENDING;
+
+    String paymentIntentId;  // Store Stripe payment intent ID
+
+    // Cancellation and refund fields
+    Boolean refunded = false;
+    LocalDateTime cancellationDate = null;
+    Double refundAmount = 0.0;
 }

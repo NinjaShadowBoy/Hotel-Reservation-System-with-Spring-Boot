@@ -57,6 +57,27 @@ public class BookingsAPI {
         }
     }
 
+    /**
+     * Endpoint for cancelling a booking
+     * @param bookingId The ID of the booking to cancel
+     * @return The updated booking information or error message
+     */
+    @PostMapping("/api/bookings/{bookingId}/cancel")
+    public ResponseEntity<?> cancelBooking(@PathVariable Integer bookingId) {
+        try {
+            ClientReservationDTO result = bookingService.cancelBooking(bookingId);
+            if (result == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Booking cannot be cancelled"));
+            }
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error cancelling booking: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Failed to cancel booking"));
+        }
+    }
+
     @PostMapping("/create-payment-intent")
     public ResponseEntity<Map<String, String>> createIntent(@RequestBody ReservationDTO request) {
         try {
