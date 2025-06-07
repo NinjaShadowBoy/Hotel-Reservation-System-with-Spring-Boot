@@ -2,8 +2,8 @@ package cm.sji.hotel_reservation.controllers.api;
 
 
 import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
-import cm.sji.hotel_reservation.entities.Hotel;
 import cm.sji.hotel_reservation.services.HotelService;
+import cm.sji.hotel_reservation.services.RoomServiceService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,8 @@ public class HotelAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final HotelService hotelService;
+
+    private final RoomServiceService roomServiceService;
 
     @GetMapping("/api/hotels")
     public ResponseEntity<List<HotelDetailsDTO>> getAllHotels() {

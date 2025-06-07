@@ -8,8 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -18,7 +19,13 @@ public class RoomServiceService {
 
     private final RoomServiceRepo roomServiceRepo;
 
-    public List<RoomService> getAllServices() {
+    private List<RoomService> getAllServices() {
         return roomServiceRepo.findAll();
+    }
+
+    public Set<String> allServices() {
+        return getAllServices().stream().map(service -> service.getLabel() + ":"
+                + service.getFontawsome_icon_class() + ":"
+                + service.getId()).collect(Collectors.toSet());
     }
 }

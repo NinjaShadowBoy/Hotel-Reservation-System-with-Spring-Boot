@@ -1,6 +1,7 @@
 package cm.sji.hotel_reservation.config;
 
 import cm.sji.hotel_reservation.dtos.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import jakarta.persistence.EntityNotFoundException;
 import cm.sji.hotel_reservation.exceptions.ResourceNotFoundException;
+import org.springframework.web.servlet.ModelAndView;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,15 +100,20 @@ public class GlobalExceptionHandler {
      * @return An error response
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex) {
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error("Internal Server Error")
-                .message("An unexpected error occurred")
-                .build();
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    public Object handleAllExceptions(HttpServletRequest request, Exception ex) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("text/html")) {
+            ModelAndView mav = new ModelAndView("error");
+            mav.addObject("message", ex.getMessage());
+            return mav;
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "status", 500,
+                            "error", "Internal Server Error",
+                            "message", ex.getMessage()
+                    ));
+        }
     }
 }
