@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse and filter hotels, view your reservations, and book your perfect stay with HotelFinder.">
+    <meta name="keywords" content="hotel, booking, reservation, accommodation, travel">
+    <meta name="author" content="HotelFinder">
+
+    <title>Hotel Browsing System - HotelFinder</title>
+
+    <!-- Critical CSS inlined for faster rendering -->
+    <style>
+        /* Critical CSS for above-the-fold content - nav-links styles removed to match client/reservation page */
+        :root {
+            --primary-color: #283593;
+            --glass-bg: rgba(10, 17, 40, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-primary: #f5f5f5;
+            --blur-amount: 18px;
+        }
+        body {
+            font-family: "Product Sans", "Poppins", "Inter", 'Segoe UI', 'Roboto', sans-serif;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #0a1128 0%, #1a237e 50%, #283593 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            margin: 0;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--blur-amount));
+            -webkit-backdrop-filter: blur(var(--blur-amount));
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: 250px 1fr 300px;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 100%;
+        }
+        @media (max-width: 992px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .header-container {
+                gap: 1rem;
+            }
+            .auth-buttons, .user-profile {
+                order: 2;
+            }
+            .logo {
+                order: 1;
+            }
+        }
+        @media (max-width: 576px) {
+            header {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1rem;
+                gap: 1rem;
+            }
+            .auth-buttons {
+                display: flex;
+                gap: 0.5rem;
+            }
+            .btn {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://js.stripe.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preload" href="/client/style.css" as="style">
+    <link rel="preload" href="/client/index.css" as="style">
+    <link rel="preload" href="/js/jquery.js" as="script">
+    <link rel="preload" href="/client/index.js" as="script">
+    <link rel="preload" href="/api/placeholder/800/600" as="image" fetchpriority="high">
+
+    <!-- Font Awesome with reduced CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" media="print" onload="this.media='all'" />
+
+    <!-- Critical CSS first, others async -->
+    <link rel="stylesheet" href="/client/style.css">
+    <link rel="stylesheet" href="/client/index.css">
+    <link rel="stylesheet" href="/client/hotel-details.css" media="print" onload="this.media='all'">
+</head>
+<body>
+<header class="site-header">
+    <div class="header-container">
+        <a class="logo" href="/">HotelFinder</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/destinations">Destinations</a>
+            <a href="/deals">Deals</a>
+            <a href="/about">About</a>
+        </nav>
+        <div class="auth-buttons" id="authButtons">
+            <button class="btn btn-outline" id="loginBtn">Login</button>
+            <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+        </div>
+        <div class="user-profile hidden" id="userProfile">
+            <span id="welcomeUser">Welcome, </span>
+            <button class="btn btn-outline" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+</header>
+
+<main class="container">
+    <!-- Left sidebar for filters -->
+    <aside class="filter-sidebar" aria-labelledby="filter-title" id="filterSidebar">
+        <div class="sidebar-header">
+            <h2 class="filter-title" id="filter-title">Filter Hotels</h2>
+            <button class="btn-close" id="closeFilterBtn" aria-label="Close filters">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div class="filter-group">
+            <h3 class="filter-subtitle" id="amenities-title">Amenities</h3>
+            <div class="checkbox-container" id="amenitiesFilters" aria-labelledby="amenities-title">
+                <!-- Service checkboxes will be added here via JavaScript -->
+                <div class="loader" id="amenitiesLoader" aria-label="Loading amenities">
+                    <div class="loader-spinner"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main content area -->
+    <section class="main-content">
+        <div class="search-container">
+            <label for="hotelSearch" class="visually-hidden">Search hotels</label>
+            <input 
+                class="search-input" 
+                id="hotelSearch" 
+                placeholder="Search hotels by name or location..." 
+                type="text"
+                aria-label="Search hotels by name or location"
+            >
+            <button class="btn btn-primary" id="searchBtn" type="button">Search</button>
+        </div>
+
+        <div class="mobile-actions">
+            <button class="btn btn-outline" id="mobileFilterBtn" type="button">
+                <i class="fa-solid fa-filter"></i> Filters
+            </button>
+            <button class="btn btn-outline" id="mobileReservationsBtn" type="button">
+                <i class="fa-solid fa-calendar-check"></i> Reservations
+            </button>
+        </div>
+
+        <div class="hotel-cards" id="hotelCards">
+            <div class="loader" id="hotelsLoader" aria-label="Loading hotels">
+                <div class="loader-spinner"></div>
+            </div>
+            <!-- Hotel cards will be added here via JavaScript -->
+        </div>
+
+        <nav class="pagination" id="pagination" aria-label="Pagination">
+            <!-- Pagination will be added here via JavaScript -->
+        </nav>
+    </section>
+
+    <!-- Right sidebar for reservations -->
+    <aside class="reservation-sidebar" aria-labelledby="reservation-title" id="reservationSidebar">
+        <div class="sidebar-header">
+            <h2 class="reservation-title" id="reservation-title">Your Reservations</h2>
+            <button class="btn-close" id="closeReservationsBtn" aria-label="Close reservations">
+                <i class="fa-solid fa-times"></i>
+            </button>
+        </div>
+        <div id="reservationsContent">
+            <div class="login-message" id="loginMessage">
+                <p>Please login to view your reservations</p>
+                <button class="btn btn-primary" id="sidebarLoginBtn" type="button">Login</button>
+            </div>
+            <div class="loader hidden" id="reservationsLoader" aria-label="Loading reservations">
+                <div class="loader-spinner"></div>
+            </div>
+            <div class="reservation-cards hidden" id="reservationCards">
+                <!-- Reservation cards will be added here via JavaScript -->
+            </div>
+        </div>
+    </aside>
+</main>
+
+<!-- This script needs to be moved to the end of the file, just before </body> -->
+<script>
+    // We'll move the sidebar toggle functionality to index.js to ensure it loads properly
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up mobile filter toggle
+        const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+        const filterSidebar = document.getElementById('filterSidebar');
+        const closeFilterBtn = document.getElementById('closeFilterBtn');
+
+        if (mobileFilterBtn) {
+            mobileFilterBtn.addEventListener('click', function() {
+                filterSidebar.classList.toggle('active');
+                document.body.classList.add('sidebar-open');
+            });
+        }
+
+        if (closeFilterBtn) {
+            closeFilterBtn.addEventListener('click', function() {
+                filterSidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            });
+        }
+
+        // Set up mobile reservations toggle
+        const mobileReservationsBtn = document.getElementById('mobileReservationsBtn');
+        const reservationSidebar = document.getElementById('reservationSidebar');
+        const closeReservationsBtn = document.getElementById('closeReservationsBtn');
+
+        if (mobileReservationsBtn) {
+            mobileReservationsBtn.addEventListener('click', function() {
+                reservationSidebar.classList.toggle('active');
+                document.body.classList.add('sidebar-open');
+
+                // Check if user is logged in and load reservations
+                const savedUser = localStorage.getItem('currentUser');
+                if (savedUser && window.loadReservations) {
+                    window.loadReservations();
+                }
+            });
+        }
+
+        if (closeReservationsBtn) {
+            closeReservationsBtn.addEventListener('click', function() {
+                reservationSidebar.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            });
+        }
+
+        // Close sidebars when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#filterSidebar') && 
+                !e.target.closest('#mobileFilterBtn') && 
+                filterSidebar.classList.contains('active')) {
+                filterSidebar.classList.remove('active');
+                if (!reservationSidebar.classList.contains('active')) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+
+            if (!e.target.closest('#reservationSidebar') && 
+                !e.target.closest('#mobileReservationsBtn') && 
+                reservationSidebar.classList.contains('active')) {
+                reservationSidebar.classList.remove('active');
+                if (!filterSidebar.classList.contains('active')) {
+                    document.body.classList.remove('sidebar-open');
+                }
+            }
+        });
+    });
+</script>
+
+<!-- Login Modal -->
+<div class="modal hidden" id="loginModal" role="dialog" aria-labelledby="login-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeLoginModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="login-modal-title">Login to Your Account</h3>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="loginEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="loginPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <p class="modal-footer-text">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal hidden" id="signupModal" role="dialog" aria-labelledby="signup-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeSignupModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="signup-modal-title">Create an Account</h3>
+        <form id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="signupFirstName">First Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupFirstName" 
+                    type="text" 
+                    placeholder="Enter your first name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupLastName">Last Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupLastName" 
+                    type="text" 
+                    placeholder="Enter your last name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="signupEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="signupPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Sign Up</button>
+        </form>
+        <p class="modal-footer-text">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>HotelFinder</h3>
+            <p>Find your perfect stay with us.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/terms">Terms & Conditions</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope" aria-hidden="true"></i> info@hotelfinder.com</p>
+            <p><i class="fas fa-phone" aria-hidden="true"></i> +1 (555) 123-4567</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 HotelFinder. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Notification Modal -->
+<div th:replace="client/fragments :: notificationModal"></div>
+
+<!-- Scripts -->
+<script src="/js/jquery.js" defer></script>
+<script src="/client/index.js" defer></script>
+
+<!-- Inline script for immediate UI feedback -->
+<script>
+    // Show loading indicators immediately
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set initial loading states
+        const loaders = document.querySelectorAll('.loader:not(.hidden)');
+        loaders.forEach(loader => {
+            loader.style.display = 'flex';
+        });
+    });
+</script>
+</body>

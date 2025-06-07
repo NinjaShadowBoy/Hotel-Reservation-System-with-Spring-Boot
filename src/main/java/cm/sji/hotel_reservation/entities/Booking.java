@@ -1,31 +1,48 @@
 package cm.sji.hotel_reservation.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Data
-@IdClass(BookingKey.class)
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Booking {
-//    @EmbeddedId
-//    private BookingKey id;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+
     @ManyToOne
-    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
-    User client;
+    @JoinColumn(name = "fk_client_id", updatable = false)
+    User client = null;
 
-    @Id
     @ManyToOne
-    @JoinColumn(name = "fk_room_type_id", insertable = false, updatable = false)
-    RoomType roomType;
+    @JoinColumn(name = "fk_room_type_id", updatable = false)
+    RoomType roomType = null;
 
-    LocalDateTime date;
+    LocalDateTime date = null;  // Booking creation date
+    LocalDateTime checkinDate = null;
 
+    // Payment and commission fields
+    Double totalAmount = 0.0;  // Total amount paid
+    Double commissionAmount = 0.0;  // 5% commission amount
+
+    @Enumerated(EnumType.STRING)
+    BookingStatus status = BookingStatus.PENDING;
+
+    String paymentIntentId;  // Store Stripe payment intent ID
+    String chargeId;  // Store Stripe charge ID
+
+    // Cancellation and refund fields
+    String refundId;
+    Boolean refunded = false;
+    LocalDateTime cancellationDate = null;
+    Double refundAmount = 0.0;
 }

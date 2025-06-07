@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View detailed information about hotels, rooms, reviews, and FAQs. Book your perfect stay with HotelFinder.">
+    <meta name="keywords" content="hotel, booking, reservation, rooms, accommodation">
+    <meta name="author" content="HotelFinder">
+
+    <title>Hotel Details - HotelFinder</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" integrity="sha512-siarrzI1u3pCqFG2LEzi87McrBmq6Tp7juVsdmGY1Dr8Saw+ZBAzDzrGwX3vgxX1NkioYNCFOVC0GpDPss10zQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" integrity="sha512-P9pgMgcSNlLb4Z2WAB2sH5KBKGnBfyJnq+bhcfLCFusrRc4XdXrhfDluBl/usq75NF5gTDIMcwI1GaG5gju+Mw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/client/style.css">
+    <link rel="stylesheet" href="/client/hotel-details.css">
+
+    <!-- Preload critical resources -->
+    <link rel="preconnect" href="https://js.stripe.com">
+</head>
+<body>
+<header class="site-header">
+    <div class="header-container">
+        <a class="logo" href="/">HotelFinder</a>
+        <nav class="nav-links" aria-label="Main navigation">
+            <a href="/">Home</a>
+            <a href="/destinations">Destinations</a>
+            <a href="/deals">Deals</a>
+            <a href="/about">About</a>
+        </nav>
+        <div class="auth-buttons" id="authButtons">
+            <button class="btn btn-outline" id="loginBtn">Login</button>
+            <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+        </div>
+        <div class="user-profile hidden" id="userProfile">
+            <span id="welcomeUser">Welcome, </span>
+            <button class="btn btn-outline" id="logoutBtn">Logout</button>
+        </div>
+    </div>
+</header>
+
+<main class="container hotel-details-container">
+    <!-- Main Hotel Info -->
+    <article class="hotel-main">
+        <header class="hotel-header">
+            <h1 class="hotel-name" id="hotelName"></h1>
+            <div class="hotel-rating" aria-label="Hotel rating">
+                <span class="hotel-star"><i class="fas fa-star" aria-hidden="true"></i></span>
+                <span id="hotelRating"></span>
+            </div>
+        </header>
+        <img class="hotel-main-image" id="hotelImage" alt="Hotel image">
+        <p class="hotel-description" id="hotelDescription"></p>
+        <div class="hotel-location">
+            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+            <span id="hotelLocation"></span>
+        </div>
+    </article>
+
+    <!-- Room Types Section -->
+    <section class="room-types" aria-labelledby="rooms-title">
+        <h2 class="rooms-title" id="rooms-title">Available Rooms</h2>
+        <div class="room-grid" id="roomGrid"></div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="reviews" aria-labelledby="reviews-title">
+        <h2 class="reviews-title" id="reviews-title">Guest Reviews</h2>
+        <div class="reviews-list" id="reviewsList">
+            <a class="hidden" href="#reviewForm" id="leaveReview">
+                <button class="btn btn-primary view-details-btn">Leave a review</button>
+            </a>
+        </div>
+
+        <form class="hidden form-container" id="reviewForm" aria-labelledby="review-form-title">
+            <h3 id="review-form-title" class="form-title">Write Your Review</h3>
+            <div class="form-group">
+                <label class="form-label" for="reviewText">Your Review</label>
+                <textarea
+                    class="form-textarea"
+                    id="reviewText"
+                    placeholder="Write your review..."
+                    required
+                    aria-required="true"
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" id="rating-label">Rating</label>
+                <div class="rating-stars" role="radiogroup" aria-labelledby="rating-label">
+                    <i class="fas fa-star" data-rating="1" role="radio" aria-label="1 star" tabindex="0"></i>
+                    <i class="fas fa-star" data-rating="2" role="radio" aria-label="2 stars" tabindex="0"></i>
+                    <i class="fas fa-star" data-rating="3" role="radio" aria-label="3 stars" tabindex="0"></i>
+                    <i class="fas fa-star" data-rating="4" role="radio" aria-label="4 stars" tabindex="0"></i>
+                    <i class="fas fa-star" data-rating="5" role="radio" aria-label="5 stars" tabindex="0"></i>
+                </div>
+                <input type="hidden" name="rating" id="ratingInput" aria-hidden="true">
+            </div>
+
+            <button class="btn btn-primary form-submit" type="submit">Submit Review</button>
+        </form>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faqs" aria-labelledby="faqs-title">
+        <h2 class="faqs-title" id="faqs-title">Frequently Asked Questions</h2>
+        <div class="faq-list" id="faqList">
+            <a class="hidden" href="#faqForm" id="writeFAQ">
+                <button class="btn btn-primary view-details-btn">Have a question for this hotel?</button>
+            </a>
+        </div>
+        <form class="hidden form-container" id="faqForm" aria-labelledby="faq-form-title">
+            <h3 id="faq-form-title" class="form-title">Ask a Question</h3>
+            <div class="form-group">
+                <label class="form-label" for="faqQuestion">Your Question</label>
+                <input
+                    class="form-input"
+                    id="faqQuestion"
+                    placeholder="Enter your question"
+                    required
+                    type="text"
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary form-submit" type="submit">Ask Question</button>
+        </form>
+    </section>
+</main>
+
+<!-- Payment Modal -->
+<div class="modal hidden" id="paymentModal" role="dialog" aria-labelledby="payment-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closePaymentModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="payment-modal-title">Complete Your Booking</h3>
+
+        <!-- Room Information Section -->
+        <div class="room-info-container" id="roomInfoContainer">
+            <div class="room-info-header">
+                <h4>Room Details</h4>
+            </div>
+            <div class="room-info-details">
+                <div class="room-info-row">
+                    <span class="room-info-label">Room Type:</span>
+                    <span class="room-info-value" id="roomInfoType"></span>
+                </div>
+                <div class="room-info-row">
+                    <span class="room-info-label">Price:</span>
+                    <span class="room-info-value" id="roomInfoPrice"></span>
+                </div>
+                <div class="room-info-row">
+                    <span class="room-info-label">Services:</span>
+                    <div class="room-info-services" id="roomInfoServices"></div>
+                </div>
+            </div>
+        </div>
+
+        <form id="paymentForm">
+            <div class="form-group">
+                <label class="form-label" for="checkinDatetime">Check-in Date and Time</label>
+                <input 
+                    class="form-input" 
+                    id="checkinDatetime" 
+                    type="datetime-local" 
+                    required
+                    aria-required="true"
+                >
+                <small class="form-hint">Check-in date must be within 1 month from today</small>
+            </div>
+            <div id="cardElement" aria-label="Credit card input"></div>
+            <button class="btn btn-primary" type="submit">Pay Now</button>
+        </form>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal hidden" id="loginModal" role="dialog" aria-labelledby="login-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeLoginModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="login-modal-title">Login to Your Account</h3>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="loginEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="loginEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="loginPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="loginPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <p class="modal-footer-text">Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="modal hidden" id="signupModal" role="dialog" aria-labelledby="signup-modal-title" aria-hidden="true">
+    <div class="modal-content">
+        <button id="closeSignupModal" aria-label="Close modal">
+            <i class="fa-solid fa-times" aria-hidden="true"></i>
+        </button>
+        <h3 id="signup-modal-title">Create an Account</h3>
+        <form id="signupForm">
+            <div class="form-group">
+                <label class="form-label" for="signupFirstName">First Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupFirstName" 
+                    type="text" 
+                    placeholder="Enter your first name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupLastName">Last Name</label>
+                <input 
+                    class="form-input" 
+                    id="signupLastName" 
+                    type="text" 
+                    placeholder="Enter your last name"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupEmail">Email</label>
+                <input 
+                    class="form-input" 
+                    id="signupEmail" 
+                    type="email" 
+                    placeholder="Enter your email"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="signupPassword">Password</label>
+                <input 
+                    class="form-input" 
+                    id="signupPassword" 
+                    type="password" 
+                    placeholder="Enter your password"
+                    required
+                    aria-required="true"
+                >
+            </div>
+            <button class="btn btn-primary" type="submit">Sign Up</button>
+        </form>
+        <p class="modal-footer-text">Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+    </div>
+</div>
+
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>HotelFinder</h3>
+            <p>Find your perfect stay with us.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About Us</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/terms">Terms & Conditions</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Contact Us</h3>
+            <p><i class="fas fa-envelope" aria-hidden="true"></i> info@hotelfinder.com</p>
+            <p><i class="fas fa-phone" aria-hidden="true"></i> +1 (555) 123-4567</p>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2023 HotelFinder. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Notification Modal -->
+<div th:replace="client/fragments :: notificationModal"></div>
+
+<!-- Scripts -->
+<script src="/js/jquery.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/fontawesome.min.js" integrity="sha512-SYzE0xw/2qjYp+Mz3J5RGKULJoIRCZwlM4QLmFRnOeXBr7bwrjPBPFQZuXeCRYUzgA0czAP2DnNYt1HGzNUbXg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/solid.min.js" integrity="sha512-s6yNeC6faUgveCQocceGXVia9tAr6kA/0z7ihaveWy9wYxLdYYpP0M36nEpYBQHHEV4rZNJhfYuHXm/uWcJ46w==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+<script src="https://js.stripe.com/basil/stripe.js" defer></script>
+<script src="/client/hotel.js" defer></script>
+</body>
+</html>

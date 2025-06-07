@@ -10,12 +10,17 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Repository
-public interface BookingRepo extends JpaRepository<Booking, BookingKey> {
+public interface BookingRepo extends JpaRepository<Booking, Integer> {
     List<Booking> findByClient(User client);
     List<Booking> findByRoomType(RoomType roomType);
     List<Booking> findByDateBetween(LocalDateTime startDate, LocalDateTime endDate);
     List<Booking> findByRoomTypeHotelId(Integer roomType_hotel_id);
+
+    List<Booking> findByClient_Id(Integer clientId);
+
+    Booking findByRefundId(String refundId);
 }

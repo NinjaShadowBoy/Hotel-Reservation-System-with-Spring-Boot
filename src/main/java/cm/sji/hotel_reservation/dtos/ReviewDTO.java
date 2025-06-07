@@ -16,5 +16,5 @@ public class ReviewDTO {
     String author;
     LocalDateTime date;
     String text;
-    Number rating;
+    Float rating;
 }

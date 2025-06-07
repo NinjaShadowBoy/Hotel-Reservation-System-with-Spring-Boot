@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -21,19 +22,20 @@ public class Hotel implements Serializable {
     private Integer id;
 
     @Column(nullable = false)
-    private String name;
+    private String name = "";
 
     @Column(nullable = false)
-    private String location;
+    private String location = "";
 
     @Column(nullable = false)
-    private Float rating;
+    private Float rating = 0F;
 
     @Column(nullable = false, length = 1000)
-    private String description;
+    private String description = "";
 
-    @Column(nullable = false)
-    private String owner;
+    @JoinColumn(nullable = true)
+    @ManyToOne
+    private User owner;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;

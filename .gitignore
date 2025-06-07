@@ -34,3 +34,9 @@ build/
 
 ### Application properties ###
 application.properties
+
+### Uploaded photos ###
+uploads/
+
+### Personal files to be ignored like secrets, machine dependent configs ###
+ignoretoo/
