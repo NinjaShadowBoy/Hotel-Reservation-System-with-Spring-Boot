@@ -4,7 +4,6 @@ import cm.sji.hotel_reservation.dtos.ClientReservationDTO;
 import cm.sji.hotel_reservation.dtos.ReservationDTO;
 import cm.sji.hotel_reservation.entities.Booking;
 import cm.sji.hotel_reservation.entities.BookingStatus;
-import cm.sji.hotel_reservation.entities.RoomPhoto;
 import cm.sji.hotel_reservation.entities.RoomType;
 import cm.sji.hotel_reservation.entities.User;
 import cm.sji.hotel_reservation.repositories.*;
@@ -47,9 +46,9 @@ public class BookingService {
     @Value("${system.commission.percentage:5.0}")
     private Double commissionPercentage;
 
-    public BookingService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, 
-                         HotelPhotoRepo hotelPhotoRepo, BookingRepo bookingRepo, 
-                         UserRepo userRepo, EmailService emailService) {
+    public BookingService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo,
+                          HotelPhotoRepo hotelPhotoRepo, BookingRepo bookingRepo,
+                          UserRepo userRepo, EmailService emailService) {
         this.hotelRepo = hotelRepo;
         this.offerRepo = offerRepo;
         this.roomTypeRepo = roomTypeRepo;
@@ -123,7 +122,7 @@ public class BookingService {
                 .setTransferData(
                         PaymentIntentCreateParams.TransferData.builder()
                                 .setDestination("acct_1RQq99QjidQV5ShK") // The connected account
-                                .setAmount((long)((totalAmount - commissionAmount) * 100)) // Transfer amount minus commission
+                                .setAmount((long) ((totalAmount - commissionAmount) * 100)) // Transfer amount minus commission
                                 .build()
                 )
                 .putMetadata("roomTypeId", reservationDTO.getRoomTypeId().toString())
@@ -161,11 +160,16 @@ public class BookingService {
                     .commissionAmount(commissionAmount)
                     .status(BookingStatus.CONFIRMED)
                     .paymentIntentId(bookingInfo.get("payment_intent"))
+                    .chargeId(bookingInfo.get("charge_id"))
                     .build();
 
             logger.info("Booking completed with commission: {}", commissionAmount);
 
             booking = bookingRepo.save(booking);
+
+            // Send booking confirmation email
+            emailService.sendBookingConfirmationEmail(booking);
+            logger.info("Sent booking confirmation email for booking ID: {}", booking.getId());
 
             return getReservationDTO(booking);
         } catch (Exception e) {
@@ -176,6 +180,7 @@ public class BookingService {
 
     /**
      * Cancels a booking and processes a refund if applicable
+     *
      * @param bookingId The ID of the booking to cancel
      * @return The updated reservation DTO or null if cancellation failed
      */
@@ -208,21 +213,46 @@ public class BookingService {
             Double refundAmount = booking.getTotalAmount() - booking.getCommissionAmount();
 
             try {
+                // Check if payment intent ID or charge ID is available
+                RefundCreateParams.Builder paramsBuilder = RefundCreateParams.builder()
+                        .setAmount((long) (refundAmount * 100)); // Convert to cents
+
+                boolean hasPaymentIntent = booking.getPaymentIntentId() != null && !booking.getPaymentIntentId().isEmpty();
+                boolean hasChargeId = booking.getChargeId() != null && !booking.getChargeId().isEmpty();
+
+                // Try to use payment intent ID first
+                if (hasPaymentIntent) {
+                    paramsBuilder.setPaymentIntent(booking.getPaymentIntentId());
+                    logger.info("Using payment_intent for refund: {}", booking.getPaymentIntentId());
+                } 
+                // If payment intent is not available, try to use charge ID
+                else if (hasChargeId) {
+                    paramsBuilder.setCharge(booking.getChargeId());
+                    logger.info("Using charge for refund: {}", booking.getChargeId());
+                } 
+                // If neither is available, return error
+                else {
+                    logger.error("Error processing refund: One of the following params should be provided for this request: payment_intent or charge; booking ID: {}", bookingId);
+                    return null;
+                }
+
                 // Create refund in Stripe
-                RefundCreateParams params = RefundCreateParams.builder()
-                        .setPaymentIntent(booking.getPaymentIntentId())
-                        .setAmount((long)(refundAmount * 100)) // Convert to cents
-                        .build();
+                RefundCreateParams params = paramsBuilder.build();
 
                 Refund refund = Refund.create(params);
 
-                // Update booking status
+                // Store the refund ID but don't mark as refunded yet
+                booking.setRefundId(refund.getId());
                 booking.setStatus(BookingStatus.CANCELLED);
                 booking.setCancellationDate(LocalDateTime.now());
-                booking.setRefunded(true);
-                booking.setRefundAmount(refundAmount);
+                // Don't set refunded=true yet
+                // Don't set refundAmount yet
 
                 booking = bookingRepo.save(booking);
+
+                // Send booking cancellation email
+                emailService.sendBookingCancellationEmail(booking);
+                logger.info("Sent booking cancellation email for booking ID: {}", booking.getId());
 
                 logger.info("Booking cancelled with refund: {}", refundAmount);
                 return getReservationDTO(booking);
@@ -233,6 +263,35 @@ public class BookingService {
         } catch (Exception e) {
             logger.error("Error when cancelling booking: {}", e.getMessage());
             return null;
+        }
+    }
+
+    /**
+     * Confirms a refund for a booking
+     *
+     * @param refundId The ID of the refund from Stripe
+     * @param refundAmount The amount refunded
+     */
+    public void confirmRefund(String refundId, Double refundAmount) {
+        try {
+            // Find booking by refund ID
+            Booking booking = bookingRepo.findByRefundId(refundId);
+            if (booking == null) {
+                logger.error("No booking found with refund ID: {}", refundId);
+                return;
+            }
+
+            // Update booking with refund confirmation
+            booking.setRefunded(true);
+            booking.setRefundAmount(refundAmount);
+
+            booking = bookingRepo.save(booking);
+
+            // Send a refund confirmation email
+            emailService.sendRefundConfirmationEmail(booking);
+            logger.info("Refund confirmed for booking ID: {} and confirmation email sent", booking.getId());
+        } catch (Exception e) {
+            logger.error("Error confirming refund: {}", e.getMessage());
         }
     }
 }

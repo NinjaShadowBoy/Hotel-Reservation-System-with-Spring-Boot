@@ -36,42 +36,71 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        try {
+            logger.info("Authentication attempt for user: {}", request.getUsername());
 
-        // Determine if input is email or username and fetch user
-        User user = userService.findByEmail(request.getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+            authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        // If authentication succeeds generate jwt token
-        // Do not include the password in the payload
-        user.setPassword(null);
-        var jwtToken = jwtService.generateToken(user);
+            logger.debug("Authentication successful for user: {}", request.getUsername());
 
-        // Set the token in HttpOnly cookie
-        Cookie cookie = new Cookie("JWT", jwtToken);
-        cookie.setHttpOnly(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(30 * 60); // Cookie expires in 30 minutes
+            // Determine if input is email or username and fetch user
+            User user = userService.findByEmail(request.getUsername())
+                    .orElseThrow(() -> {
+                        logger.error("User not found with email/username: {}", request.getUsername());
+                        return new RuntimeException("User not found");
+                    });
 
-        response.addCookie(cookie);
+            // If authentication succeeds generate jwt token
+            // Do not include the password in the payload
+            user.setPassword(null);
+            var jwtToken = jwtService.generateToken(user);
+            logger.debug("JWT token generated for user: {}", user.getEmail());
 
-        // Set the token in Authorization header
-        response.addHeader("Authorization", "Bearer " + jwtToken);
+            // Set the token in HttpOnly cookie
+            Cookie cookie = new Cookie("JWT", jwtToken);
+            cookie.setHttpOnly(true);
+            cookie.setPath("/");
+            cookie.setMaxAge(30 * 60); // Cookie expires in 30 minutes
 
-        return AuthenticationResponse
-                .builder()
-                .user(user)
-                .token(jwtToken)
-                .build();
+            response.addCookie(cookie);
+
+            // Set the token in Authorization header
+            response.addHeader("Authorization", "Bearer " + jwtToken);
+
+            logger.info("User successfully authenticated: {} (ID: {})", user.getEmail(), user.getId());
+
+            return AuthenticationResponse
+                    .builder()
+                    .user(user)
+                    .token(jwtToken)
+                    .build();
+        } catch (AuthenticationException e) {
+            logger.error("Authentication failed for user {}: {} - {}", 
+                    request.getUsername(), e.getClass().getSimpleName(), e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.error("Unexpected error during authentication for user {}: {} - {}", 
+                    request.getUsername(), e.getClass().getSimpleName(), e.getMessage());
+            throw e;
+        }
     }
 
     public String getCurrentUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() ||
-                authentication instanceof AnonymousAuthenticationToken) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.isAuthenticated() ||
+                    authentication instanceof AnonymousAuthenticationToken) {
+                logger.debug("No authenticated user found, returning anonymous");
+                return "anonymous";
+            }
+            String username = authentication.getName();
+            logger.debug("Current authenticated username: {}", username);
+            return username;
+        } catch (Exception e) {
+            logger.error("Error retrieving current username: {} - {}", 
+                    e.getClass().getSimpleName(), e.getMessage());
             return "anonymous";
         }
-        return authentication.getName();
     }
 }

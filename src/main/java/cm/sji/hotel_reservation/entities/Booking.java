@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Data
@@ -39,8 +38,10 @@ public class Booking {
     BookingStatus status = BookingStatus.PENDING;
 
     String paymentIntentId;  // Store Stripe payment intent ID
+    String chargeId;  // Store Stripe charge ID
 
     // Cancellation and refund fields
+    String refundId;
     Boolean refunded = false;
     LocalDateTime cancellationDate = null;
     Double refundAmount = 0.0;
