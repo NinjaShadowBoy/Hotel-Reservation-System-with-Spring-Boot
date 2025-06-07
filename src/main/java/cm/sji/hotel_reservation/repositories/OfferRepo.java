@@ -13,4 +13,5 @@ import java.util.List;
 public interface OfferRepo extends JpaRepository<Offer, OfferKey> {
     List<Offer> findByRoomType(RoomType roomType);
     List<Offer> findByRoomService(RoomService roomService);
+    boolean existsByRoomTypeAndRoomService(RoomType roomType, RoomService roomService);
 }

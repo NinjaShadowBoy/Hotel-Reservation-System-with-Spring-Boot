@@ -19,7 +19,7 @@ public class RoomServiceService {
 
     private final RoomServiceRepo roomServiceRepo;
 
-    private List<RoomService> getAllServices() {
+    public List<RoomService> getAllServices() {
         return roomServiceRepo.findAll();
     }
 

@@ -19,6 +19,9 @@
 -- Table structure for table `booking`
 --
 
+create database hotel_reservation;
+use hotel_reservation;
+
 DROP TABLE IF EXISTS `booking`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
@@ -56,13 +59,13 @@ INSERT INTO `booking` (`id`, `checkin_date`, `date`, `fk_client_id`, `fk_room_ty
 UNLOCK TABLES;
 
 --
--- Table structure for table `faq`
+-- Table structure for table `question`
 --
 
-DROP TABLE IF EXISTS `faq`;
+DROP TABLE IF EXISTS `question`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `faq` (
+CREATE TABLE `question` (
   `fk_client_id` int NOT NULL,
   `fk_hotel_id` int NOT NULL,
   `faq_answer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -77,13 +80,13 @@ CREATE TABLE `faq` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `faq`
+-- Dumping data for table `question`
 --
 
-LOCK TABLES `faq` WRITE;
-/*!40000 ALTER TABLE `faq` DISABLE KEYS */;
-INSERT INTO `faq` (`fk_client_id`, `fk_hotel_id`, `faq_answer`, `faq_question`, `id`) VALUES (1,1,'Check-in time is 3:00 PM and check-out time is 11:00 AM. Early check-in and late check-out may be available upon request, subject to availability.','What time is check-in and check-out?',1),(1,5,'We offer a Kids Club for ages 4-12, daily poolside activities, beach games, and special evening entertainment for the whole family.','What activities are available for children?',2),(2,1,'Breakfast is included with certain room packages. Please check your specific reservation details or contact our front desk for more information.','Is breakfast included in the room rate?',3),(3,2,'Yes, we offer complimentary airport shuttle service for all guests. Please provide your flight details at least 24 hours prior to arrival.','Do you offer airport shuttle service?',4),(4,3,'Yes, we offer both valet parking ($35/day) and self-parking ($25/day) options for our guests.','Is parking available at the hotel?',5),(5,4,'Yes, we are a pet-friendly resort. There is a $50 pet fee per stay, and we welcome pets under 50 pounds. Please notify us in advance if you plan to bring a pet.','Are pets allowed at the resort?',6),(10,2,'','Can I have more food?',7);
-/*!40000 ALTER TABLE `faq` ENABLE KEYS */;
+LOCK TABLES `question` WRITE;
+/*!40000 ALTER TABLE `question` DISABLE KEYS */;
+INSERT INTO `question` (`fk_client_id`, `fk_hotel_id`, `faq_answer`, `faq_question`, `id`) VALUES (1,1,'Check-in time is 3:00 PM and check-out time is 11:00 AM. Early check-in and late check-out may be available upon request, subject to availability.','What time is check-in and check-out?',1),(1,5,'We offer a Kids Club for ages 4-12, daily poolside activities, beach games, and special evening entertainment for the whole family.','What activities are available for children?',2),(2,1,'Breakfast is included with certain room packages. Please check your specific reservation details or contact our front desk for more information.','Is breakfast included in the room rate?',3),(3,2,'Yes, we offer complimentary airport shuttle service for all guests. Please provide your flight details at least 24 hours prior to arrival.','Do you offer airport shuttle service?',4),(4,3,'Yes, we offer both valet parking ($35/day) and self-parking ($25/day) options for our guests.','Is parking available at the hotel?',5),(5,4,'Yes, we are a pet-friendly resort. There is a $50 pet fee per stay, and we welcome pets under 50 pounds. Please notify us in advance if you plan to bring a pet.','Are pets allowed at the resort?',6),(10,2,'','Can I have more food?',7);
+/*!40000 ALTER TABLE `question` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

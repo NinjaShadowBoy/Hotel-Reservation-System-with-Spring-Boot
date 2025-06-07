@@ -25,7 +25,13 @@ public class ServicesAPI {
     @GetMapping("/api/services")
     public ResponseEntity<Set<String>> services() {
         try {
-            return new ResponseEntity<>(roomServiceService.allServices(), HttpStatus.OK);
+            var services = roomServiceService.getAllServices();
+
+            Set<String> result = services.stream().map(service ->
+                            service.getLabel()+":"+service.getFontawsome_icon_class()+":"+
+                            service.getId())
+                    .collect(Collectors.toSet());
+            return new ResponseEntity<>(result, HttpStatus.OK);
         }catch (Exception e){
             logger.error(e.getMessage());
             return new ResponseEntity<>(new HashSet<>(), HttpStatus.INTERNAL_SERVER_ERROR);

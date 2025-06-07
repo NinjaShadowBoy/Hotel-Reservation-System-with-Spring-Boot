@@ -3,14 +3,12 @@ package cm.sji.hotel_reservation.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FAQ {
+public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

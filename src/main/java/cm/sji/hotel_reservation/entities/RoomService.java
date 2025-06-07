@@ -14,7 +14,7 @@ import lombok.*;
 public class RoomService {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    Integer Id;
     String label;
     String fontawsome_icon_class = "fa fa-square";
 }
