@@ -171,7 +171,10 @@ function getOwnerHotels() {
     const hotelCards = document.getElementById('HotelCards');
     const selectHotel = document.getElementById('select-hotel');
     const filterHotel = document.getElementById('hotel-review-filter');
-    
+    const filterHotelQuestion = document.getElementById('hotel-question-filter');
+    const filterHotelFAQ = document.getElementById('hotel-faq-filter');
+
+
     // Clear existing content
     hotelCards.innerHTML = '';
     selectHotel.innerHTML = '<option value="">Select a hotel</option>';
@@ -243,11 +246,25 @@ function getOwnerHotels() {
             hotelCards.appendChild(card);
 
             // Add option to select hotel
-            const option = document.createElement('option');
-            option.value = hotel.id;
-            option.textContent = hotel.name || 'Unnamed Hotel';
-            selectHotel.appendChild(option);
-            filterHotel.appendChild(option);
+            const option1 = document.createElement('option');
+            option1.value = hotel.id;
+            option1.textContent = hotel.name || 'Unnamed Hotel';
+            selectHotel.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = hotel.id;
+            option2.textContent = hotel.name || 'Unnamed Hotel';
+            filterHotel.appendChild(option2);
+
+            const option3 = document.createElement('option');
+            option3.value = hotel.id;
+            option3.textContent = hotel.name || 'Unnamed Hotel';
+            filterHotelQuestion.appendChild(option3);
+
+            const option4 = document.createElement('option');
+            option4.value = hotel.id;
+            option4.textContent = hotel.name || 'Unnamed Hotel';
+            filterHotelFAQ.appendChild(option4);
         });
 
         // Add event listener for hotel selection only once
@@ -256,6 +273,12 @@ function getOwnerHotels() {
 
         filterHotel.removeEventListener('change', handleHotelSelectionForReviews);
         filterHotel.addEventListener('change', handleHotelSelectionForReviews);
+
+        filterHotelQuestion.removeEventListener('change', handleHotelSelectionForQuestions);
+        filterHotelQuestion.addEventListener('change', handleHotelSelectionForQuestions);
+
+        filterHotelFAQ.removeEventListener('change', handleHotelSelectionForFaq);
+        filterHotelFAQ.addEventListener('change', handleHotelSelectionForFaq);
     })
     .catch(error => {
         console.error('Error fetching owner hotels:', error);
@@ -372,6 +395,7 @@ function handleHotelSelectionForReviews(e) {
 
     if (value === 'all') {
 
+        hotelReviews.innerHTML = '<p>Please select a hotel to display its Reviews</p>';
         localStorage.setItem('ReviewsHotelId', 'all');
         console.log('currently ', localStorage.getItem('ReviewsHotelId'));
         return;  //to be touched
@@ -459,6 +483,157 @@ function simpleStarUpdate(rating, starsContainer) {
 }
 
 
+// Separate function for handling hotel selection for questions
+function handleHotelSelectionForQuestions(e) {
+    const value = e.target.value;
+    const hotelQuestions = document.getElementById('question-body');
+
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const ownerId = currentUser.id;
+
+
+    if (value === 'all') {
+
+        hotelQuestions.innerHTML = '<p>Please select a hotel to display its Questions</p>';
+        localStorage.setItem('QuestionsHotelId', 'all');
+        console.log('currently ', localStorage.getItem('QuestionsHotelId'));
+        return;  //to be touched
+    }
+
+
+    hotelQuestions.innerHTML = '';
+
+    console.log('Selected hotel id:', value);
+    localStorage.setItem('QuestionsHotelId', value);
+    console.log('Current hotel set to: ', localStorage.getItem('QuestionsHotelId'));
+
+
+    fetch(`/api/question/${encodeURIComponent(value)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Hotel questions:', data);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                hotelQuestions.innerHTML = '<p>No questions for this hotel yet!</p>';
+                return;
+            }
+
+            data.forEach(question => {
+                if (!question) return; // Skip null room types
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'review-card';
+                questionDiv.innerHTML = `
+                        <div class="review-header">
+                          <div>
+                            <span class="review-author">${question.question}</span>
+                          </div>
+                        </div>                
+                   
+            `;
+                hotelQuestions.appendChild(questionDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching reviews:', error);
+            hotelQuestions.innerHTML = `
+            <div class="error-message">
+                <p>Error loading questions: ${error.message}</p>
+                <p>Please try refreshing the page or contact support if the problem persists.</p>
+            </div>`;
+        });
+}
+
+
+// Separate function for handling hotel selection for Faqs
+function handleHotelSelectionForFaq(e) {
+    const value = e.target.value;
+    const hotelFaqs = document.getElementById('faq-body');
+
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const ownerId = currentUser.id;
+
+
+    if (value === 'all') {
+
+        hotelFaqs.innerHTML = '<p>Please select a hotel to display its FAQs</p>';
+        localStorage.setItem('FaqsHotelId', 'all');
+        console.log('currently ', localStorage.getItem('FaqsHotelId'));
+        return;  //to be touched
+    }
+
+
+    hotelFaqs.innerHTML = '';
+
+    console.log('Selected hotel id:', value);
+    localStorage.setItem('FaqsHotelId', value);
+    console.log('Current hotel set to: ', localStorage.getItem('FaqsHotelId'));
+
+
+    fetch(`/api/faqs/${encodeURIComponent(value)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Hotel Faqs:', data);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                hotelFaqs.innerHTML = '<p>No FAQs for this hotel yet! Add one</p>';
+                return;
+            }
+
+            data.forEach(faq => {
+                if (!faq) return; // Skip null room types
+
+                const faqDiv = document.createElement('div');
+                faqDiv.className = 'review-card';
+                faqDiv.innerHTML = `
+                        <div class="review-header">
+                          <div>
+                            <span class="review-author">Question:  </span><span class="review-author">${faq.question}</span>
+                          
+                          </div>
+                         
+                        </div>
+                    <span class="review-author">Answer:  </span><span>${faq.answer}</span>         
+                   
+            `;
+                hotelFaqs.appendChild(faqDiv);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching reviews:', error);
+            hotelFaqs.innerHTML = `
+            <div class="error-message">
+                <p>Error loading questions: ${error.message}</p>
+                <p>Please try refreshing the page or contact support if the problem persists.</p>
+            </div>`;
+        });
+}
+
+
 
 function getServices(){
     const services = document.getElementById('service-elements');
@@ -496,6 +671,80 @@ function getServices(){
         services.innerHTML = `<p>Error fetching services: ${error.message}</p>`;
     })
 }
+
+function addFaq(){
+    document.getElementById('add-faq-form').addEventListener('submit', function (e){
+        e.preventDefault();
+
+        const HotelFaqs = document.getElementById('faq-body');
+        const hotelId = localStorage.getItem('FaqsHotelId');
+        if(!hotelId || hotelId === 'all'){
+            alert('Please select a hotel first before adding a FAQ!');
+            return;
+        }
+        console.log(this);
+
+        const formData = new FormData(this);
+        const jsonData = {};
+
+        console.log('hotel: ', hotelId);
+
+        formData.forEach((value, key) => {
+                jsonData[key] = value;
+                console.log(`${key}: ${value}`);
+        });
+        console.log('Final jsonData:', jsonData);
+
+        fetch(`/api/${encodeURIComponent(hotelId)}/faqs/add`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(jsonData),
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
+
+                return response.text().then(text => {
+                    console.log('Response text:', text);
+
+                    if (!response.ok) {
+                        throw new Error(text || `Server Error (${response.status})`);
+                    }
+
+                    try {
+                        return JSON.parse(text);
+                    } catch (parseError) {
+                        console.warn('Response is not JSON, treating as success');
+                        return { success: true, message: text };
+                    }
+                });
+            })
+            .then(data => {
+                console.log('FAQ added successfully:', data);
+
+                // Reset form
+                document.getElementById('add-faq-form').reset();
+
+                // Show success message
+                alert('FAQ Added successfully!');
+
+                // Refresh the room list
+                const selectedHotel = document.getElementById('hotel-faq-filter');
+                if (selectedHotel) {
+                    selectedHotel.dispatchEvent(new Event('change'));
+                }
+
+            })
+            .catch(error => {
+                console.error('Error adding FAQ:', error);
+                alert(`Failed to add FAQ: ${error.message}`);
+            })
+    });
+
+}
+
 
 function addRoomType(){
     document.getElementById('add-room-form').addEventListener('submit', function(e) {
@@ -563,6 +812,7 @@ function addRoomType(){
             });
         })
         .then(data => {
+            alert('Room added successfully! ');
             console.log('Room added successfully:', data);
 
             // Reset form
@@ -614,11 +864,33 @@ function handleAddRoomButtonClick() {
 
 document.addEventListener('DOMContentLoaded', function(){
     localStorage.setItem('CurrentHotelId', 'none');
+    localStorage.setItem('FaqsHotelId', 'all');
+    localStorage.setItem('QuestionsHotelId', 'all');
+    localStorage.setItem('ReviewsHotelId', 'none');
+
+    const filterHotelFAQ = document.getElementById('hotel-faq-filter');
+
+    const inputFaqQuestion = document.getElementById('faq-question');
+    const inputFaqAnswer = document.getElementById('faq-answer');
+
+    filterHotelFAQ.addEventListener('change', function() {
+        if (filterHotelFAQ.value === 'all') {
+            inputFaqQuestion.disabled = true;
+            inputFaqAnswer.disabled = true;
+            alert('Choose a hotel to add a FAQ');
+        } else {
+            inputFaqAnswer.disabled = false;
+            inputFaqAnswer.value = '';
+            inputFaqQuestion.disabled = false;
+            inputFaqAnswer.value = '';
+        }
+    });
 
     getServices();
     registerHotels();
     getOwnerHotels();
     addRoomType();
+    addFaq();
 
     // Add event listener for the add room button
     const addRoomButton = document.getElementById('add-room-button');

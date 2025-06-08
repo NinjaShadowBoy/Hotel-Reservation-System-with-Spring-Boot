@@ -1,9 +1,12 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.dtos.FaqDTO;
 import cm.sji.hotel_reservation.dtos.QuestionDTO;
+import cm.sji.hotel_reservation.entities.FAQ;
 import cm.sji.hotel_reservation.entities.Question;
 import cm.sji.hotel_reservation.entities.Hotel;
 import cm.sji.hotel_reservation.entities.User;
+import cm.sji.hotel_reservation.repositories.FAQRepo;
 import cm.sji.hotel_reservation.repositories.QuestionRepo;
 import cm.sji.hotel_reservation.repositories.HotelRepo;
 import cm.sji.hotel_reservation.repositories.UserRepo;
@@ -17,42 +20,36 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class QuestionService {
+public class FAQService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final QuestionRepo questionRepo;
+    private final FAQRepo faqRepo;
 
     private final HotelRepo hotelRepo;
 
     private final UserRepo userRepo;
 
-    public List<QuestionDTO> getFaqs(Integer hotelId) {
+    public List<FaqDTO> getHotelFaqs(Integer hotelId) {
         try {
             logger.info("Retrieving FAQs for hotel ID: {}", hotelId);
 
             // Get faqs of a particular hotel.
-            List<Question> questions = questionRepo.findByHotel_Id(hotelId);
+            List<FAQ> faqs = faqRepo.findByHotel_Id(hotelId);
 
-            logger.info("Found {} FAQs for hotel ID: {}", questions.size(), hotelId);
+            logger.info("Found {} FAQs for hotel ID: {}", faqs.size(), hotelId);
 
             // Convert to dto and return.
-            return questions.stream().map(this::getFAQDTO).toList();
+            return faqs.stream().map(this::getHotelFAQDTO).toList();
         } catch (Exception e) {
-            logger.error("Error retrieving FAQs for hotel ID {}: {} - {}", 
+            logger.error("Error retrieving FAQs for hotel ID {}: {} - {}",
                     hotelId, e.getClass().getSimpleName(), e.getMessage());
             return new ArrayList<>();
         }
     }
 
-    public QuestionDTO saveFaq(QuestionDTO faq, Integer hotelId, Integer clientId) {
+    public FaqDTO saveHotelFaq(FaqDTO faq, Integer hotelId) {
         try {
-            logger.info("Saving new FAQ for hotel ID: {}, client ID: {}", hotelId, clientId);
-
-            User client = userRepo.findById(clientId)
-                    .orElseThrow(() -> {
-                        logger.error("Client not found with ID: {}", clientId);
-                        return new IllegalArgumentException("Client not found");
-                    });
+            logger.info("Saving new FAQ for hotel ID: {}", hotelId);
 
             Hotel hotel = hotelRepo.findById(hotelId)
                     .orElseThrow(() -> {
@@ -62,38 +59,37 @@ public class QuestionService {
 
             logger.debug("Creating FAQ entity with question: {}", faq.getQuestion());
 
-            Question question1 = Question.builder()
-                    .client(client)
+            FAQ faq1 = FAQ.builder()
                     .hotel(hotel)
                     .faqQuestion(faq.getQuestion())
-                    .faqAnswer("")
+                    .faqAnswer(faq.getAnswer())
                     .build();
 
-            Question savedQuestion = questionRepo.save(question1);
-            logger.info("Successfully saved FAQ with ID: {} for hotel: {}", savedQuestion.getId(), hotelId);
+            FAQ savedFaq = faqRepo.save(faq1);
+            logger.info("Successfully saved FAQ with ID: {} for hotel: {}", savedFaq.getId(), hotelId);
 
-            return getFAQDTO(savedQuestion);
+            return getHotelFAQDTO(savedFaq);
         } catch (IllegalArgumentException e) {
             logger.error("Invalid input when saving FAQ: {}", e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.error("Error saving FAQ for hotel ID {}, client ID {}: {} - {}", 
-                    hotelId, clientId, e.getClass().getSimpleName(), e.getMessage());
+            logger.error("Error saving FAQ for hotel ID {}: {} - {}",
+                    hotelId, e.getClass().getSimpleName(), e.getMessage());
             throw e;
         }
     }
 
-    // Helper functions to get FAQDTO.
-    private QuestionDTO getFAQDTO(Question question) {
+    // Helper functions to get Faqdto.
+    private FaqDTO getHotelFAQDTO(FAQ faq) {
         try {
-            logger.debug("Converting FAQ entity to DTO, FAQ ID: {}", question.getId());
+            logger.debug("Converting FAQ entity to DTO, FAQ ID: {}", faq.getId());
 
-            return QuestionDTO.builder()
-                    .question(question.getFaqQuestion())
-                    .answer(question.getFaqAnswer())
+            return FaqDTO.builder()
+                    .question(faq.getFaqQuestion())
+                    .answer(faq.getFaqAnswer())
                     .build();
         } catch (Exception e) {
-            logger.error("Error converting FAQ entity to DTO: {} - {}", 
+            logger.error("Error converting FAQ entity to DTO: {} - {}",
                     e.getClass().getSimpleName(), e.getMessage());
             throw e;
         }

@@ -1359,6 +1359,14 @@
         <i class="fas fa-star"></i>
         <span>Reviews</span>
       </a>
+      <a class="nav-item" data-tab="questions-fragment">
+        <i class="fas fa-star"></i>
+        <span>Question</span>
+      </a>
+      <a class="nav-item" data-tab="faqs-fragment">
+        <i class="fas fa-star"></i>
+        <span>FAQs</span>
+      </a>
       <a class="nav-item" data-tab="analytics">
         <i class="fas fa-chart-line"></i>
         <span>Analytics</span>
@@ -1414,7 +1422,7 @@
             <i class="fas fa-star"></i>
           </div>
           <div class="stat-details">
-            <h3>4.7</h3>
+            <h3>8</h3>
             <p>Average Rating</p>
           </div>
         </div>
@@ -1426,105 +1434,14 @@
           <a class="btn btn-primary btn-sm" data-tab="add-hotel">
             <i class="fas fa-plus"></i> Add New Hotel
           </a>
+
+          <a class="btn btn-primary btn-sm" data-tab="edit-hotel">
+            <i class="fas fa-pen-to-square"></i>  Edit Hotel
+          </a>
+
         </div>
         <div class="card-body">
-          <div id="HotelCards" class="hotel-cards">
-<!--            <div class="hotel-card">-->
-<!--              <div class="hotel-image" style="background-image: url('/api/placeholder/400/300')"></div>-->
-<!--              <div class="hotel-card-body">-->
-<!--                <h3 class="hotel-name">Oceanview Resort</h3>-->
-<!--                <div class="hotel-location">-->
-<!--                  <i class="fas fa-map-marker-alt"></i> Malibu, CA-->
-<!--                </div>-->
-<!--                <div class="hotel-stats">-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">12</div>-->
-<!--                    <div class="hotel-stat-label">Rooms</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">87%</div>-->
-<!--                    <div class="hotel-stat-label">Occupancy</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">4.9</div>-->
-<!--                    <div class="hotel-stat-label">Rating</div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-
-<!--            <div class="hotel-card">-->
-<!--              <div class="hotel-image" style="background-image: url('/api/placeholder/400/300')"></div>-->
-<!--              <div class="hotel-card-body">-->
-<!--                <h3 class="hotel-name">Downtown Suites</h3>-->
-<!--                <div class="hotel-location">-->
-<!--                  <i class="fas fa-map-marker-alt"></i> San Francisco, CA-->
-<!--                </div>-->
-<!--                <div class="hotel-stats">-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">20</div>-->
-<!--                    <div class="hotel-stat-label">Rooms</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">92%</div>-->
-<!--                    <div class="hotel-stat-label">Occupancy</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">4.5</div>-->
-<!--                    <div class="hotel-stat-label">Rating</div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-
-<!--            <div class="hotel-card">-->
-<!--              <div class="hotel-image" style="background-image: url('/api/placeholder/400/300')"></div>-->
-<!--              <div class="hotel-card-body">-->
-<!--                <h3 class="hotel-name">Mountain Lodge</h3>-->
-<!--                <div class="hotel-location">-->
-<!--                  <i class="fas fa-map-marker-alt"></i> Aspen, CO-->
-<!--                </div>-->
-<!--                <div class="hotel-stats">-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">8</div>-->
-<!--                    <div class="hotel-stat-label">Rooms</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">73%</div>-->
-<!--                    <div class="hotel-stat-label">Occupancy</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">4.7</div>-->
-<!--                    <div class="hotel-stat-label">Rating</div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-
-<!--            <div class="hotel-card">-->
-<!--              <div class="hotel-image" style="background-image: url('/api/placeholder/400/300')"></div>-->
-<!--              <div class="hotel-card-body">-->
-<!--                <h3 class="hotel-name">Lakeview Inn</h3>-->
-<!--                <div class="hotel-location">-->
-<!--                  <i class="fas fa-map-marker-alt"></i> Lake Tahoe, NV-->
-<!--                </div>-->
-<!--                <div class="hotel-stats">-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">15</div>-->
-<!--                    <div class="hotel-stat-label">Rooms</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">65%</div>-->
-<!--                    <div class="hotel-stat-label">Occupancy</div>-->
-<!--                  </div>-->
-<!--                  <div class="hotel-stat">-->
-<!--                    <div class="hotel-stat-value">4.6</div>-->
-<!--                    <div class="hotel-stat-label">Rating</div>-->
-<!--                  </div>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
-          </div>
+          <div id="HotelCards" class="hotel-cards"></div>
         </div>
       </div>
 
@@ -1711,92 +1628,7 @@
                 <th>Actions</th>
               </tr>
               </thead>
-              <tbody id="rooms-body">
-<!--                <tr>-->
-<!--                  <td>Standard Room</td>-->
-<!--                  <td>-->
-<!--                    <span class="price-display">$159</span>-->
-<!--                    <input type="number" class="price-edit" style="display: none;" value="159">-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <label class="switch">-->
-<!--                      <input type="checkbox" checked>-->
-<!--                      <span class="slider"></span>-->
-<!--                    </label>-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <button class="btn btn-secondary btn-sm edit-price">-->
-<!--                      <i class="fas fa-edit"></i> Edit Price-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-danger btn-sm">-->
-<!--                      <i class="fas fa-trash-alt"></i>-->
-<!--                    </button>-->
-<!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                  <td>Deluxe Suite</td>-->
-<!--                  <td>-->
-<!--                    <span class="price-display">$259</span>-->
-<!--                    <input type="number" class="price-edit" style="display: none;" value="259">-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <label class="switch">-->
-<!--                      <input type="checkbox" checked>-->
-<!--                      <span class="slider"></span>-->
-<!--                    </label>-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <button class="btn btn-secondary btn-sm edit-price">-->
-<!--                      <i class="fas fa-edit"></i> Edit Price-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-danger btn-sm">-->
-<!--                      <i class="fas fa-trash-alt"></i>-->
-<!--                    </button>-->
-<!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                  <td>Family Suite</td>-->
-<!--                  <td>-->
-<!--                    <span class="price-display">$329</span>-->
-<!--                    <input type="number" class="price-edit" style="display: none;" value="329">-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <label class="switch">-->
-<!--                      <input type="checkbox">-->
-<!--                      <span class="slider"></span>-->
-<!--                    </label>-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <button class="btn btn-secondary btn-sm edit-price">-->
-<!--                      <i class="fas fa-edit"></i> Edit Price-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-danger btn-sm">-->
-<!--                      <i class="fas fa-trash-alt"></i>-->
-<!--                    </button>-->
-<!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                  <td>Executive Suite</td>-->
-<!--                  <td>-->
-<!--                    <span class="price-display">$459</span>-->
-<!--                    <input type="number" class="price-edit" style="display: none;" value="459">-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <label class="switch">-->
-<!--                      <input type="checkbox" checked>-->
-<!--                      <span class="slider"></span>-->
-<!--                    </label>-->
-<!--                  </td>-->
-<!--                  <td>-->
-<!--                    <button class="btn btn-secondary btn-sm edit-price">-->
-<!--                      <i class="fas fa-edit"></i> Edit Price-->
-<!--                    </button>-->
-<!--                    <button class="btn btn-danger btn-sm">-->
-<!--                      <i class="fas fa-trash-alt"></i>-->
-<!--                    </button>-->
-<!--                  </td>-->
-<!--                </tr>-->
-              </tbody>
+              <tbody id="rooms-body"></tbody>
             </table>
           </div>
         </div>
@@ -1924,83 +1756,80 @@
 
     <!-- Reviews -->
     <div class="dashboard-content" id="reviews" th:fragment="ReviewResponse">
-      <h1>Reviews & Responses</h1>
+      <h1>Reviews</h1>
 
       <div class="card">
         <div class="card-header">
           <h2>Recent Reviews</h2>
           <div>
             <select id="hotel-review-filter" class="form-control">
-              <option value="all">All Hotels</option>
+              <option value="all">Choose Hotel</option>
             </select>
           </div>
         </div>
-        <div id="review-body" class="card-body">
-<!--          <div class="review-card">-->
-<!--            <div class="review-header">-->
-<!--              <div>-->
-<!--                <span class="review-author">John Doe</span>-->
-<!--                <span class="review-date">May 10, 2025</span>-->
-<!--              </div>-->
-<!--              <div class="review-rating">-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <p class="review-text">The Oceanview Resort was absolutely stunning. The room was spacious and clean, and the staff was very attentive to our needs. The beach access was convenient, and the restaurant served delicious food. Will definitely be back!</p>-->
-<!--            <div class="reply-form">-->
-<!--              <textarea placeholder="Write your response..."></textarea>-->
-<!--              <button class="btn btn-primary">Reply</button>-->
-<!--            </div>-->
-<!--          </div>-->
-
-<!--          <div class="review-card">-->
-<!--            <div class="review-header">-->
-<!--              <div>-->
-<!--                <span class="review-author">Mary Johnson</span>-->
-<!--                <span class="review-date">May 8, 2025</span>-->
-<!--              </div>-->
-<!--              <div class="review-rating">-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star-half-alt"></i>-->
-<!--                <i class="far fa-star"></i>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <p class="review-text">Downtown Suites was in a great location, close to all the attractions we wanted to visit. The room was comfortable but a bit small. The staff was friendly and helpful. The breakfast could use some improvement, but overall a good stay.</p>-->
-<!--            <div class="reply-form">-->
-<!--              <textarea placeholder="Write your response..."></textarea>-->
-<!--              <button class="btn btn-primary">Reply</button>-->
-<!--            </div>-->
-<!--          </div>-->
-
-<!--          <div class="review-card">-->
-<!--            <div class="review-header">-->
-<!--              <div>-->
-<!--                <span class="review-author">Robert Wilson</span>-->
-<!--                <span class="review-date">May 7, 2025</span>-->
-<!--              </div>-->
-<!--              <div class="review-rating">-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="fas fa-star"></i>-->
-<!--                <i class="far fa-star"></i>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <p class="review-text">Mountain Lodge exceeded our expectations. The views were breathtaking, and the cabin was cozy and well-equipped. The staff was knowledgeable about local hiking trails and activities. Would highly recommend for a peaceful retreat!</p>-->
-<!--            <div class="reply-form">-->
-<!--              <textarea placeholder="Write your response...">Thank you for your wonderful review, Robert! We're thrilled to hear that you enjoyed your stay at Mountain Lodge. Our staff takes pride in providing recommendations for local activities, and we're glad you found this helpful. We look forward to welcoming you back for another peaceful retreat soon!</textarea>-->
-<!--              <button class="btn btn-primary">Update Reply</button>-->
-<!--            </div>-->
-<!--          </div>-->
-        </div>
+        <div id="review-body" class="card-body"></div>
       </div>
     </div>
+
+
+    <!-- Questions Fragment -->
+    <div class="dashboard-content"  id="questions-fragment" th:fragment="CustomerQuestions">
+      <h1>Questions</h1>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Recent Questions</h2>
+          <div>
+            <select id="hotel-question-filter" class="form-control">
+              <option value="all">Choose Hotel</option>
+            </select>
+          </div>
+        </div>
+        <div id="question-body" class="card-body"></div>
+      </div>
+    </div>
+
+
+    <!-- FAQs Fragment -->
+    <div class="dashboard-content" id="faqs-fragment" th:fragment="HotelFAQs">
+      <h1>FAQs</h1>
+
+      <!-- Add New FAQ Section -->
+      <div class="card mb-3">
+        <div class="card-header">
+          <h2>Add New FAQ</h2>
+        </div>
+        <div class="card-body">
+          <form id="add-faq-form">
+            <div class="mb-3">
+              <label for="faq-question" class="form-label">Question</label>
+              <input type="text" class="form-control" id="faq-question" name="question" placeholder="Enter FAQ question" required>
+            </div>
+            <div class="mb-3">
+              <label for="faq-answer" class="form-label">Answer</label>
+              <textarea class="form-control" id="faq-answer" name="answer" rows="4" placeholder="Enter FAQ answer" required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add FAQ</button>
+            <button type="button" class="btn btn-secondary" id="cancel-faq">Cancel</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Existing FAQ Display Section -->
+      <div class="card">
+        <div class="card-header">
+          <h2>Your FAQs</h2>
+          <div>
+            <select id="hotel-faq-filter" class="form-control">
+              <option value="all">Choose Hotel</option>
+            </select>
+          </div>
+        </div>
+        <div id="faq-body" class="card-body"></div>
+      </div>
+    </div>
+
 
     <!-- Analytics -->
     <div class="dashboard-content" id="analytics" th:fragment="OwnerAnalytics">
