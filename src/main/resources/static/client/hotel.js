@@ -83,7 +83,7 @@
         // Additional selectors that were previously direct in the code
         ratingStars: () => $('#reviewForm .rating-stars'),
         checkinDatetime: () => $('#checkinDatetime'),
-        submit: () => $('#submit'),
+        submit: () => $('#paymentForm .btn'),
         cardElement: () => $('#cardElement'),
         roomInfoType: () => $('#roomInfoType'),
         roomInfoPrice: () => $('#roomInfoPrice'),
@@ -401,10 +401,12 @@
 
         // Disable submit button to prevent double submissions
         DOM.submit().prop('disabled', true);
+        DOM.submit().text('Sending Booking Request...');
 
         if (!state.stripe || !state.cardElement) {
             showError('Payment processing is not available');
             DOM.submit().prop('disabled', false);
+            DOM.submit().text('Pay Now');
             return;
         }
 
@@ -413,6 +415,7 @@
         if (!checkinDatetime) {
             showError('Please select a check-in date and time');
             DOM.submit().prop('disabled', false);
+            DOM.submit().text('Pay Now');
             return;
         }
 
@@ -426,12 +429,14 @@
         if (checkinDate < today) {
             showError('Check-in date cannot be in the past');
             DOM.submit().prop('disabled', false);
+            DOM.submit().text('Pay Now');
             return;
         }
 
         if (checkinDate > oneMonthLater) {
             showError('Check-in date cannot be more than 1 month ahead');
             DOM.submit().prop('disabled', false);
+            DOM.submit().text('Pay Now');
             return;
         }
 
@@ -445,6 +450,7 @@
             if (error) {
                 showError(error.message);
                 DOM.submit().prop('disabled', false);
+                DOM.submit().text('Pay Now');
                 return;
             }
 
@@ -476,6 +482,7 @@
             if (paymentResult.error) {
                 showError(paymentResult.error.message);
                 DOM.submit().prop('disabled', false);
+                DOM.submit().text('Pay Now');
                 return;
             }
 
@@ -494,7 +501,7 @@
                     //     })
                     // });
 
-                    showSuccess('Booking successful!');
+                    showSuccess('Booking request sent successfully. We will contact you via email shortly to confirm your booking.!');
                     DOM.modals.payment().addClass('hidden');
 
                     // Optional: Reset form or redirect
@@ -512,6 +519,7 @@
             showError('Payment processing failed. Please try again.');
             console.error('Payment error:', err);
             DOM.submit().prop('disabled', false);
+            DOM.submit().text('Pay Now');
         }
 
     }
@@ -667,6 +675,7 @@
      * @returns {string} HTML for room card
      */
     function createRoomCard(room) {
+        console.info("Room type ", room)
         return `
             <div class="room-card">
                 <img src="${room.image}" alt="${room.label}">
@@ -677,7 +686,7 @@
                 <div class="room-price">$${room.price}
                     <span class="price-period">/night</span>
                 </div>
-                <button class="btn btn-primary book-btn" data-room-id="${room.id}">Book Now</button>
+                <button class="btn btn-primary book-btn" data-room-id="${room.id}" ${room.numberAvailable > 0 ? '' : 'disabled'}>${room.numberAvailable > 0 ? 'Book Now' : 'Not Available'}</button>
             </div>
         `;
     }

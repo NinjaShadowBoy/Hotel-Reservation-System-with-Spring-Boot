@@ -543,6 +543,8 @@
         // Build HTML string for better performance
         let reservationsHtml = '';
 
+        reservations = Array.from(reservations).sort((a, b) => a.date > b.date ? -1 : 1)
+
         reservations.forEach(reservation => {
             reservationsHtml += `
                 <div class="reservation-card" data-reservation-id="${reservation.id}">

@@ -183,6 +183,8 @@ public class RoomTypeService {
                 .image(imageUrl)
                 .label(roomType.getLabel())
                 .services(amenities)
+                .numberAvailable(roomType.getNumberAvailable())
+                .totalNumber(roomType.getTotalNumber())
                 .price(roomType.getPrice())
                 .build();
     }
