@@ -21,4 +21,5 @@ public class RoomTypeDTO {
     Number price;
     String image;
     Integer numberAvailable;
+    Integer totalNumber;
 }

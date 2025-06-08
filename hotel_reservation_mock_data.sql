@@ -19,7 +19,6 @@
 -- Table structure for table `booking`
 --
 
-create database hotel_reservation;
 use hotel_reservation;
 
 DROP TABLE IF EXISTS `booking`;
@@ -45,7 +44,7 @@ CREATE TABLE `booking` (
   KEY `FKmhyw2j6qklc56li7otporbwop` (`fk_room_type_id`),
   CONSTRAINT `FK3ns9240iigl4s8nw8o938enjp` FOREIGN KEY (`fk_client_id`) REFERENCES `user` (`id`),
   CONSTRAINT `FKmhyw2j6qklc56li7otporbwop` FOREIGN KEY (`fk_room_type_id`) REFERENCES `room_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -54,18 +53,18 @@ CREATE TABLE `booking` (
 
 LOCK TABLES `booking` WRITE;
 /*!40000 ALTER TABLE `booking` DISABLE KEYS */;
-INSERT INTO `booking` (`id`, `checkin_date`, `date`, `fk_client_id`, `fk_room_type_id`, `cancellation_date`, `commission_amount`, `payment_intent_id`, `refund_amount`, `refunded`, `status`, `total_amount`, `refund_id`, `charge_id`) VALUES (12,'2025-06-10 03:20:00.000000','2025-06-07 04:21:34.000112',12,3,'2025-06-07 04:22:15.236252',24.9995,'pi_3RXEG7QW2O1tpdCC3wKnu16m',474.99,_binary '','CANCELLED',499.99,'re_3RXEG7QW2O1tpdCC3Cw23f5H',NULL);
+INSERT INTO `booking` (`id`, `checkin_date`, `date`, `fk_client_id`, `fk_room_type_id`, `cancellation_date`, `commission_amount`, `payment_intent_id`, `refund_amount`, `refunded`, `status`, `total_amount`, `refund_id`, `charge_id`) VALUES (12,'2025-06-10 03:20:00.000000','2025-06-07 04:21:34.000112',12,3,'2025-06-07 04:22:15.236252',24.9995,'pi_3RXEG7QW2O1tpdCC3wKnu16m',474.99,_binary '','CANCELLED',499.99,'re_3RXEG7QW2O1tpdCC3Cw23f5H',NULL),(13,'2025-06-09 23:00:00.000000','2025-06-08 12:00:09.368807',12,14,'2025-06-08 13:09:00.854477',49.999500000000005,'pi_3RXhtTQW2O1tpdCC59kbAqzU',949.99,_binary '','CANCELLED',999.99,'re_3RXhtTQW2O1tpdCC55AhurF0',NULL),(14,'2025-06-10 12:19:00.000000','2025-06-08 13:20:41.061327',12,13,'2025-06-08 13:22:17.902462',22.9995,'pi_3RXj9PQW2O1tpdCC22epBcBL',436.99,_binary '','CANCELLED',459.99,'re_3RXj9PQW2O1tpdCC2aFn5LdY',NULL),(15,'2025-06-10 12:19:00.000000','2025-06-08 13:20:41.070325',12,13,NULL,22.9995,'pi_3RXj9PQW2O1tpdCC22epBcBL',NULL,NULL,'CONFIRMED',459.99,NULL,NULL),(16,'2025-06-27 12:31:00.000000','2025-06-08 13:32:20.114709',12,7,NULL,12.499500000000001,'pi_3RXjKfQW2O1tpdCC2f25XggS',NULL,NULL,'CONFIRMED',249.99,NULL,NULL);
 /*!40000 ALTER TABLE `booking` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `question`
+-- Table structure for table `faq`
 --
 
-DROP TABLE IF EXISTS `question`;
+DROP TABLE IF EXISTS `faq`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `question` (
+CREATE TABLE `faq` (
   `fk_client_id` int NOT NULL,
   `fk_hotel_id` int NOT NULL,
   `faq_answer` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
@@ -80,13 +79,13 @@ CREATE TABLE `question` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `question`
+-- Dumping data for table `faq`
 --
 
-LOCK TABLES `question` WRITE;
-/*!40000 ALTER TABLE `question` DISABLE KEYS */;
-INSERT INTO `question` (`fk_client_id`, `fk_hotel_id`, `faq_answer`, `faq_question`, `id`) VALUES (1,1,'Check-in time is 3:00 PM and check-out time is 11:00 AM. Early check-in and late check-out may be available upon request, subject to availability.','What time is check-in and check-out?',1),(1,5,'We offer a Kids Club for ages 4-12, daily poolside activities, beach games, and special evening entertainment for the whole family.','What activities are available for children?',2),(2,1,'Breakfast is included with certain room packages. Please check your specific reservation details or contact our front desk for more information.','Is breakfast included in the room rate?',3),(3,2,'Yes, we offer complimentary airport shuttle service for all guests. Please provide your flight details at least 24 hours prior to arrival.','Do you offer airport shuttle service?',4),(4,3,'Yes, we offer both valet parking ($35/day) and self-parking ($25/day) options for our guests.','Is parking available at the hotel?',5),(5,4,'Yes, we are a pet-friendly resort. There is a $50 pet fee per stay, and we welcome pets under 50 pounds. Please notify us in advance if you plan to bring a pet.','Are pets allowed at the resort?',6),(10,2,'','Can I have more food?',7);
-/*!40000 ALTER TABLE `question` ENABLE KEYS */;
+LOCK TABLES `faq` WRITE;
+/*!40000 ALTER TABLE `faq` DISABLE KEYS */;
+INSERT INTO `faq` (`fk_client_id`, `fk_hotel_id`, `faq_answer`, `faq_question`, `id`) VALUES (1,1,'Check-in time is 3:00 PM and check-out time is 11:00 AM. Early check-in and late check-out may be available upon request, subject to availability.','What time is check-in and check-out?',1),(1,5,'We offer a Kids Club for ages 4-12, daily poolside activities, beach games, and special evening entertainment for the whole family.','What activities are available for children?',2),(2,1,'Breakfast is included with certain room packages. Please check your specific reservation details or contact our front desk for more information.','Is breakfast included in the room rate?',3),(3,2,'Yes, we offer complimentary airport shuttle service for all guests. Please provide your flight details at least 24 hours prior to arrival.','Do you offer airport shuttle service?',4),(4,3,'Yes, we offer both valet parking ($35/day) and self-parking ($25/day) options for our guests.','Is parking available at the hotel?',5),(5,4,'Yes, we are a pet-friendly resort. There is a $50 pet fee per stay, and we welcome pets under 50 pounds. Please notify us in advance if you plan to bring a pet.','Are pets allowed at the resort?',6),(10,2,'','Can I have more food?',7);
+/*!40000 ALTER TABLE `faq` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -173,6 +172,36 @@ LOCK TABLES `offer` WRITE;
 /*!40000 ALTER TABLE `offer` DISABLE KEYS */;
 INSERT INTO `offer` (`fk_room_service`, `fk_room_type`) VALUES (1,1),(1,2),(1,3),(7,3),(1,4),(7,4),(1,5),(6,5),(7,5),(1,6),(6,6),(7,6),(8,6),(1,7),(6,7),(7,7),(8,7),(14,7),(1,8),(2,8),(6,8),(7,8),(8,8),(14,8),(1,9),(2,9),(6,9),(7,9),(8,9),(14,9),(15,9),(1,10),(2,10),(3,10),(6,10),(7,10),(8,10),(9,10),(14,10),(15,10),(1,11),(2,11),(3,11),(6,11),(7,11),(8,11),(9,11),(10,11),(14,11),(15,11),(1,12),(2,12),(3,12),(4,12),(6,12),(7,12),(8,12),(9,12),(10,12),(11,12),(14,12),(15,12),(1,13),(2,13),(3,13),(4,13),(5,13),(6,13),(7,13),(8,13),(9,13),(10,13),(11,13),(12,13),(14,13),(15,13),(1,14),(2,14),(3,14),(4,14),(5,14),(6,14),(7,14),(8,14),(9,14),(10,14),(11,14),(12,14),(13,14),(14,14),(15,14);
 /*!40000 ALTER TABLE `offer` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `question`
+--
+
+DROP TABLE IF EXISTS `question`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `question` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `faq_answer` varchar(255) DEFAULT NULL,
+  `faq_question` varchar(255) DEFAULT NULL,
+  `fk_client_id` int DEFAULT NULL,
+  `fk_hotel_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK43d7h1luqhu4f76ge2bh0xjms` (`fk_client_id`),
+  KEY `FKdwmwnkwjlbsk50dtwg8fe1kho` (`fk_hotel_id`),
+  CONSTRAINT `FK43d7h1luqhu4f76ge2bh0xjms` FOREIGN KEY (`fk_client_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `FKdwmwnkwjlbsk50dtwg8fe1kho` FOREIGN KEY (`fk_hotel_id`) REFERENCES `hotel` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `question`
+--
+
+LOCK TABLES `question` WRITE;
+/*!40000 ALTER TABLE `question` DISABLE KEYS */;
+/*!40000 ALTER TABLE `question` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -284,7 +313,7 @@ CREATE TABLE `room_type` (
 
 LOCK TABLES `room_type` WRITE;
 /*!40000 ALTER TABLE `room_type` DISABLE KEYS */;
-INSERT INTO `room_type` (`id`, `label`, `number_available`, `price`, `total_number`, `fk_hotel`) VALUES (1,'Standard Room',15,199.99,20,1),(2,'Deluxe Room',8,299.99,10,1),(3,'Ocean View Suite',3,499.99,5,1),(4,'Historic Queen Room',12,179.99,15,2),(5,'Historic King Room',7,219.99,10,2),(6,'Heritage Suite',2,349.99,3,2),(7,'Smart City Room',18,249.99,25,3),(8,'Urban Executive Suite',6,399.99,8,3),(9,'Mountain View Room',10,299.99,12,4),(10,'Fireplace Suite',5,449.99,7,4),(11,'Presidential Cabin',1,899.99,1,4),(12,'Family Beach Room',20,259.99,25,5),(13,'Oceanfront Suite',8,459.99,10,5),(14,'Premium Penthouse',1,999.99,1,5);
+INSERT INTO `room_type` (`id`, `label`, `number_available`, `price`, `total_number`, `fk_hotel`) VALUES (1,'Standard Room',15,199.99,20,1),(2,'Deluxe Room',8,299.99,10,1),(3,'Ocean View Suite',3,499.99,5,1),(4,'Historic Queen Room',12,179.99,15,2),(5,'Historic King Room',7,219.99,10,2),(6,'Heritage Suite',2,349.99,3,2),(7,'Smart City Room',17,249.99,25,3),(8,'Urban Executive Suite',6,399.99,8,3),(9,'Mountain View Room',10,299.99,12,4),(10,'Fireplace Suite',5,449.99,7,4),(11,'Presidential Cabin',1,899.99,1,4),(12,'Family Beach Room',20,259.99,25,5),(13,'Oceanfront Suite',7,459.99,10,5),(14,'Premium Penthouse',0,999.99,1,5);
 /*!40000 ALTER TABLE `room_type` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -329,4 +358,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-06-07  5:47:20
+-- Dump completed on 2025-06-08 14:36:15

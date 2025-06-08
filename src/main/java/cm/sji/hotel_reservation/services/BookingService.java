@@ -105,6 +105,10 @@ public class BookingService {
         RoomType roomType = roomTypeRepo.findById(reservationDTO.getRoomTypeId())
                 .orElseThrow(() -> new IllegalArgumentException("Inexisting roomtype"));
 
+        if (roomType.getNumberAvailable() <= 0) {
+            throw new IllegalArgumentException("No rooms available for this roomtype");
+        }
+
         Double totalAmount = roomType.getPrice();
         Double commissionAmount = calculateCommission(totalAmount);
 
@@ -166,6 +170,8 @@ public class BookingService {
             logger.info("Booking completed with commission: {}", commissionAmount);
 
             booking = bookingRepo.save(booking);
+            roomType.setNumberAvailable(roomType.getNumberAvailable() - 1);
+            roomType =  roomTypeRepo.save(roomType);
 
             // Send booking confirmation email
             emailService.sendBookingConfirmationEmail(booking);
