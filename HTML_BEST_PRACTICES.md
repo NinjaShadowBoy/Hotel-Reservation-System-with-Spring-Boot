@@ -286,7 +286,7 @@ The original `hotel.html` file had several issues:
 
 4. **Performance Optimization**: Add lazy loading for images and implement critical CSS
    ```html
-   <img src="image.jpg" loading="lazy" alt="Description">
+   <img src="image.jpg" alt="Description">
    ```
 
 5. **Internationalization**: Add support for multiple languages

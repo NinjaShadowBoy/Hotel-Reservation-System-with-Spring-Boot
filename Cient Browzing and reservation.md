@@ -77,7 +77,7 @@ class FAQ {
 Directly on page load the front:
 - GET `List<RoomType>` at `/api/roomtype/{hotelId}`
 - GET `List<Review>` at `/api/reviews/{hotelId}`
-- GET `List<FAQ>` at `/api/faq/{hotelId}`
+- GET `List<FAQ>` at `/api/question/{hotelId}`
 
 ### Hotel reservation
 Client must login first.
@@ -91,5 +91,5 @@ POST `Review` at `/api/reviews/{hotelId}/{clientId}` and get back
 
 ### Asking a FAQ
 Client must login first.
-POST `FAQ` at `/api/faq/{hotelId}/{clientId}`  and get back
+POST `FAQ` at `/api/question/{hotelId}/{clientId}`  and get back
 `String` as response.

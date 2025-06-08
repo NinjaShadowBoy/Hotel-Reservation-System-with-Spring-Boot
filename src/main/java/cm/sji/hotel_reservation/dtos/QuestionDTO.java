@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FAQDTO {
+public class QuestionDTO {
     String question;
     String answer;
 }

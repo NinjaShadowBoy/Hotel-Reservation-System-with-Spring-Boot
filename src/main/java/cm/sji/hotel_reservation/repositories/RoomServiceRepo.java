@@ -7,7 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RoomServiceRepo extends JpaRepository<RoomService, String> {
+public interface RoomServiceRepo extends JpaRepository<RoomService, Integer> {
     List<RoomService> findByLabelContainingIgnoreCase(String keyword);
+    RoomService findByLabel(String label);
 }
 

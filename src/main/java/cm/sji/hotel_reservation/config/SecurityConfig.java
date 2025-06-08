@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
                                 .requestMatchers("/**", "/logout", "/login", "/css/**", "/js/**", "/images/**", "/api/user/auth", "/scss/**", "/img/**").permitAll()
                                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/login").permitAll()
+                                .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/owner/login").permitAll()
                                 // All other requests require authentication
                                 .anyRequest().authenticated()
                 )

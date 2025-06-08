@@ -25,7 +25,7 @@ import io.jsonwebtoken.security.SignatureException;
 @Service
 public class JwtService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private static final String SECRET_KEY = "uqwhefuhDADUI/adsf+dsafsdaQ153JGJHF1234ldfsjkj97jsfdg";
+    private static final String SECRET_KEY = "wryteu234ty32tuytr68t6wrYTQWYTR6772367GR23TGGY/wf/34+98";
 
     // extract the username from the token
     public String extractUsername(String token) {
