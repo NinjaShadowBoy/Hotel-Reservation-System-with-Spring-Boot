@@ -335,7 +335,7 @@
 
             hotelsHtml += `
                 <div class="hotel-card" data-hotel-id="${hotel.id}">
-                    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image" loading="lazy" width="350" height="250">
+                    <img src="${hotel.image}" alt="${hotel.name}" class="hotel-image" width="350" height="250">
                     <div class="hotel-details">
                         <div class="hotel-header">
                             <h2 class="hotel-name">${hotel.name}</h2>
@@ -542,6 +542,8 @@
 
         // Build HTML string for better performance
         let reservationsHtml = '';
+
+        reservations = Array.from(reservations).sort((a, b) => a.date > b.date ? -1 : 1)
 
         reservations.forEach(reservation => {
             reservationsHtml += `

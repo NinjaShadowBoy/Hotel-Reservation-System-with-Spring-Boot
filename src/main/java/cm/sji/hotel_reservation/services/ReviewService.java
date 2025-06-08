@@ -45,7 +45,18 @@ public class ReviewService {
                 .rating(reviewDTO.getRating())
                 .build();
 
-        return getReviewDTO(reviewRepo.save(review));
+        List<Review> reviews = reviewRepo.findByHotel_Id(hotelId);
+        float ratingSum = reviews.stream().map(Review::getRating).reduce(0f, Float::sum) + review.getRating();
+
+        try {
+            hotel.setRating(ratingSum / reviews.size());
+        } catch (Exception e) {
+            hotel.setRating(0f);
+        }
+        hotelRepo.save(hotel);
+        logger.info("Saving review {}", review);
+        review = reviewRepo.save(review);
+        return getReviewDTO(review);
     }
 
     // Helper function to get ReviewDTO.
@@ -53,7 +64,7 @@ public class ReviewService {
         return ReviewDTO.builder()
                 .author(
                         review.getClient().getLastName()
-                + " " + review.getClient().getFirstName())
+                                + " " + review.getClient().getFirstName())
                 .date(review.getReviewDate())
                 .text(review.getReviewText())
                 .rating(review.getRating())

@@ -34,7 +34,7 @@ public class Hotel implements Serializable {
     private String description = "";
 
     @JoinColumn(nullable = true)
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private User owner;
 
     @Column(nullable = false)

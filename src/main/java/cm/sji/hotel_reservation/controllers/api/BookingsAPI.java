@@ -56,28 +56,6 @@ public class BookingsAPI {
     }
 
     /**
-     * Endpoint for cancelling a booking
-     *
-     * @param bookingId The ID of the booking to cancel
-     * @return The updated booking information or error message
-     */
-    @PostMapping("/api/bookings/{bookingId}/cancel")
-    public ResponseEntity<?> cancelBooking(@PathVariable Integer bookingId) {
-        try {
-            ClientReservationDTO result = bookingService.cancelBooking(bookingId);
-            if (result == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "Booking cannot be cancelled"));
-            }
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            logger.error("Error cancelling booking: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to cancel booking"));
-        }
-    }
-
-    /**
      * DELETE endpoint for cancelling a booking
      *
      * @param bookingId The ID of the booking to cancel
@@ -88,14 +66,12 @@ public class BookingsAPI {
         try {
             ClientReservationDTO result = bookingService.cancelBooking(bookingId);
             if (result == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(Map.of("error", "Booking cannot be cancelled"));
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Booking cannot be cancelled"));
             }
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             logger.error("Error cancelling booking: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to cancel booking"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to cancel booking"));
         }
     }
 
@@ -104,8 +80,10 @@ public class BookingsAPI {
         try {
             PaymentIntent intent = bookingService.createPaymentIntent(request);
             return ResponseEntity.ok(Map.of("clientSecret", intent.getClientSecret()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         } catch (StripeException e) {
-            return ResponseEntity.status(500).body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -117,9 +95,7 @@ public class BookingsAPI {
         // Log request details for debugging
         logger.debug("Webhook request content type: {}", request.getContentType());
         logger.debug("Webhook request headers:");
-        request.getHeaderNames().asIterator().forEachRemaining(headerName ->
-                logger.debug("  {}: {}", headerName, request.getHeader(headerName))
-        );
+        request.getHeaderNames().asIterator().forEachRemaining(headerName -> logger.debug("  {}: {}", headerName, request.getHeader(headerName)));
 
         if (sigHeader == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing Stripe signature header");
@@ -178,9 +154,7 @@ public class BookingsAPI {
         // Handle the event
         switch (event.getType()) {
             case "payment_intent.succeeded":
-                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer()
-                        .getObject()
-                        .orElse(null);
+                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
                 if (paymentIntent != null) {
                     // Fulfill the purchase, e.g., update reservation status
                     logger.info("Received payment intent. Now creating a new reservation");
@@ -205,9 +179,7 @@ public class BookingsAPI {
                 break;
             case "refund.updated":
                 // Handle successful refund
-                Refund refund = (Refund) event.getDataObjectDeserializer()
-                        .getObject()
-                        .orElse(null);
+                Refund refund = (Refund) event.getDataObjectDeserializer().getObject().orElse(null);
                 if (refund != null && "succeeded".equals(refund.getStatus())) {
                     logger.info("Received refund confirmation: {}", refund.getId());
                     // Convert amount from cents to dollars

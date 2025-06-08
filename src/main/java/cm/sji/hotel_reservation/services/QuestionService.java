@@ -1,46 +1,43 @@
 package cm.sji.hotel_reservation.services;
 
-import cm.sji.hotel_reservation.dtos.FAQDTO;
-import cm.sji.hotel_reservation.entities.FAQ;
+import cm.sji.hotel_reservation.dtos.QuestionDTO;
+import cm.sji.hotel_reservation.entities.Question;
 import cm.sji.hotel_reservation.entities.Hotel;
-import cm.sji.hotel_reservation.entities.Review;
 import cm.sji.hotel_reservation.entities.User;
-import cm.sji.hotel_reservation.repositories.FAQRepo;
+import cm.sji.hotel_reservation.repositories.QuestionRepo;
 import cm.sji.hotel_reservation.repositories.HotelRepo;
-import cm.sji.hotel_reservation.repositories.ReviewRepo;
 import cm.sji.hotel_reservation.repositories.UserRepo;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class FAQService {
+public class QuestionService {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final FAQRepo faqRepo;
+    private final QuestionRepo questionRepo;
 
     private final HotelRepo hotelRepo;
 
     private final UserRepo userRepo;
 
-    public List<FAQDTO> getFaqs(Integer hotelId) {
+    public List<QuestionDTO> getFaqs(Integer hotelId) {
         try {
             logger.info("Retrieving FAQs for hotel ID: {}", hotelId);
 
             // Get faqs of a particular hotel.
-            List<FAQ> faqs = faqRepo.findByHotel_Id(hotelId);
+            List<Question> questions = questionRepo.findByHotel_Id(hotelId);
 
-            logger.info("Found {} FAQs for hotel ID: {}", faqs.size(), hotelId);
+            logger.info("Found {} FAQs for hotel ID: {}", questions.size(), hotelId);
 
             // Convert to dto and return.
-            List<FAQDTO> faqDTOs = faqs.stream().map(this::getFAQDTO).toList();
-            return faqDTOs;
+            List<QuestionDTO> faqDTOS = questions.stream().map(this::getFAQDTO).toList();
+            return faqDTOS;
         } catch (Exception e) {
             logger.error("Error retrieving FAQs for hotel ID {}: {} - {}", 
                     hotelId, e.getClass().getSimpleName(), e.getMessage());
@@ -48,7 +45,7 @@ public class FAQService {
         }
     }
 
-    public FAQDTO saveFaq(FAQDTO faq, Integer hotelId, Integer clientId) {
+    public QuestionDTO saveFaq(QuestionDTO faq, Integer hotelId, Integer clientId) {
         try {
             logger.info("Saving new FAQ for hotel ID: {}, client ID: {}", hotelId, clientId);
 
@@ -66,17 +63,17 @@ public class FAQService {
 
             logger.debug("Creating FAQ entity with question: {}", faq.getQuestion());
 
-            FAQ faq1 = FAQ.builder()
+            Question question1 = Question.builder()
                     .client(client)
                     .hotel(hotel)
                     .faqQuestion(faq.getQuestion())
                     .faqAnswer("")
                     .build();
 
-            FAQ savedFaq = faqRepo.save(faq1);
-            logger.info("Successfully saved FAQ with ID: {} for hotel: {}", savedFaq.getId(), hotelId);
+            Question savedQuestion = questionRepo.save(question1);
+            logger.info("Successfully saved FAQ with ID: {} for hotel: {}", savedQuestion.getId(), hotelId);
 
-            return getFAQDTO(savedFaq);
+            return getFAQDTO(savedQuestion);
         } catch (IllegalArgumentException e) {
             logger.error("Invalid input when saving FAQ: {}", e.getMessage());
             throw e;
@@ -88,13 +85,13 @@ public class FAQService {
     }
 
     // Helper functions to get FAQDTO.
-    private FAQDTO getFAQDTO(FAQ faq) {
+    private QuestionDTO getFAQDTO(Question question) {
         try {
-            logger.debug("Converting FAQ entity to DTO, FAQ ID: {}", faq.getId());
+            logger.debug("Converting FAQ entity to DTO, FAQ ID: {}", question.getId());
 
-            FAQDTO dto = FAQDTO.builder()
-                    .question(faq.getFaqQuestion())
-                    .answer(faq.getFaqAnswer())
+            QuestionDTO dto = QuestionDTO.builder()
+                    .question(question.getFaqQuestion())
+                    .answer(question.getFaqAnswer())
                     .build();
 
             return dto;

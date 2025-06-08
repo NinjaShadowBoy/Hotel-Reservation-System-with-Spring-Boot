@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hotel Reservation System - Login</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ====== VARIABLES ====== */
+    :root {
+      /* Color Scheme */
+      --primary-color: #4361ee;
+      --primary-light: #6080ff;
+      --primary-dark: #3150cc;
+      --secondary-color: #3a0ca3;
+      --success-color: #38b000;
+      --warning-color: #ff9f1c;
+      --danger-color: #e63946;
+      --info-color: #4cc9f0;
+
+      /* Light Theme */
+      --bg-primary: #f8f9fa;
+      --bg-secondary: #ffffff;
+      --bg-accent: #e9ecef;
+      --text-primary: #212529;
+      --text-secondary: #6c757d;
+      --border-color: #dee2e6;
+
+      /* Shadows */
+      --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+      /* Animations */
+      --transition-fast: 0.2s ease;
+      --transition-medium: 0.3s ease;
+      --transition-slow: 0.5s ease;
+
+      /* Spacing */
+      --spacing-xs: 0.25rem;
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+      --spacing-xxl: 3rem;
+
+      /* Border Radius */
+      --radius-sm: 0.25rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 1rem;
+      --radius-xl: 2rem;
+      --radius-circle: 50%;
+
+      /* Glass Effect */
+      --glass-bg: rgba(255, 255, 255, 0.8);
+      --glass-border: rgba(255, 255, 255, 0.18);
+      --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+      --glass-blur: blur(8px);
+    }
+
+    /* Dark Theme Variables */
+    .dark-theme {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-accent: #2d2d2d;
+      --text-primary: #f8f9fa;
+      --text-secondary: #adb5bd;
+      --border-color: #444444;
+
+      /* Glass Effect - Dark */
+      --glass-bg: rgba(30, 30, 30, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.1);
+    }
+
+    /* ====== GLOBAL STYLES ====== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color var(--transition-medium), color var(--transition-medium);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 16px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-color) 100%);
+      padding: var(--spacing-md);
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 450px;
+      background-color: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .login-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: var(--spacing-lg);
+      text-align: center;
+    }
+
+    .login-header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+
+    .login-body {
+      padding: var(--spacing-xl);
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: var(--spacing-sm);
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: var(--spacing-md);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .btn {
+      display: inline-block;
+      font-weight: 500;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      user-select: none;
+      border: 1px solid transparent;
+      padding: var(--spacing-md) var(--spacing-lg);
+      font-size: 1rem;
+      line-height: 1.5;
+      border-radius: var(--radius-sm);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      color: white;
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+      border-color: var(--primary-dark);
+    }
+
+    .btn-block {
+      display: block;
+      width: 100%;
+    }
+
+    .login-footer {
+      padding: var(--spacing-lg);
+      text-align: center;
+      border-top: 1px solid var(--border-color);
+      background-color: var(--bg-accent);
+    }
+
+    .login-footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: color var(--transition-fast);
+    }
+
+    .login-footer a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .alert {
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+    }
+
+    .alert-danger {
+      color: #721c24;
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+    }
+
+    .input-group {
+      position: relative;
+    }
+
+    .input-group .icon {
+      position: absolute;
+      left: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+
+    .input-group input {
+      padding-left: calc(var(--spacing-md) * 2 + 1rem);
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: var(--spacing-md);
+      right: var(--spacing-md);
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--success-color);
+      color: white;
+      padding: 15px 25px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-md);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    /* Dark mode */
+    body.dark-mode {
+      --bg-primary: #121212;
+      --bg-secondary: #1e1e1e;
+      --bg-accent: #2d2d2d;
+      --text-primary: #f8f9fa;
+      --text-secondary: #adb5bd;
+      --border-color: #444444;
+    }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle">
+    <i class="fas fa-moon"></i>
+  </button>
+
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Hotel Reservation System</h1>
+    </div>
+
+    <div class="login-body">
+      <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+      
+<!--      <form th:action="@{/login}" method="post" th:object="${user}">-->
+      <form id="login-form">
+      <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-group">
+            <i class="icon fas fa-user"></i>
+            <input type="text" id="email" name="email" placeholder="Enter your email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-group">
+            <i class="icon fas fa-lock"></i>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary btn-block">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+        </div>
+        <div id="login-result"></div>
+      </form>
+    </div>
+
+<!--    <div class="login-footer">-->
+<!--      <p>Don't have an account? <a href="#">Register</a></p>-->
+<!--      <p><a href="#">Forgot Password?</a></p>-->
+<!--    </div>-->
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Theme toggle
+      const body = document.body;
+      const themeToggle = document.querySelector('.theme-toggle');
+
+      themeToggle.addEventListener('click', function() {
+        body.classList.toggle('dark-mode');
+        const icon = themeToggle.querySelector('i');
+
+        if (body.classList.contains('dark-mode')) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+        }
+      });
+
+      // Toast notification function
+      function showToast(message) {
+        // Create toast element if it doesn't exist
+        let toast = document.querySelector('.toast');
+
+        if (!toast) {
+          toast = document.createElement('div');
+          toast.className = 'toast';
+          document.body.appendChild(toast);
+        }
+
+        // Set message and show toast
+        toast.textContent = message;
+        toast.classList.add('show');
+
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 3000);
+      }
+
+      // Show error message as toast if it exists
+      const errorMessage = document.querySelector('.alert-danger');
+      if (errorMessage && errorMessage.textContent.trim() !== '') {
+        showToast(errorMessage.textContent);
+      }
+    });
+  </script>
+  <script src="/owner/O-login.js"></script>
+</body>
+</html>

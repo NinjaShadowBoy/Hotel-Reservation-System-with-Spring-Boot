@@ -52,7 +52,7 @@ const config = {
         hotels: '/api/hotels',
         roomTypes: '/api/roomtype',
         reviews: '/api/reviews',
-        faq: '/api/faq',
+        question: '/api/question',
         reservation: '/api/reservation'
     }
 };

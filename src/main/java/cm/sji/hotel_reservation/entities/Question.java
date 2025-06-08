@@ -3,25 +3,23 @@ package cm.sji.hotel_reservation.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
-
 @Entity
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class FAQ {
+public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_client_id", updatable = false)
     User client;
 
     @ManyToOne
-    @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_hotel_id", updatable = false)
     Hotel hotel;
 
     String faqQuestion = "";
