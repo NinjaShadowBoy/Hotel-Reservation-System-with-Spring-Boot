@@ -1,22 +1,41 @@
 package cm.sji.hotel_reservation.dtos;
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Builder;
+
+import java.time.LocalDateTime;
 
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-    Integer id;
+@AllArgsConstructor
+@Builder
 
-    private String firstName = "";
+    public class UserDTO {
+        private Integer id;
 
-    private String lastName = "";
+        @NotBlank(message = "First name is required")
+        private String firstName;
 
-    private String email = "";
+        @NotBlank(message = "Last name is required")
+        private String lastName;
 
-    private String role = "";
+        @Email(message = "Invalid email format")
+        @NotBlank(message = "Email is required")
+        private String email;
+
+        @NotBlank(message = "Password is required")
+        private String password;
+
+        private String role;
+        private Boolean active = true;
+        private LocalDateTime joinDate;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+
+        // Constructors
+
 }

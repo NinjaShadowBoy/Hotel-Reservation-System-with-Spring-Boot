@@ -1,5 +1,6 @@
 package cm.sji.hotel_reservation.services;
 
+import cm.sji.hotel_reservation.dtos.HotelDTO;
 import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
 import cm.sji.hotel_reservation.entities.Hotel;
 import cm.sji.hotel_reservation.entities.RoomType;
@@ -46,6 +47,14 @@ public class HotelService {
     }
 
     private HotelDetailsDTO getHotelDTO(Hotel hotel) {
+        if (hotel == null) {
+            return HotelDetailsDTO.builder()
+                    .name("Unknown Hotel")
+                    .location("Location not specified")
+                    .rating(0F)
+                    .desc("No description available")
+                    .build();
+        }
         List<RoomType> roomTypes = roomTypeRepo.findByHotel(hotel);
 
         Set<String> amenities = roomTypes.stream().flatMap(roomType ->
@@ -80,6 +89,23 @@ public class HotelService {
                 .rating(hotel.getRating())
                 .services(amenities)
                 .build();
+    }
+    public Hotel createHotel(HotelDTO hotelDTO) {
+        if (hotelDTO == null ||
+                hotelDTO.getName() == null || hotelDTO.getName().isBlank() ||
+                hotelDTO.getLocation() == null || hotelDTO.getLocation().isBlank()) {
+            throw new IllegalArgumentException("Invalid hotel data provided");
+        }
+        Hotel hotel = Hotel.builder()
+                .name(hotelDTO.getName())
+                .location(hotelDTO.getLocation())
+                .rating(hotelDTO.getRating())
+                .description(hotelDTO.getDescription())
+                // Set owner if needed: .owner(userRepository.findById(hotelDTO.getOwnerId()).orElse(null))
+                .build();
+
+
+        return hotelRepo.save(hotel);
     }
 
     public HotelDetailsDTO getHotel(Integer hotelId) {

@@ -1,7 +1,9 @@
 package cm.sji.hotel_reservation.controllers.api;
 
 
+import cm.sji.hotel_reservation.dtos.HotelDTO;
 import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
+import cm.sji.hotel_reservation.entities.Hotel;
 import cm.sji.hotel_reservation.services.HotelService;
 import cm.sji.hotel_reservation.services.RoomServiceService;
 import lombok.AllArgsConstructor;
@@ -9,9 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +44,16 @@ public class HotelAPI {
         } catch (Exception e){
             logger.error(e.getMessage());
             return new ResponseEntity<>(new HotelDetailsDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    @PostMapping
+    public ResponseEntity<Hotel> createHotel(@RequestBody HotelDTO hotelDTO) {
+        try {
+            Hotel createdHotel = hotelService.createHotel(hotelDTO);
+            return new ResponseEntity<>(createdHotel, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("Error creating hotel: " + e.getMessage());
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

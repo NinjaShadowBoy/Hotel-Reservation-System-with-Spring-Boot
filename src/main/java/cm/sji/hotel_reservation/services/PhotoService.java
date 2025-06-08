@@ -105,7 +105,7 @@ public class PhotoService {
                 roomType.getLabel().substring(0, Math.min(20, roomType.getLabel().length())) + (extension.isEmpty() ? "" : "." + extension);
 
         // Step 3: Save file to disk
-        Path filePath = Paths.get(hoteluploadDir, filename);
+        Path filePath = Paths.get(roomuploadDir, filename);
         Files.createDirectories(filePath.getParent());
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 

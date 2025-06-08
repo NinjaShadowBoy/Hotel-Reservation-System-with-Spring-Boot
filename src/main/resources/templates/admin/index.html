@@ -950,7 +950,7 @@
     </div>
     <ul class="sidebar-menu">
         <li>
-            <a href="#" class="nav-link active" data-section="dashboard">
+            <a href="#" class="nav-link active" data-section="/dashboard">
                 <i class="fas fa-tachometer-alt"></i>
                 <span>Dashboard</span>
             </a>
@@ -965,18 +965,6 @@
             <a href="#" class="nav-link" data-section="hotels">
                 <i class="fas fa-building"></i>
                 <span>Hotel Management</span>
-            </a>
-        </li>
-        <li>
-            <a href="#" class="nav-link" data-section="reviews">
-                <i class="fas fa-star"></i>
-                <span>Review Moderation</span>
-            </a>
-        </li>
-        <li>
-            <a href="#" class="nav-link" data-section="tickets">
-                <i class="fas fa-headset"></i>
-                <span>Support Tickets</span>
             </a>
         </li>
         <li>
@@ -1024,6 +1012,7 @@
                 </div>
             </div>
 
+
             <!-- Quick Stats Cards -->
             <div class="cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                 <div class="card">
@@ -1033,7 +1022,7 @@
                         </div>
                         <div>
                             <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Total Users</h4>
-                            <p style="font-size: 1.5rem; font-weight: 600;">1,258</p>
+                            <p id="userCount" style="font-size: 1.5rem; font-weight: 600;">Loading...</p>
                             <p style="font-size: 0.8rem; color: var(--success-color);"><i class="fas fa-arrow-up"></i> 12% this month</p>
                         </div>
                     </div>
@@ -1045,8 +1034,8 @@
                             <i class="fas fa-building" style="color: var(--success-color); font-size: 1.5rem;"></i>
                         </div>
                         <div>
-                            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Active Hotels</h4>
-                            <p style="font-size: 1.5rem; font-weight: 600;">847</p>
+                            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Number of Hotels</h4>
+                            <p id="hotelCount" style="font-size: 1.5rem; font-weight: 600;">Loading...</p>
                             <p style="font-size: 0.8rem; color: var(--success-color);"><i class="fas fa-arrow-up"></i> 5% this month</p>
                         </div>
                     </div>
@@ -1058,26 +1047,87 @@
                             <i class="fas fa-star" style="color: var(--warning-color); font-size: 1.5rem;"></i>
                         </div>
                         <div>
-                            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">New Reviews</h4>
-                            <p style="font-size: 1.5rem; font-weight: 600;">132</p>
+                            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Number of owners</h4>
+                            <p id="ownerCount" style="font-size: 1.5rem; font-weight: 600;">Loading...</p>
                             <p style="font-size: 0.8rem; color: var(--success-color);"><i class="fas fa-arrow-up"></i> 8% this week</p>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="background-color: rgba(230, 57, 70, 0.1); width: 3rem; height: 3rem; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-headset" style="color: var(--danger-color); font-size: 1.5rem;"></i>
-                        </div>
-                        <div>
-                            <h4 style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Open Tickets</h4>
-                            <p style="font-size: 1.5rem; font-weight: 600;">24</p>
-                            <p style="font-size: 0.8rem; color: var(--danger-color);"><i class="fas fa-arrow-up"></i> 3 new today</p>
-                        </div>
-                    </div>
-                </div>
+                <!-- ... rest of your HTML ... -->
             </div>
+                <script>
+                    // Fetch dashboard stats when page loads
+                    document.addEventListener('DOMContentLoaded', function() {
+                    // Debug: Confirm script is running
+                    console.log('Dashboard script loaded');
+
+
+                    // Function to update dashboard stats
+                    function updateDashboardStats() {
+                    fetch('/api/dashboard/stats')
+                    .then(response => {
+                    if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                    return response.json();
+                })
+                    .then(data => {
+                    // Debug: Log the received data
+                    console.log('API response:', data);
+
+                    // Update the DOM elements
+                    const userCountElement = document.getElementById('userCount');
+                    const hotelCountElement = document.getElementById('hotelCount');
+                    const ownerCountElement = document.getElementById('ownerCount');
+
+                    if (userCountElement) userCountElement.textContent = data.userCount || '0';
+                    if (hotelCountElement) hotelCountElement.textContent = data.hotelCount || '0';
+                    if (ownerCountElement) ownerCountElement.textContent = data.ownerCount || '0';
+
+                    // Debug: Confirm updates
+                    console.log('Updated counts:', {
+                    users: data.userCount,
+                    hotels: data.hotelCount,
+                    owners: data.ownerCount
+                });
+                })
+                    .catch(error => {
+                    console.error('Error fetching dashboard stats:', error);
+
+                    // Display error to user
+                    const errorElements = document.querySelectorAll('#userCount, #hotelCount, #ownerCount');
+                    errorElements.forEach(el => {
+                    if (el) el.textContent = 'Error';
+                });
+
+                    // Show error message to user
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'alert alert-danger';
+                    errorMessage.textContent = 'Failed to load dashboard data. Please try again later.';
+                    document.querySelector('.content-section').prepend(errorMessage);
+                });
+                }
+
+                    // Initial load
+                    updateDashboardStats();
+
+                    // Add click handler for refresh button
+                    const refreshButton = document.querySelector('.btn-primary');
+                    if (refreshButton) {
+                    refreshButton.addEventListener('click', function() {
+                    // Remove any existing error messages
+                    const existingError = document.querySelector('.alert-danger');
+                    if (existingError) {
+                    existingError.remove();
+                }
+
+                    // Update stats
+                    updateDashboardStats();
+                });
+                }
+                });
+            </script>
 
             <!-- Recent Activity -->
             <div class="card">
@@ -1193,13 +1243,760 @@
                 </div>
             </div>
         </div>
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>User Management</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <style>
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
+
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    background-color: #f8f9fa;
+                    color: #333;
+                }
+
+                .content-section {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 30px;
+                }
+
+                .content-header h2 {
+                    font-size: 2rem;
+                    color: #2c3e50;
+                }
+
+                .btn-primary {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+                }
+
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+                }
+
+                .btn-light {
+                    background: #f8f9fa;
+                    color: #495057;
+                    border: 1px solid #dee2e6;
+                    padding: 8px 16px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-light:hover {
+                    background: #e9ecef;
+                    transform: translateY(-1px);
+                }
+
+                .btn-sm {
+                    padding: 6px 12px;
+                    font-size: 0.875rem;
+                }
+
+                .btn-danger {
+                    background: #dc3545;
+                    color: white;
+                    border: none;
+                }
+
+                .btn-danger:hover {
+                    background: #c82333;
+                }
+
+                .card {
+                    background: white;
+                    border-radius: 12px;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                }
+
+                .search-filter {
+                    padding: 20px;
+                    background: #f8f9fa;
+                    border-bottom: 1px solid #dee2e6;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+
+                .search-input {
+                    position: relative;
+                    flex: 1;
+                    min-width: 250px;
+                }
+
+                .search-input i {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #6c757d;
+                }
+
+                .search-input input {
+                    width: 100%;
+                    padding: 10px 12px 10px 40px;
+                    border: 1px solid #dee2e6;
+                    border-radius: 6px;
+                    font-size: 14px;
+                }
+
+                select {
+                    padding: 10px 12px;
+                    border: 1px solid #dee2e6;
+                    border-radius: 6px;
+                    background: white;
+                    font-size: 14px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                th, td {
+                    padding: 15px;
+                    text-align: left;
+                    border-bottom: 1px solid #dee2e6;
+                }
+
+                th {
+                    background: #f8f9fa;
+                    font-weight: 600;
+                    color: #495057;
+                }
+
+                .badge {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                }
+
+                .badge-success {
+                    background: #d1ecf1;
+                    color: #0c5460;
+                }
+
+                .badge-warning {
+                    background: #fff3cd;
+                    color: #856404;
+                }
+
+                .table-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                /* Modal Styles */
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    backdrop-filter: blur(5px);
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .modal.show {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .modal-content {
+                    background: white;
+                    padding: 0;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                    animation: slideIn 0.3s ease;
+                }
+
+                .modal-header {
+                    padding: 20px 24px;
+                    border-bottom: 1px solid #dee2e6;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .modal-header h3 {
+                    margin: 0;
+                    color: #2c3e50;
+                }
+
+                .close {
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #6c757d;
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    transition: background-color 0.3s ease;
+                }
+
+                .close:hover {
+                    background-color: #f8f9fa;
+                }
+
+                .modal-body {
+                    padding: 24px;
+                }
+
+                .form-group {
+                    margin-bottom: 20px;
+                }
+
+                .form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                    color: #495057;
+                }
+
+                .form-group input,
+                .form-group select {
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #dee2e6;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+                }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                }
+
+                .form-group input.error,
+                .form-group select.error {
+                    border-color: #dc3545;
+                }
+
+                .error-message {
+                    color: #dc3545;
+                    font-size: 12px;
+                    margin-top: 4px;
+                }
+
+                .modal-footer {
+                    padding: 20px 24px;
+                    border-top: 1px solid #dee2e6;
+                    display: flex;
+                    gap: 12px;
+                    justify-content: flex-end;
+                }
+
+                .btn-success {
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-success:hover {
+                    background: #218838;
+                    transform: translateY(-1px);
+                }
+
+                .btn-secondary {
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    padding: 12px 24px;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                }
+
+                .btn-secondary:hover {
+                    background: #545b62;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-20px) scale(0.95);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+
+                .notification {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 16px 20px;
+                    border-radius: 8px;
+                    color: white;
+                    z-index: 1001;
+                    animation: slideInRight 0.3s ease;
+                    max-width: 300px;
+                }
+
+                .notification.success {
+                    background: #28a745;
+                }
+
+                .notification.error {
+                    background: #dc3545;
+                }
+
+                @keyframes slideInRight {
+                    from {
+                        opacity: 0;
+                        transform: translateX(100%);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(0);
+                    }
+                }
+            </style>
+        </head>
 
         <!-- User Management Section -->
-        <div th:fragment="users" class="content-section" id="users">
+
+
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>User Management</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+            <style>
+                /* Your existing styles should be here */
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.5);
+                    backdrop-filter: blur(5px);
+                }
+
+                .modal.active {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .modal-content {
+                    background: white;
+                    border-radius: 12px;
+                    width: 90%;
+                    max-width: 500px;
+                    max-height: 90vh;
+                    overflow-y: auto;
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+                    animation: modalSlideIn 0.3s ease-out;
+                }
+
+                @keyframes modalSlideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(-50px) scale(0.9);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
+                }
+
+                .modal-header {
+                    padding: 20px 25px;
+                    border-bottom: 1px solid #e5e7eb;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .modal-header h3 {
+                    margin: 0;
+                    color: #1f2937;
+                    font-size: 1.25rem;
+                    font-weight: 600;
+                }
+
+                .close {
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #6b7280;
+                    padding: 0;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 6px;
+                    transition: all 0.2s;
+                }
+
+                .close:hover {
+                    background: #f3f4f6;
+                    color: #374151;
+                }
+
+                .form-group {
+                    margin-bottom: 20px;
+                    padding: 0 25px;
+                }
+
+                .form-group label {
+                    display: block;
+                    margin-bottom: 6px;
+                    font-weight: 500;
+                    color: #374151;
+                    font-size: 0.875rem;
+                }
+
+                .form-group input,
+                .form-group select {
+                    width: 100%;
+                    padding: 10px 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                    box-sizing: border-box;
+                }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+                }
+
+                .form-row {
+                    display: flex;
+                    gap: 15px;
+                    padding: 0 25px;
+                    margin-bottom: 20px;
+                }
+
+                .form-row .form-group {
+                    flex: 1;
+                    margin-bottom: 0;
+                    padding: 0;
+                }
+
+                .modal-actions {
+                    padding: 20px 25px;
+                    border-top: 1px solid #e5e7eb;
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 12px;
+                }
+
+                .btn-primary, .btn-success, .btn-light, .btn-danger {
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    transition: all 0.2s;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                }
+
+                .btn-primary {
+                    background: #3b82f6;
+                    color: white;
+                }
+
+                .btn-primary:hover {
+                    background: #2563eb;
+                }
+
+                .btn-success {
+                    background: #10b981;
+                    color: white;
+                }
+
+                .btn-success:hover {
+                    background: #059669;
+                }
+
+                .btn-light {
+                    background: #f3f4f6;
+                    color: #374151;
+                    border: 1px solid #d1d5db;
+                }
+
+                .btn-light:hover {
+                    background: #e5e7eb;
+                }
+
+                .btn-danger {
+                    background: #ef4444;
+                    color: white;
+                }
+
+                .btn-danger:hover {
+                    background: #dc2626;
+                }
+
+                .notification {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 12px 16px;
+                    background: #10b981;
+                    color: white;
+                    border-radius: 8px;
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                    transform: translateX(400px);
+                    transition: transform 0.3s ease;
+                    z-index: 1100;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .notification.show {
+                    transform: translateX(0);
+                }
+
+                .notification.error {
+                    background: #ef4444;
+                }
+
+                /* Basic table styles */
+                .content-section {
+                    padding: 20px;
+                }
+
+                .content-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                }
+
+                .content-header h2 {
+                    margin: 0;
+                    color: #1f2937;
+                }
+
+                .card {
+                    background: white;
+                    border-radius: 8px;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+                    overflow: hidden;
+                }
+
+                .search-filter {
+                    padding: 20px;
+                    border-bottom: 1px solid #e5e7eb;
+                    display: flex;
+                    gap: 15px;
+                    align-items: center;
+                    flex-wrap: wrap;
+                }
+
+                .search-input {
+                    position: relative;
+                    flex: 1;
+                    min-width: 200px;
+                }
+
+                .search-input i {
+                    position: absolute;
+                    left: 12px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #6b7280;
+                }
+
+                .search-input input {
+                    width: 100%;
+                    padding: 8px 12px 8px 35px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                }
+
+                #role-filter {
+                    padding: 8px 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                th, td {
+                    padding: 12px;
+                    text-align: left;
+                    border-bottom: 1px solid #e5e7eb;
+                }
+
+                th {
+                    background: #f9fafb;
+                    font-weight: 600;
+                    color: #374151;
+                }
+
+                .badge {
+                    padding: 4px 8px;
+                    border-radius: 12px;
+                    font-size: 0.75rem;
+                    font-weight: 500;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .badge-success {
+                    background: #d1fae5;
+                    color: #065f46;
+                }
+
+                .badge-warning {
+                    background: #fef3c7;
+                    color: #92400e;
+                }
+
+                .badge-danger {
+                    background: #fee2e2;
+                    color: #991b1b;
+                }
+
+                .table-actions {
+                    display: flex;
+                    gap: 8px;
+                }
+
+                .btn-sm {
+                    padding: 6px 8px;
+                    font-size: 0.75rem;
+                }
+
+                .storage-status {
+                    position: fixed;
+                    bottom: 20px;
+                    left: 20px;
+                    padding: 8px 12px;
+                    background: #f3f4f6;
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    font-size: 0.75rem;
+                    color: #6b7280;
+                }
+
+                .storage-status.connected {
+                    background: #d1fae5;
+                    color: #065f46;
+                    border-color: #10b981;
+                }
+
+                .storage-status.error {
+                    background: #fee2e2;
+                    color: #991b1b;
+                    border-color: #ef4444;
+                }
+                /* Status indicators */
+                .status {
+                    padding: 5px 10px;
+                    border-radius: 20px;
+                    font-size: 12px;
+                    font-weight: 500;
+                }
+
+                .status.active {
+                    background-color: rgba(56, 176, 0, 0.1);
+                    color: var(--success-color);
+                }
+
+                .status.inactive {
+                    background-color: rgba(230, 57, 70, 0.1);
+                    color: var(--danger-color);
+                }
+
+                /* No data message */
+                .no-data {
+                    text-align: center;
+                    padding: 20px;
+                    color: var(--text-secondary);
+                }
+            </style>
+        </head>
+        <body>
+        <div class="content-section" id="users">
             <div class="content-header">
                 <h2>User Management</h2>
                 <div class="actions">
-                    <button class="btn-primary">
+                    <button class="btn-primary" id="addUserBtn">
                         <i class="fas fa-plus"></i>
                         <span>Add User</span>
                     </button>
@@ -1214,21 +2011,21 @@
                     </div>
                     <select id="role-filter">
                         <option value="all">All Roles</option>
-                        <option value="guest">Guest</option>
                         <option value="owner">Owner</option>
                         <option value="admin">Admin</option>
                     </select>
-                    <button class="btn-light">
-                        <i class="fas fa-filter"></i>
-                        <span>Filter</span>
+                    <button class="btn-light" id="clear-data-btn">
+                        <i class="fas fa-trash"></i>
+                        <span>Clear All Data</span>
                     </button>
                 </div>
 
                 <table id="users-table">
                     <thead>
                     <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
                         <th>Email</th>
-                        <th>Full Name</th>
                         <th>Role</th>
                         <th>Join Date</th>
                         <th>Status</th>
@@ -1236,431 +2033,1969 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>john.doe@example.com</td>
-                        <td>John Doe</td>
-                        <td>Guest</td>
-                        <td>May 1, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-edit"></i></button>
-                                <button class="btn-danger btn-sm user-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>jane.smith@example.com</td>
-                        <td>Jane Smith</td>
-                        <td>Owner</td>
-                        <td>Apr 15, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-edit"></i></button>
-                                <button class="btn-danger btn-sm user-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>hotel.manager@example.com</td>
-                        <td>Hotel Manager</td>
-                        <td>Owner</td>
-                        <td>Mar 22, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-edit"></i></button>
-                                <button class="btn-danger btn-sm user-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>sarah.johnson@example.com</td>
-                        <td>Sarah Johnson</td>
-                        <td>Guest</td>
-                        <td>Feb 10, 2025</td>
-                        <td><span class="badge badge-warning"><i class="fas fa-clock"></i> Pending</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-edit"></i></button>
-                                <button class="btn-danger btn-sm user-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>admin@example.com</td>
-                        <td>Admin User</td>
-                        <td>Admin</td>
-                        <td>Jan 5, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Active</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-edit"></i></button>
-                                <button class="btn-danger btn-sm user-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
+                    <!-- Users will be loaded here -->
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- Add User Modal -->
+        <div id="addUserModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New User</h3>
+                    <button class="close" onclick="closeAddModal()">&times;</button>
+                </div>
+                <form id="addUserForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="addFirstName">First Name</label>
+                            <input type="text" id="addFirstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="addLastName">Last Name</label>
+                            <input type="text" id="addLastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="addEmail">Email Address</label>
+                        <input type="email" id="addEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addPassword">Password</label>
+                        <input type="password" id="addPassword" name="password" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="addRole">Role</label>
+                            <select id="addRole" name="role" required>
+                                <option value="">Select Role</option>
+                                <option value="CLIENT">User</option>
+                                <option value="OWNER">Owner</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="addStatus">Status</label>
+                            <select id="addStatus" name="active">
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-light" onclick="closeAddModal()">Cancel</button>
+                        <button type="submit" class="btn-success">
+                            <i class="fas fa-plus"></i>
+                            Add User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Edit User Modal -->
+        <div id="editUserModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Edit User</h3>
+                    <button class="close" onclick="closeEditModal()">×</button>
+                </div>
+                <form id="editUserForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editFirstName">First Name</label>
+                            <input type="text" id="editFirstName" name="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editLastName">Last Name</label>
+                            <input type="text" id="editLastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="editEmail">Email Address</label>
+                        <input type="email" id="editEmail" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editPassword">Password (leave blank to keep unchanged)</label>
+                        <input type="password" id="editPassword" name="password">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editRole">Role</label>
+                            <select id="editRole" name="role" required>
+                                <option value="CLIENT">User</option>
+                                <option value="OWNER">Owner</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editStatus">Status</label>
+                            <select id="editStatus" name="active" required>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-light" onclick="closeEditModal()">Cancel</button>
+                        <button type="submit" class="btn-success">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const API_BASE_URL = 'http://localhost:8081/api/owners';
+            let currentEditingUserId = null;
+            let users = []; // Store loaded users
+
+            // Function to load users from the backend API
+            async function loadUsers() {
+                try {
+                    console.log('Loading users from API...');
+                    const response = await fetch(API_BASE_URL, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const apiResponse = await response.json();
+                    console.log('Full API Response:', apiResponse);
+
+                    let userList = apiResponse.data || apiResponse;
+                    if (apiResponse.success !== undefined) {
+                        userList = apiResponse.data;
+                    }
+
+                    if (userList && (Array.isArray(userList) || userList.content)) {
+                        users = Array.isArray(userList) ? userList : userList.content;
+                        displayUsers(users);
+                        console.log(`Successfully loaded ${users.length} users`);
+                    } else {
+                        throw new Error('Invalid user data format received');
+                    }
+                } catch (error) {
+                    console.error('Error loading users:', error);
+                    showNotification('Failed to load users: ' + error.message, 'error');
+                    loadDemoUsers();
+                }
+            }
+
+            // Function to load demo users if API fails
+            function loadDemoUsers() {
+                const defaultUsers = [
+                    {
+                        id: 1,
+                        email: 'john.doe@example.com',
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        role: 'CLIENT',
+                        active: true,
+                        createdAt: '2025-05-01T00:00:00'
+                    },
+                    {
+                        id: 2,
+                        email: 'jane.smith@example.com',
+                        firstName: 'Jane',
+                        lastName: 'Smith',
+                        role: 'OWNER',
+                        active: true,
+                        createdAt: '2025-04-15T00:00:00'
+                    },
+                    {
+                        id: 3,
+                        email: 'admin@example.com',
+                        firstName: 'Admin',
+                        lastName: 'User',
+                        role: 'ADMIN',
+                        active: true,
+                        createdAt: '2025-01-05T00:00:00'
+                    }
+                ];
+
+                users = defaultUsers;
+                displayUsers(users);
+                console.log('Using demo data - API connection failed');
+            }
+
+            // Function to display users in the table
+            function displayUsers(usersToDisplay) {
+                const tbody = document.querySelector('#users-table tbody');
+
+                if (!tbody) {
+                    console.error('Users table tbody not found');
+                    return;
+                }
+
+                tbody.innerHTML = '';
+
+                if (!usersToDisplay || usersToDisplay.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No users found</td></tr>';
+                    return;
+                }
+
+                usersToDisplay.forEach(user => {
+                    const row = createUserRow(user);
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Function to create a user row
+            function createUserRow(user) {
+                const row = document.createElement('tr');
+                row.setAttribute('data-user-id', user.id);
+
+                const joinDate = user.createdAt ?
+                    new Date(user.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    }) : 'N/A';
+
+                const roleDisplay = user.role === 'CLIENT' ? 'User' :
+                    user.role === 'OWNER' ? 'Owner' :
+                        user.role === 'ADMIN' ? 'Admin' : user.role;
+
+                const status = user.active ? 'Active' : 'Inactive';
+                const statusClass = user.active ? 'badge-success' : 'badge-danger';
+                const statusIcon = user.active ? 'fas fa-check' : 'fas fa-times';
+
+                row.innerHTML = `
+                <td>${user.firstName || ''}</td>
+                <td>${user.lastName || ''}</td>
+                <td>${user.email || 'N/A'}</td>
+                <td><span class="role-badge role-${user.role.toLowerCase()}">${roleDisplay}</span></td>
+                <td>${joinDate}</td>
+                <td><span class="badge ${statusClass}"><i class="${statusIcon}"></i> ${status}</span></td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn-light btn-sm edit-user-btn" title="Edit User" data-user-id="${user.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-danger btn-sm user-delete-btn" title="Delete User" data-user-id="${user.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            `;
+
+                // Add event listeners
+                const editBtn = row.querySelector('.edit-user-btn');
+                const deleteBtn = row.querySelector('.user-delete-btn');
+
+                editBtn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openEditModal(parseInt(userId));
+                });
+
+                deleteBtn.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    const userEmail = user.email;
+                    if (confirm(`Are you sure you want to delete user ${userEmail}?`)) {
+                        deleteUser(parseInt(userId));
+                    }
+                });
+
+                return row;
+            }
+
+            // Function to create a new user via API
+            async function createUser(userData) {
+                try {
+                    console.log('Creating user:', userData);
+
+                    const response = await fetch(API_BASE_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const apiResponse = await response.json();
+                    console.log('Create user response:', apiResponse);
+
+                    if (!response.ok) {
+                        if (response.status === 409) {
+                            throw new Error('Email already exists');
+                        } else if (response.status === 400) {
+                            throw new Error(apiResponse.message || 'Invalid input data');
+                        } else {
+                            throw new Error(apiResponse.message || `Failed to create user (${response.status})`);
+                        }
+                    }
+
+                    if (!apiResponse.success) {
+                        throw new Error(apiResponse.message || 'Failed to create user');
+                    }
+
+                    showNotification('User created successfully!', 'success');
+                    await loadUsers();
+                    return apiResponse.data;
+
+                } catch (error) {
+                    console.error('Error creating user:', error);
+                    showNotification(error.message || 'Failed to create user', 'error');
+                    throw error;
+                }
+            }
+
+            // Function to update a user via API
+            async function updateUser(userId, userData) {
+                try {
+                    console.log('Updating user:', userId, userData);
+
+                    const response = await fetch(`${API_BASE_URL}/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(userData)
+                    });
+
+                    const apiResponse = await response.json();
+                    console.log('Update user response:', apiResponse);
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('User not found');
+                        } else if (response.status === 409) {
+                            throw new Error('Email already exists');
+                        } else if (response.status === 400) {
+                            throw new Error(apiResponse.message || 'Invalid input data');
+                        } else {
+                            throw new Error(apiResponse.message || `Failed to update user (${response.status})`);
+                        }
+                    }
+
+                    if (!apiResponse.success) {
+                        throw new Error(apiResponse.message || 'Failed to update user');
+                    }
+
+                    showNotification('User updated successfully!', 'success');
+                    await loadUsers();
+                    return apiResponse.data;
+
+                } catch (error) {
+                    console.error('Error updating user:', error);
+                    showNotification(error.message || 'Failed to update user', 'error');
+                    throw error;
+                }
+            }
+
+            // Function to delete a user via API
+            async function deleteUser(userId) {
+                try {
+                    console.log('Deleting user:', userId);
+
+                    // Get the token from wherever it's stored in your frontend
+                    const token = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+
+                    const headers = {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    };
+
+                    // Only add Authorization header if token exists
+                    if (token) {
+                        headers['Authorization'] = `Bearer ${token}`;
+                    }
+
+                    const response = await fetch(`${API_BASE_URL}/${userId}`, {
+                        method: 'DELETE',
+                        headers: headers
+                    });
+
+                    const apiResponse = await response.json();
+                    console.log('Delete user response:', apiResponse);
+
+                    if (!response.ok) {
+                        if (response.status === 401 || response.status === 403) {
+                            // Handle unauthorized/forbidden cases specifically
+                            throw new Error('You do not have permission to delete users. Please log in with an admin account.');
+                        } else if (response.status === 404) {
+                            throw new Error('User not found');
+                        } else {
+                            throw new Error(apiResponse.message || `Failed to delete user (${response.status})`);
+                        }
+                    }
+
+                    if (!apiResponse.success) {
+                        throw new Error(apiResponse.message || 'Failed to delete user');
+                    }
+
+                    showNotification('User deleted successfully!', 'success');
+                    await loadUsers();
+
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    showNotification(error.message || 'Failed to delete user', 'error');
+                }
+            }
+            async function deleteUser(userId) {
+                try {
+                    console.log('Deleting user:', userId);
+
+                    const response = await fetch(`${API_BASE_URL}/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    const apiResponse = await response.json();
+                    console.log('Delete user response:', apiResponse);
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            throw new Error('User not found');
+                        } else {
+                            throw new Error(apiResponse.message || `Failed to delete user (${response.status})`);
+                        }
+                    }
+
+                    if (!apiResponse.success) {
+                        throw new Error(apiResponse.message || 'Failed to delete user');
+                    }
+
+                    showNotification('User deleted successfully!', 'success');
+                    await loadUsers();
+
+                } catch (error) {
+                    console.error('Error deleting user:', error);
+                    showNotification(error.message || 'Failed to delete user', 'error');
+                }
+            }
+            // Function to clear all data
+            function clearAllData() {
+                if (confirm('Are you sure you want to clear all user data? This action cannot be undone.')) {
+                    users = [];
+                    displayUsers(users);
+                    showNotification('All user data cleared!', 'success');
+                }
+            }
+
+            // Function to show notifications
+            function showNotification(message, type = 'success') {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+
+                const icon = type === 'success' ? 'fa-check-circle' :
+                    type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle';
+
+                notification.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }
+
+            // Modal Functions
+            function openAddModal() {
+                document.getElementById('addUserForm').reset();
+                document.getElementById('addUserModal').classList.add('active');
+            }
+
+            function closeAddModal() {
+                document.getElementById('addUserModal').classList.remove('active');
+            }
+
+            function openEditModal(userId) {
+                currentEditingUserId = userId;
+                const user = users.find(u => u.id === userId);
+
+                if (user) {
+                    document.getElementById('editFirstName').value = user.firstName || '';
+                    document.getElementById('editLastName').value = user.lastName || '';
+                    document.getElementById('editEmail').value = user.email || '';
+                    document.getElementById('editPassword').value = '';
+                    document.getElementById('editRole').value = user.role;
+                    document.getElementById('editStatus').value = user.active ? 'true' : 'false';
+                    document.getElementById('editUserModal').classList.add('active');
+                } else {
+                    showNotification('User not found', 'error');
+                }
+            }
+
+            function closeEditModal() {
+                document.getElementById('editUserModal').classList.remove('active');
+                currentEditingUserId = null;
+            }
+            function loadOwners() {
+                fetch('/api/users/owners')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            displayOwners(data.data);
+                        } else {
+                            console.error('Error loading owners:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+
+            function displayOwners(owners) {
+                const tableBody = document.getElementById('ownersTableBody');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                owners.forEach(owner => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+            <td>${owner.firstName} ${owner.lastName}</td>
+            <td>${owner.email}</td>
+            <td>${owner.role}</td>
+            <td>${owner.active ? 'Active' : 'Inactive'}</td>
+            <td>
+                <button class="btn-edit" onclick="editOwner(${owner.id})">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-delete" onclick="deleteOwner(${owner.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Role filter change handler
+            document.getElementById('role-filter').addEventListener('change', function() {
+                const role = this.value;
+                loadUsers(role);
+            });
+
+            // Function to load users by role
+            function loadUsers(role = 'all') {
+                let url = '/api/users';
+                if (role !== 'all') {
+                    url = `/api/users/by-role/${role}`;
+                }
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            renderUsers(data.data);
+                        } else {
+                            console.error('Error loading users:', data.message);
+                            showAlert('error', 'Failed to load users: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showAlert('error', 'Error loading users: ' + error.message);
+                    });
+            }
+
+            // Function to render users in the table
+            function renderUsers(users) {
+                const tbody = document.querySelector('#users-table tbody');
+                tbody.innerHTML = '';
+
+                if (users.length === 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `<td colspan="7" class="no-data">No users found</td>`;
+                    tbody.appendChild(row);
+                    return;
+                }
+
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+            <td>${user.firstName}</td>
+            <td>${user.lastName}</td>
+            <td>${user.email}</td>
+            <td>${formatRole(user.role)}</td>
+            <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+            <td><span class="status ${user.active ? 'active' : 'inactive'}">
+                ${user.active ? 'Active' : 'Inactive'}
+            </span></td>
+            <td class="actions">
+                <button class="btn-icon edit-user" data-id="${user.id}">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn-icon delete-user" data-id="${user.id}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+                    tbody.appendChild(row);
+                });
+
+                // Add event listeners to edit/delete buttons
+                addUserActionListeners();
+            }
+
+            // Helper function to format role for display
+            function formatRole(role) {
+                const roleMap = {
+                    'CLIENT': 'User',
+                    'OWNER': 'Owner',
+                    'ADMIN': 'Admin'
+                };
+                return roleMap[role] || role;
+            }
+
+            // Initialize when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                loadUsers();
+            });
+
+            // Call this when your page loads
+            document.addEventListener('DOMContentLoaded', loadOwners);
+
+            // Search and Filter Functions
+            function filterUsers() {
+                const searchTerm = document.getElementById('user-search').value.toLowerCase();
+                const roleFilter = document.getElementById('role-filter').value.toLowerCase();
+                const rows = document.querySelectorAll('#users-table tbody tr');
+
+                rows.forEach(row => {
+                    if (row.cells.length < 7) return;
+
+                    const firstName = row.cells[0].textContent.toLowerCase();
+                    const lastName = row.cells[1].textContent.toLowerCase();
+                    const email = row.cells[2].textContent.toLowerCase();
+                    const role = row.cells[3].textContent.toLowerCase();
+
+                    const matchesSearch = firstName.includes(searchTerm) ||
+                        lastName.includes(searchTerm) ||
+                        email.includes(searchTerm);
+
+                    const matchesRole = roleFilter === 'all' ||
+                        (roleFilter === 'user' && role.includes('user')) ||
+                        (roleFilter === 'owner' && role.includes('owner')) ||
+                        (roleFilter === 'admin' && role.includes('admin'));
+
+                    if (matchesSearch && matchesRole) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            // Initialize when DOM is loaded
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Initializing User Management Dashboard...');
+
+                // Load users from API
+                loadUsers();
+
+                // Add User button
+                const addUserBtn = document.getElementById('addUserBtn');
+                if (addUserBtn) {
+                    addUserBtn.addEventListener('click', openAddModal);
+                }
+
+                // Add User form submission
+                const addUserForm = document.getElementById('addUserForm');
+                if (addUserForm) {
+                    addUserForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(this);
+                        const userData = {
+                            firstName: formData.get('firstName').trim(),
+                            lastName: formData.get('lastName').trim(),
+                            email: formData.get('email').trim(),
+                            password: formData.get('password'),
+                            role: formData.get('role'),
+                            active: formData.get('active') === 'true'
+                        };
+
+                        if (!userData.firstName || userData.firstName.length < 2) {
+                            showNotification('First name must be at least 2 characters.', 'error');
+                            return;
+                        }
+                        if (!userData.lastName || userData.lastName.length < 2) {
+                            showNotification('Last name must be at least 2 characters.', 'error');
+                            return;
+                        }
+                        if (!userData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email)) {
+                            showNotification('Please provide a valid email address.', 'error');
+                            return;
+                        }
+                        if (!userData.password || userData.password.length < 6) {
+                            showNotification('Password must be at least 6 characters.', 'error');
+                            return;
+                        }
+                        if (!userData.role || !['CLIENT', 'OWNER', 'ADMIN'].includes(userData.role)) {
+                            showNotification('Please select a valid role.', 'error');
+                            return;
+                        }
+
+                        try {
+                            await createUser(userData);
+                            closeAddModal();
+                        } catch (error) {
+                            // Error handled in createUser
+                        }
+                    });
+                }
+
+                // Edit User form submission
+                const editUserForm = document.getElementById('editUserForm');
+                if (editUserForm) {
+                    editUserForm.addEventListener('submit', async function(e) {
+                        e.preventDefault();
+
+                        const formData = new FormData(this);
+                        const userData = {
+                            firstName: formData.get('firstName').trim(),
+                            lastName: formData.get('lastName').trim(),
+                            email: formData.get('email').trim(),
+                            password: formData.get('password') || undefined, // Only include password if provided
+                            role: formData.get('role'),
+                            active: formData.get('active') === 'true'
+                        };
+
+                        if (!userData.firstName || userData.firstName.length < 2) {
+                            showNotification('First name must be at least 2 characters.', 'error');
+                            return;
+                        }
+                        if (!userData.lastName || userData.lastName.length < 2) {
+                            showNotification('Last name must be at least 2 characters.', 'error');
+                            return;
+                        }
+                        if (!userData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userData.email)) {
+                            showNotification('Please provide a valid email address.', 'error');
+                            return;
+                        }
+                        if (!userData.role || !['CLIENT', 'OWNER', 'ADMIN'].includes(userData.role)) {
+                            showNotification('Please select a valid role.', 'error');
+                            return;
+                        }
+                        if (userData.password && userData.password.length < 6) {
+                            showNotification('Password must be at least 6 characters if provided.', 'error');
+                            return;
+                        }
+
+                        try {
+                            await updateUser(currentEditingUserId, userData);
+                            closeEditModal();
+                        } catch (error) {
+                            // Error handled in updateUser
+                        }
+                    });
+                }
+
+                // Search and filter events
+                const searchInput = document.getElementById('user-search');
+                if (searchInput) {
+                    searchInput.addEventListener('input', filterUsers);
+                }
+
+                const roleFilter = document.getElementById('role-filter');
+                if (roleFilter) {
+                    roleFilter.addEventListener('change', filterUsers);
+                }
+
+                // Modal close events
+                const addModal = document.getElementById('addUserModal');
+                if (addModal) {
+                    addModal.addEventListener('click', function(e) {
+                        if (e.target === this) closeAddModal();
+                    });
+                }
+
+                const editModal = document.getElementById('editUserModal');
+                if (editModal) {
+                    editModal.addEventListener('click', function(e) {
+                        if (e.target === this) closeEditModal();
+                    });
+                }
+
+                // Keyboard shortcuts
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (document.getElementById('addUserModal')?.classList.contains('active')) {
+                            closeAddModal();
+                        }
+                        if (document.getElementById('editUserModal')?.classList.contains('active')) {
+                            closeEditModal();
+                        }
+                    }
+                });
+
+                console.log('User Management Dashboard initialized');
+            });
+        </script>
+        </body>
 
         <!-- Hotel Management Section -->
-        <div th:fragment="hotels" class="content-section" id="hotels">
-            <div class="content-header">
-                <h2>Hotel Management</h2>
-                <div class="actions">
-                    <button class="btn-primary">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 20px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+
+            .header {
+                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                color: white;
+                padding: 30px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .header h1 {
+                font-size: 32px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .header .stats {
+                display: flex;
+                gap: 30px;
+                font-size: 14px;
+            }
+
+            .stat-item {
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 24px;
+                font-weight: bold;
+                display: block;
+            }
+
+            .content-section {
+                padding: 40px;
+            }
+
+            .content-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+            }
+
+            .content-header h2 {
+                color: #2c3e50;
+                font-size: 28px;
+                font-weight: 600;
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                border: none;
+                padding: 15px 25px;
+                border-radius: 12px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+
+            .btn-primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            }
+
+            .btn-primary:active {
+                transform: translateY(-1px);
+            }
+
+            .tabs {
+                display: flex;
+                background: #f8f9fa;
+                border-radius: 15px;
+                padding: 8px;
+                margin-bottom: 30px;
+                box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+            }
+
+            .tab {
+                flex: 1;
+                padding: 15px 20px;
+                text-align: center;
+                cursor: pointer;
+                border-radius: 10px;
+                transition: all 0.3s ease;
+                font-weight: 600;
+                color: #6c757d;
+                position: relative;
+            }
+
+            .tab.active {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            }
+
+            .tab:not(.active):hover {
+                background: white;
+                color: #495057;
+            }
+
+            .tab-content {
+                display: none;
+                animation: fadeIn 0.3s ease;
+            }
+
+            .tab-content.active {
+                display: block;
+            }
+
+            .card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+                overflow: hidden;
+                border: 1px solid #e9ecef;
+            }
+
+            .search-filter {
+                display: flex;
+                gap: 20px;
+                padding: 25px;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .search-input {
+                position: relative;
+                flex: 1;
+            }
+
+            .search-input i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: #6c757d;
+                font-size: 16px;
+            }
+
+            .search-input input {
+                width: 100%;
+                padding: 15px 15px 15px 45px;
+                border: 2px solid #e9ecef;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            .search-input input:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .search-filter select {
+                padding: 15px 20px;
+                border: 2px solid #e9ecef;
+                border-radius: 10px;
+                font-size: 16px;
+                cursor: pointer;
+                background: white;
+                min-width: 150px;
+            }
+
+            .search-filter select:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            th, td {
+                padding: 20px;
+                text-align: left;
+                border-bottom: 1px solid #f1f3f4;
+            }
+
+            th {
+                background: #f8f9fa;
+                font-weight: 700;
+                color: #2c3e50;
+                font-size: 14px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            td {
+                font-size: 14px;
+                color: #495057;
+            }
+
+            tr:hover {
+                background: #f8f9fa;
+            }
+
+            .table-actions {
+                display: flex;
+                gap: 8px;
+            }
+
+            .btn-sm {
+                padding: 8px 12px;
+                border: none;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 12px;
+                transition: all 0.3s ease;
+                font-weight: 500;
+            }
+
+            .btn-light {
+                background: #f8f9fa;
+                color: #6c757d;
+                border: 1px solid #dee2e6;
+            }
+
+            .btn-light:hover {
+                background: #e9ecef;
+                transform: translateY(-1px);
+            }
+
+            .btn-success {
+                background: #28a745;
+                color: white;
+            }
+
+            .btn-success:hover {
+                background: #218838;
+                transform: translateY(-1px);
+            }
+
+            .btn-danger {
+                background: #dc3545;
+                color: white;
+            }
+
+            .btn-danger:hover {
+                background: #c82333;
+                transform: translateY(-1px);
+            }
+
+            .empty-state {
+                text-align: center;
+                padding: 80px 20px;
+                color: #6c757d;
+            }
+
+            .empty-state i {
+                font-size: 64px;
+                margin-bottom: 20px;
+                color: #dee2e6;
+            }
+
+            .empty-state h4 {
+                margin-bottom: 10px;
+                font-size: 20px;
+                color: #495057;
+            }
+
+            .empty-state p {
+                font-size: 16px;
+                margin-bottom: 30px;
+            }
+
+            /* Modal Styles */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 2000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.7);
+                backdrop-filter: blur(5px);
+            }
+
+            .modal.show {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                animation: modalFadeIn 0.3s ease;
+            }
+
+            .modal-content {
+                background: white;
+                border-radius: 20px;
+                width: 90%;
+                max-width: 600px;
+                max-height: 90vh;
+                overflow-y: auto;
+                box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+                animation: modalSlideIn 0.3s ease;
+            }
+
+            .modal-header {
+                padding: 30px 40px 20px;
+                border-bottom: 1px solid #e9ecef;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            }
+
+            .modal-header h3 {
+                color: #2c3e50;
+                font-size: 24px;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .close {
+                background: none;
+                border: none;
+                font-size: 28px;
+                cursor: pointer;
+                color: #6c757d;
+                transition: all 0.3s ease;
+                padding: 5px;
+                border-radius: 50%;
+            }
+
+            .close:hover {
+                background: #f8f9fa;
+                color: #dc3545;
+            }
+
+            .modal-body {
+                padding: 30px 40px;
+            }
+
+            .form-group {
+                margin-bottom: 25px;
+            }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+                color: #2c3e50;
+                font-size: 14px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                width: 100%;
+                padding: 15px 20px;
+                border: 2px solid #e9ecef;
+                border-radius: 10px;
+                font-size: 16px;
+                transition: all 0.3s ease;
+                background: #f8f9fa;
+            }
+
+            .form-group input:focus,
+            .form-group select:focus,
+            .form-group textarea:focus {
+                outline: none;
+                border-color: #667eea;
+                background: white;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 120px;
+                font-family: inherit;
+            }
+
+            .form-actions {
+                display: flex;
+                gap: 15px;
+                justify-content: flex-end;
+                padding: 20px 40px 30px;
+                background: #f8f9fa;
+            }
+
+            .btn-secondary {
+                background: #6c757d;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 10px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .btn-secondary:hover {
+                background: #5a6268;
+                transform: translateY(-2px);
+            }
+
+            .error {
+                color: #dc3545;
+                font-size: 13px;
+                margin-top: 5px;
+                font-weight: 500;
+            }
+
+            .alert {
+                padding: 15px 20px;
+                border-radius: 10px;
+                margin-bottom: 25px;
+                display: none;
+                font-weight: 500;
+            }
+
+            .alert.success {
+                background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+                color: #155724;
+                border: 1px solid #c3e6cb;
+            }
+
+            .alert.error {
+                background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+                color: #721c24;
+                border: 1px solid #f5c6cb;
+            }
+
+            .alert.show {
+                display: block;
+                animation: alertSlideIn 0.3s ease;
+            }
+
+            .rating-input {
+                display: flex;
+                gap: 5px;
+                align-items: center;
+                margin-top: 10px;
+            }
+
+            .star {
+                font-size: 24px;
+                color: #dee2e6;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            .star.active {
+                color: #ffc107;
+            }
+
+            .star:hover {
+                color: #ffc107;
+                transform: scale(1.1);
+            }
+
+            .rating-text {
+                margin-left: 15px;
+                font-weight: 600;
+                color: #6c757d;
+            }
+
+            .badge {
+                display: inline-block;
+                padding: 4px 8px;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                text-transform: uppercase;
+            }
+
+            .badge-luxury {
+                background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+                color: #856404;
+            }
+
+            .badge-budget {
+                background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+                color: #0c5460;
+            }
+
+            .badge-boutique {
+                background: linear-gradient(135deg, #e2e3e5 0%, #d6d8db 100%);
+                color: #383d41;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes modalFadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes modalSlideIn {
+                from { transform: translateY(-50px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+
+            @keyframes alertSlideIn {
+                from { transform: translateX(-20px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+
+            /* Responsive */
+            @media (max-width: 768px) {
+                .container {
+                    margin: 10px;
+                    border-radius: 15px;
+                }
+
+                .header {
+                    padding: 20px;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                .content-section {
+                    padding: 20px;
+                }
+
+                .search-filter {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+
+                .modal-content {
+                    width: 95%;
+                    margin: 20px;
+                }
+
+                /* Add to your existing CSS */
+                .star {
+                    color: #ccc;
+                    cursor: pointer;
+                    font-size: 24px;
+                    transition: color 0.2s;
+                }
+
+                .star.active {
+                    color: #ffc107;
+                }
+
+                .rating-input {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .rating-text {
+                    margin-left: 10px;
+                    color: #666;
+                }
+                .modal-header,
+                .modal-body,
+                .form-actions {
+                    padding: 20px;
+                }
+                .rating-display {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .rating-display .rating-value {
+                    color: #666;
+                    font-size: 0.9em;
+                }
+            }
+        </style>
+        <div class="content-section" id="hotels">
+                <div class="content-header">
+                    <h2>Manage Hotels</h2>
+                    <button class="btn-primary" id="addHotelBtn">
                         <i class="fas fa-plus"></i>
-                        <span>Add Hotel</span>
+                        <span>Add New Hotel</span>
                     </button>
                 </div>
-            </div>
 
-            <div class="tabs">
-                <div class="tab active" data-tab="pending">Pending Approval (5)</div>
-                <div class="tab" data-tab="active">Active Hotels (847)</div>
-                <div class="tab" data-tab="suspended">Suspended (12)</div>
-            </div>
-
-            <div class="tab-content active" id="pending-hotels">
-                <div class="card">
-                    <div class="search-filter">
-                        <div class="search-input">
-                            <i class="fas fa-search"></i>
-                            <input type="search" placeholder="Search hotels...">
-                        </div>
-                        <select>
-                            <option value="all">All Categories</option>
-                            <option value="luxury">Luxury</option>
-                            <option value="budget">Budget</option>
-                            <option value="boutique">Boutique</option>
-                        </select>
+                <div class="tabs">
+                    <div class="tab active" data-tab="pending">
+                        <i class="fas fa-clock"></i>
+                        Pending Approval (5)
                     </div>
-
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Hotel Name</th>
-                            <th>Owner</th>
-                            <th>Location</th>
-                            <th>Category</th>
-                            <th>Submission Date</th>
-                            <th>Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Grand Plaza Hotel</td>
-                            <td>hotel.manager@example.com</td>
-                            <td>New York, USA</td>
-                            <td>Luxury</td>
-                            <td>Today, 10:30 AM</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-success btn-sm hotel-approve-btn"><i class="fas fa-check"></i></button>
-                                    <button class="btn-danger btn-sm hotel-reject-btn"><i class="fas fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Cozy Inn Budget</td>
-                            <td>inn.owner@example.com</td>
-                            <td>Chicago, USA</td>
-                            <td>Budget</td>
-                            <td>Yesterday, 3:45 PM</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-success btn-sm hotel-approve-btn"><i class="fas fa-check"></i></button>
-                                    <button class="btn-danger btn-sm hotel-reject-btn"><i class="fas fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Sunset Beach Resort</td>
-                            <td>beach.resort@example.com</td>
-                            <td>Miami, USA</td>
-                            <td>Luxury</td>
-                            <td>May 10, 2025</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-success btn-sm hotel-approve-btn"><i class="fas fa-check"></i></button>
-                                    <button class="btn-danger btn-sm hotel-reject-btn"><i class="fas fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Urban Boutique Hotel</td>
-                            <td>urban.hotel@example.com</td>
-                            <td>San Francisco, USA</td>
-                            <td>Boutique</td>
-                            <td>May 9, 2025</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-success btn-sm hotel-approve-btn"><i class="fas fa-check"></i></button>
-                                    <button class="btn-danger btn-sm hotel-reject-btn"><i class="fas fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Mountain View Lodge</td>
-                            <td>mountain.lodge@example.com</td>
-                            <td>Denver, USA</td>
-                            <td>Budget</td>
-                            <td>May 8, 2025</td>
-                            <td>
-                                <div class="table-actions">
-                                    <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                    <button class="btn-success btn-sm hotel-approve-btn"><i class="fas fa-check"></i></button>
-                                    <button class="btn-danger btn-sm hotel-reject-btn"><i class="fas fa-times"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="tab-content" id="active-hotels">
-                <div class="card">
-                    <div class="search-filter">
-                        <div class="search-input">
-                            <i class="fas fa-search"></i>
-                            <input type="search" placeholder="Search active hotels...">
-                        </div>
-                        <select>
-                            <option value="all">All Categories</option>
-                            <option value="luxury">Luxury</option>
-                            <option value="budget">Budget</option>
-                            <option value="boutique">Boutique</option>
-                        </select>
+                    <div class="tab" data-tab="active">
+                        <i class="fas fa-check-circle"></i>
+                        Active Hotels (847)
                     </div>
-
-                    <!-- Active hotels would be listed here -->
-                    <div class="empty-state">
-                        <i class="fas fa-hotel"></i>
-                        <h4>No Active Hotels Loaded</h4>
-                        <p>Click the button below to load active hotels data.</p>
-                        <button class="btn-primary">Load Hotels</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-content" id="suspended-hotels">
-                <div class="card">
-                    <div class="search-filter">
-                        <div class="search-input">
-                            <i class="fas fa-search"></i>
-                            <input type="search" placeholder="Search suspended hotels...">
-                        </div>
-                    </div>
-
-                    <!-- Suspended hotels would be listed here -->
-                    <div class="empty-state">
+                    <div class="tab" data-tab="suspended">
                         <i class="fas fa-ban"></i>
-                        <h4>No Suspended Hotels Loaded</h4>
-                        <p>Click the button below to load suspended hotels data.</p>
-                        <button class="btn-primary">Load Hotels</button>
+                        Suspended (12)
+                    </div>
+                </div>
+
+                <div class="tab-content active" id="pending-hotels">
+                    <div class="card">
+                        <div class="search-filter">
+                            <div class="search-input">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search pending hotels...">
+                            </div>
+                            <select>
+                                <option value="all">All Categories</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="budget">Budget</option>
+                                <option value="boutique">Boutique</option>
+                            </select>
+                        </div>
+
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Hotel Name</th>
+                                <th>Owner</th>
+                                <th>Location</th>
+                                <th>Rating</th>
+                                <th>Description</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody id="pendingHotelsTable">
+                            <tr>
+                                <td><strong>Grand Plaza Hotel</strong></td>
+                                <td>hotel.manager@example.com</td>
+                                <td>New York, USA</td>
+                                <td>
+                                    <div class="rating-display">
+                                        ★★★★☆
+                                        <span class="rating-value">4.0</span>
+                                    </div>
+                                </td>
+                                <td>Luxury hotel with 5-star amenities in downtown Manhattan</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn-light btn-sm" title="View Details"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-success btn-sm hotel-approve-btn" title="Approve"><i class="fas fa-check"></i></button>
+                                        <button class="btn-danger btn-sm hotel-reject-btn" title="Reject"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Cozy Inn Budget</strong></td>
+                                <td>inn.owner@example.com</td>
+                                <td>Chicago, USA</td>
+                                <td>
+                                    <div class="rating-display">
+                                        ★★★☆☆
+                                        <span class="rating-value">3.0</span>
+                                    </div>
+                                </td>
+                                <td>Affordable accommodations near the city center</td>
+                                <td>
+                                    <div class="table-actions">
+                                        <button class="btn-light btn-sm" title="View Details"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-success btn-sm hotel-approve-btn" title="Approve"><i class="fas fa-check"></i></button>
+                                        <button class="btn-danger btn-sm hotel-reject-btn" title="Reject"><i class="fas fa-times"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="active-hotels">
+                    <div class="card">
+                        <div class="search-filter">
+                            <div class="search-input">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search active hotels...">
+                            </div>
+                            <select>
+                                <option value="all">All Categories</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="budget">Budget</option>
+                                <option value="boutique">Boutique</option>
+                            </select>
+                        </div>
+
+                        <div class="empty-state">
+                            <i class="fas fa-hotel"></i>
+                            <h4>No Active Hotels Data Loaded</h4>
+                            <p>Active hotels will be displayed here once you load the data from your backend.</p>
+                            <button class="btn-primary" onclick="loadActiveHotels()">
+                                <i class="fas fa-download"></i>
+                                Load Active Hotels
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="suspended-hotels">
+                    <div class="card">
+                        <div class="search-filter">
+                            <div class="search-input">
+                                <i class="fas fa-search"></i>
+                                <input type="search" placeholder="Search suspended hotels...">
+                            </div>
+                        </div>
+
+                        <div class="empty-state">
+                            <i class="fas fa-ban"></i>
+                            <h4>No Suspended Hotels Data Loaded</h4>
+                            <p>Suspended hotels will be displayed here once you load the data from your backend.</p>
+                            <button class="btn-primary" onclick="loadSuspendedHotels()">
+                                <i class="fas fa-download"></i>
+                                Load Suspended Hotels
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Review Moderation Section -->
-        <div th:fragment="reviews" class="content-section" id="reviews">
-            <div class="content-header">
-                <h2>Review Moderation</h2>
-            </div>
-
-            <div class="card">
-                <div class="search-filter">
-                    <div class="search-input">
-                        <i class="fas fa-search"></i>
-                        <input type="search" placeholder="Search reviews...">
-                    </div>
-                    <select>
-                        <option value="all">All Statuses</option>
-                        <option value="flagged">Flagged</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Rejected</option>
-                    </select>
+        <!-- Add Hotel Modal -->
+        <div id="addHotelModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>
+                        <i class="fas fa-plus-circle"></i>
+                        Add New Hotel
+                    </h3>
+                    <button class="close" type="button">&times;</button>
                 </div>
+                <form id="addHotelForm">
+                    <div class="modal-body">
+                        <div class="alert success" id="successAlert">
+                            <i class="fas fa-check-circle"></i>
+                            Hotel added successfully and is pending approval!
+                        </div>
+                        <div class="alert error" id="errorAlert">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span id="errorMessage">Please fix the errors below.</span>
+                        </div>
 
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Review</th>
-                        <th>Hotel</th>
-                        <th>User</th>
-                        <th>Rating</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>"This hotel was terrible. The staff was rude and the room was dirty..."</td>
-                        <td>Grand Plaza Hotel</td>
-                        <td>john.doe@example.com</td>
-                        <td>1 ★</td>
-                        <td>Today, 11:20 AM</td>
-                        <td><span class="badge badge-danger"><i class="fas fa-flag"></i> Flagged</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-success btn-sm review-approve-btn"><i class="fas fa-check"></i></button>
-                                <button class="btn-danger btn-sm review-delete-btn"><i class="fas fa-trash"></i></button>
+                        <div class="form-group">
+                            <label for="hotelName">
+                                <i class="fas fa-hotel"></i>
+                                Hotel Name *
+                            </label>
+                            <input type="text" id="hotelName" name="name" required placeholder="Enter hotel name">
+                            <div class="error" id="nameError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hotelLocation">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Location *
+                            </label>
+                            <input type="text" id="hotelLocation" name="location" required placeholder="City, Country">
+                            <div class="error" id="locationError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hotelCategory">
+                                <i class="fas fa-tag"></i>
+                                Category *
+                            </label>
+                            <select id="hotelCategory" name="category" required>
+                                <option value="">Select Category</option>
+                                <option value="luxury">Luxury</option>
+                                <option value="budget">Budget</option>
+                                <option value="boutique">Boutique</option>
+                                <option value="business">Business</option>
+                                <option value="resort">Resort</option>
+                            </select>
+                            <div class="error" id="categoryError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-star"></i>
+                                Rating *
+                            </label>
+                            <div class="rating-input">
+                                <span class="star" data-rating="1">★</span>
+                                <span class="star" data-rating="2">★</span>
+                                <span class="star" data-rating="3">★</span>
+                                <span class="star" data-rating="4">★</span>
+                                <span class="star" data-rating="5">★</span>
+                                <span class="rating-text" id="ratingText">Click to rate</span>
                             </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>"I would not recommend this place to anyone. Complete waste of money..."</td>
-                        <td>Sunset Beach Resort</td>
-                        <td>sarah.smith@example.com</td>
-                        <td>2 ★</td>
-                        <td>Yesterday, 4:30 PM</td>
-                        <td><span class="badge badge-danger"><i class="fas fa-flag"></i> Flagged</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-success btn-sm review-approve-btn"><i class="fas fa-check"></i></button>
-                                <button class="btn-danger btn-sm review-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>"Absolutely amazing experience! The staff was so helpful and friendly..."</td>
-                        <td>Urban Boutique Hotel</td>
-                        <td>mike.johnson@example.com</td>
-                        <td>5 ★</td>
-                        <td>May 10, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Approved</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-warning btn-sm review-flag-btn"><i class="fas fa-flag"></i></button>
-                                <button class="btn-danger btn-sm review-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>"The location was great but the noise from the street made it hard to sleep..."</td>
-                        <td>Mountain View Lodge</td>
-                        <td>alex.brown@example.com</td>
-                        <td>3 ★</td>
-                        <td>May 8, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Approved</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-warning btn-sm review-flag-btn"><i class="fas fa-flag"></i></button>
-                                <button class="btn-danger btn-sm review-delete-btn"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+                            <input type="hidden" id="hotelRating" name="rating" required>
+                            <div class="error" id="ratingError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="hotelDescription">
+                                <i class="fas fa-align-left"></i>
+                                Description *
+                            </label>
+                            <textarea id="hotelDescription" name="description" required placeholder="Provide a detailed description of the hotel, its amenities, and unique features..."></textarea>
+                            <div class="error" id="descriptionError"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ownerEmail">
+                                <i class="fas fa-envelope"></i>
+                                Owner Email
+                            </label>
+                            <input type="email" id="ownerEmail" name="ownerEmail" placeholder="hotel.owner@example.com">
+                            <div class="error" id="ownerEmailError"></div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelBtn">
+                            <i class="fas fa-times"></i>
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Add Hotel
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
 
-        <!-- Support Tickets Section -->
-        <div th:fragment="tickets" class="content-section" id="tickets">
-            <div class="content-header">
-                <h2>Support Tickets</h2>
-            </div>
+        <script>
+            // Global variables
+            const modal = document.getElementById('addHotelModal');
+            const addHotelBtn = document.getElementById('addHotelBtn');
+            const closeBtn = document.querySelector('.close');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const form = document.getElementById('addHotelForm');
 
-            <div class="card">
-                <div class="search-filter">
-                    <div class="search-input">
-                        <i class="fas fa-search"></i>
-                        <input type="search" placeholder="Search tickets...">
-                    </div>
-                    <select>
-                        <option value="all">All Statuses</option>
-                        <option value="open">Open</option>
-                        <option value="closed">Closed</option>
-                    </select>
-                </div>
+            // Initialize the application
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Hotel Management System loaded successfully!');
+                initializeEventListeners();
+            });
 
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Ticket ID</th>
-                        <th>Subject</th>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>#T-1001</td>
-                        <td>Booking confirmation not received</td>
-                        <td>john.doe@example.com</td>
-                        <td>Today, 9:45 AM</td>
-                        <td><span class="badge badge-danger"><i class="fas fa-exclamation-circle"></i> Open</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-warning btn-sm ticket-reply-btn"><i class="fas fa-reply"></i></button>
-                                <button class="btn-success btn-sm ticket-close-btn"><i class="fas fa-check"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#T-1002</td>
-                        <td>Can't modify reservation dates</td>
-                        <td>sarah.smith@example.com</td>
-                        <td>Yesterday, 4:30 PM</td>
-                        <td><span class="badge badge-danger"><i class="fas fa-exclamation-circle"></i> Open</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-warning btn-sm ticket-reply-btn"><i class="fas fa-reply"></i></button>
-                                <button class="btn-success btn-sm ticket-close-btn"><i class="fas fa-check"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#T-1003</td>
-                        <td>Issue with payment refund</td>
-                        <td>michael.brown@example.com</td>
-                        <td>Yesterday, 2:15 PM</td>
-                        <td><span class="badge badge-danger"><i class="fas fa-exclamation-circle"></i> Open</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-warning btn-sm ticket-reply-btn"><i class="fas fa-reply"></i></button>
-                                <button class="btn-success btn-sm ticket-close-btn"><i class="fas fa-check"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#T-998</td>
-                        <td>Hotel cancellation policy question</td>
-                        <td>alex.wilson@example.com</td>
-                        <td>May 9, 2025</td>
-                        <td><span class="badge badge-success"><i class="fas fa-check"></i> Closed</span></td>
-                        <td>
-                            <div class="table-actions">
-                                <button class="btn-light btn-sm"><i class="fas fa-eye"></i></button>
-                                <button class="btn-warning btn-sm ticket-reopen-btn"><i class="fas fa-redo"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
+            function initializeEventListeners() {
+                // Tab functionality
+                const tabs = document.querySelectorAll('.tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        switchTab(this.getAttribute('data-tab'));
+                    });
+                });
 
-                <div class="reply-form" id="ticket-reply-form">
-                    <h4>Reply to Ticket #T-1001</h4>
-                    <textarea placeholder="Type your response here..."></textarea>
-                    <div class="reply-actions">
-                        <button class="btn-light" id="cancel-reply">Cancel</button>
-                        <button class="btn-primary" id="send-reply">Send Reply</button>
-                    </div>
-                </div>
-            </div>
+                // Modal functionality
+                addHotelBtn.addEventListener('click', openModal);
+                closeBtn.addEventListener('click', closeModal);
+                cancelBtn.addEventListener('click', closeModal);
+
+                // Close modal when clicking outside
+                window.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeModal();
+                    }
+                });
+
+                // Form submission
+                form.addEventListener('submit', handleFormSubmit);
+
+                // Rating functionality
+                initializeRating();
+
+                // Action buttons
+                document.addEventListener('click', handleActionButtons);
+            }
+
+            function switchTab(tabName) {
+                console.log('Switching to tab:', tabName);
+
+                // Remove active class from all tabs and contents
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                // Add active class to clicked tab
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+                // Show corresponding content
+                const targetContent = document.getElementById(`${tabName}-hotels`);
+                if (targetContent) {
+                    targetContent.classList.add('active');
+                }
+            }
+
+            function openModal() {
+                console.log('Opening add hotel modal');
+                modal.classList.add('show');
+                resetForm();
+                // Focus on first input
+                setTimeout(() => {
+                    document.getElementById('hotelName').focus();
+                }, 300);
+            }
+
+            function closeModal() {
+                console.log('Closing modal');
+                modal.classList.remove('show');
+            }
+
+            function initializeRating() {
+                const stars = document.querySelectorAll('.star');
+                const ratingInput = document.getElementById('hotelRating');
+                const ratingText = document.getElementById('ratingText');
+
+                stars.forEach(star => {
+                    star.addEventListener('click', function() {
+                        const rating = parseInt(this.getAttribute('data-rating'));
+                        ratingInput.value = rating;
+                        updateStars(rating);
+                        ratingText.textContent = `${rating} star${rating > 1 ? 's' : ''}`;
+                        console.log('Rating selected:', rating);
+                    });
+
+                    star.addEventListener('mouseover', function() {
+                        const rating = parseInt(this.getAttribute('data-rating'));
+                        updateStars(rating);
+                    });
+                });
+
+                document.querySelector('.rating-input').addEventListener('mouseleave', function() {
+                    const currentRating = parseInt(ratingInput.value) || 0;
+                    updateStars(currentRating);
+                });
+            }
+
+            function updateStars(rating) {
+                const stars = document.querySelectorAll('.star');
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
+            }
+            function handleFormSubmit(e) {
+                e.preventDefault();
+
+                if (validateForm()) {
+                    const formData = {
+                        name: document.getElementById('hotelName').value,
+                        location: document.getElementById('hotelLocation').value,
+                        category: document.getElementById('hotelCategory').value,
+                        rating: document.getElementById('hotelRating').value,
+                        description: document.getElementById('hotelDescription').value,
+                        ownerEmail: document.getElementById('ownerEmail').value
+                    };
+
+                    // Show success message
+                    document.getElementById('successAlert').style.display = 'block';
+                    document.getElementById('errorAlert').style.display = 'none';
+
+                    // Add the new hotel to the pending table
+                    addHotelToTable(formData);
+
+                    // Reset and close
+                    setTimeout(() => {
+                        resetForm();
+                        closeModal();
+                    }, 1500);
+                }
+            }
+            function validateForm() {
+                let isValid = true;
+
+                // Reset errors
+                document.querySelectorAll('.error').forEach(el => el.textContent = '');
+                document.getElementById('errorAlert').style.display = 'none';
+
+                // Validate each field
+                if (!document.getElementById('hotelName').value) {
+                    document.getElementById('nameError').textContent = 'Hotel name is required';
+                    isValid = false;
+                }
+
+                if (!document.getElementById('hotelLocation').value) {
+                    document.getElementById('locationError').textContent = 'Location is required';
+                    isValid = false;
+                }
+
+                if (!document.getElementById('hotelCategory').value) {
+                    document.getElementById('categoryError').textContent = 'Category is required';
+                    isValid = false;
+                }
+
+                if (!document.getElementById('hotelRating').value) {
+                    document.getElementById('ratingError').textContent = 'Rating is required';
+                    isValid = false;
+                }
+
+                if (!document.getElementById('hotelDescription').value) {
+                    document.getElementById('descriptionError').textContent = 'Description is required';
+                    isValid = false;
+                }
+
+                if (!isValid) {
+                    document.getElementById('errorAlert').style.display = 'block';
+                }
+
+                return isValid;
+            }
+
+            function resetForm() {
+                document.getElementById('addHotelForm').reset();
+                document.getElementById('successAlert').style.display = 'none';
+                document.getElementById('errorAlert').style.display = 'none';
+                document.querySelectorAll('.error').forEach(el => el.textContent = '');
+                document.getElementById('ratingText').textContent = 'Click to rate';
+                updateStars(0);
+            }
+            function handleActionButtons(e) {
+                if (e.target.closest('.hotel-approve-btn')) {
+                    const row = e.target.closest('tr');
+                    const hotelName = row.querySelector('td:first-child strong').textContent;
+                    console.log(`Approving hotel: ${hotelName}`);
+                    // In a real app, you would send this to your backend
+                    row.remove();
+                }
+
+                if (e.target.closest('.hotel-reject-btn')) {
+                    const row = e.target.closest('tr');
+                    const hotelName = row.querySelector('td:first-child strong').textContent;
+                    console.log(`Rejecting hotel: ${hotelName}`);
+                    // In a real app, you would send this to your backend
+                    row.remove();
+                }
+
+                if (e.target.closest('.btn-light')) {
+                    const row = e.target.closest('tr');
+                    const hotelName = row.querySelector('td:first-child strong').textContent;
+                    console.log(`Viewing details for: ${hotelName}`);
+                    // In a real app, you would show a details modal
+                }
+            }
+            function loadActiveHotels() {
+                console.log('Loading active hotels...');
+                // In a real app, you would fetch from your backend
+                document.querySelector('#active-hotels .empty-state').innerHTML = `
+        <i class="fas fa-spinner fa-spin"></i>
+        <h4>Loading Active Hotels...</h4>
+    `;
+
+                // Simulate loading delay
+                setTimeout(() => {
+                    document.querySelector('#active-hotels .empty-state').style.display = 'none';
+                    // Here you would populate the table with real data
+                    console.log('Active hotels loaded');
+                }, 1500);
+            }
+
+            function loadSuspendedHotels() {
+                console.log('Loading suspended hotels...');
+                // In a real app, you would fetch from your backend
+                document.querySelector('#suspended-hotels .empty-state').innerHTML = `
+        <i class="fas fa-spinner fa-spin"></i>
+        <h4>Loading Suspended Hotels...</h4>
+    `;
+
+                // Simulate loading delay
+                setTimeout(() => {
+                    document.querySelector('#suspended-hotels .empty-state').style.display = 'none';
+                    // Here you would populate the table with real data
+                    console.log('Suspended hotels loaded');
+                }, 1500);
+            }
+            function addHotelToTable(hotelData) {
+                const pendingTable = document.getElementById('pendingHotelsTable');
+
+                // Create a new table row
+                const newRow = document.createElement('tr');
+
+                // Create the rating display
+                const ratingStars = '★'.repeat(Math.floor(hotelData.rating)) + '☆'.repeat(5 - Math.floor(hotelData.rating));
+                const ratingDisplay = `
+        <div class="rating-display">
+            ${ratingStars}
+            <span class="rating-value">${hotelData.rating}.0</span>
         </div>
+    `;
+
+                // Add the cells to the row
+                newRow.innerHTML = `
+        <td><strong>${hotelData.name}</strong></td>
+        <td>${hotelData.ownerEmail || 'N/A'}</td>
+        <td>${hotelData.location}</td>
+        <td>${ratingDisplay}</td>
+        <td>${hotelData.description}</td>
+        <td>
+            <div class="table-actions">
+                <button class="btn-light btn-sm" title="View Details"><i class="fas fa-eye"></i></button>
+                <button class="btn-success btn-sm hotel-approve-btn" title="Approve"><i class="fas fa-check"></i></button>
+                <button class="btn-danger btn-sm hotel-reject-btn" title="Reject"><i class="fas fa-times"></i></button>
+            </div>
+        </td>
+    `;
+
+                // Add the row to the table (at the top)
+                pendingTable.insertBefore(newRow, pendingTable.firstChild);
+
+                // Update the pending count
+                updatePendingCount();
+            }
+            // Helper function
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            // Update the pending count display
+            function updatePendingCount() {
+                const pendingCount = document.getElementById('pendingHotelsTable').rows.length;
+                document.querySelector('[data-tab="pending"]').textContent =
+                    `<i class="fas fa-clock"></i> Pending Approval (${pendingCount})`;
+                document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = pendingCount;
+            }
+        </script>
 
         <!-- Analytics Section -->
         <div th:fragment="analytics" class="content-section" id="analytics">
@@ -1933,7 +4268,7 @@
             // Add event listeners to new buttons
             attachReviewButtonListeners(actionsCell);
         });
-    });
+            });
 
     // Review flag functionality
     const reviewFlagButtons = document.querySelectorAll('.review-flag-btn');
