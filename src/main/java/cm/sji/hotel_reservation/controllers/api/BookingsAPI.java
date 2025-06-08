@@ -55,6 +55,30 @@ public class BookingsAPI {
         }
     }
 
+
+    @GetMapping("/api/bookings/{hotelId}")
+    public ResponseEntity<List<ClientReservationDTO>> getHotelBookings(@PathVariable Integer hotelId) {
+        try {
+            var bookings = bookingService.getHotelReservations(hotelId);
+            return new ResponseEntity<>(bookings, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    @GetMapping("/api/bookings/hotels/{ownerId}")
+    public ResponseEntity<List<ClientReservationDTO>> getOwnerBookings(@PathVariable Integer ownerId) {
+        try {
+            var ownerBookings = bookingService.getOwnerReservations(ownerId);
+            return new ResponseEntity<>(ownerBookings, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     /**
      * DELETE endpoint for cancelling a booking
      *

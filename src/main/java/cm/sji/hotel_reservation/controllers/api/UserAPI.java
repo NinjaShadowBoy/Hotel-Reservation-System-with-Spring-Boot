@@ -4,6 +4,7 @@ import cm.sji.hotel_reservation.dtos.AuthenticationRequest;
 import cm.sji.hotel_reservation.dtos.AuthenticationResponse;
 import cm.sji.hotel_reservation.dtos.UserDTO;
 import cm.sji.hotel_reservation.entities.User;
+import cm.sji.hotel_reservation.repositories.UserRepo;
 import cm.sji.hotel_reservation.services.AuthenticationService;
 import cm.sji.hotel_reservation.services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,9 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +23,7 @@ import java.util.Optional;
 public class UserAPI {
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final UserService userService;
+    private final UserRepo userRepo;
     private final AuthenticationService authenticationService;
 
     @PostMapping("/api/owner/login")
@@ -41,6 +41,29 @@ public class UserAPI {
         }else{
             logger.warn("User with email {} not found", email);
             return ResponseEntity.status(404).body(null);
+        }
+    }
+
+    @GetMapping("/api/client/{clientId}")
+    public ResponseEntity<UserDTO> getClientDetails(@PathVariable Integer clientId) {
+        try {
+            Optional<User> optionalclient = userRepo.findById(clientId);
+            if (optionalclient.isEmpty()) {
+                logger.warn("Client with ID {} not found", clientId);
+                return ResponseEntity.status(404).body(null);
+            }
+
+            UserDTO userDTO = userService.getUserDTO(optionalclient.get());
+
+            if (userDTO != null) {
+                return ResponseEntity.ok(userDTO);
+            } else {
+                logger.warn("User with ID {} not found", clientId);
+                return ResponseEntity.status(404).body(null);
+            }
+        } catch (Exception e) {
+            logger.error("Error fetching user details: {}", e.getMessage());
+            return ResponseEntity.status(500).body(null);
         }
     }
 

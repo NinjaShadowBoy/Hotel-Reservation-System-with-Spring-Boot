@@ -15,11 +15,11 @@ public class Question {
     Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "fk_client_id", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_client_id", updatable = false)
     User client;
 
     @ManyToOne
-    @JoinColumn(name = "fk_hotel_id", insertable = false, updatable = false)
+    @JoinColumn(name = "fk_hotel_id", updatable = false)
     Hotel hotel;
 
     String faqQuestion = "";

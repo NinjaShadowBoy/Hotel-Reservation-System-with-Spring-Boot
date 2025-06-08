@@ -167,12 +167,64 @@ function registerHotels() {
     })
 }
 
+
+function updateHotel() {
+    document.getElementById('edit-hotel-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const hotelId = localStorage.getItem('updatesHotelId');
+        const formData = new FormData(this);
+
+        // Ensure hotelName is present
+        if (!formData.get('hotelName')) {
+            alert('Hotel name is required');
+            return;
+        }
+
+        fetch(`/api/hotels/${encodeURIComponent(hotelId)}/update`, {
+            method: 'PUT',
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('updated Hotel:', data);
+
+                if(data.id === hotelId) {
+                    const hotelCard = document.getElementById(`hotel-${hotelId}`);
+                    if (hotelCard) {
+                        hotelCard.querySelector('.hotel-name').textContent = data.name || 'Unnamed Hotel';
+                        hotelCard.querySelector('.hotel-image').style.backgroundImage = `url('${data.image || '/images/placeholder.png'}')`;
+                    }
+                    alert('Hotel updated successfully!');
+                }
+                else {
+                    console.error('Hotel ID mismatch after update:', data.id, hotelId);
+                    alert('Error: Hotel ID mismatch after update. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating hotel:', error);
+                alert('Error updating hotel: ' + error.message);
+            });
+    });
+}
+
 function getOwnerHotels() {
     const hotelCards = document.getElementById('HotelCards');
     const selectHotel = document.getElementById('select-hotel');
     const filterHotel = document.getElementById('hotel-review-filter');
     const filterHotelQuestion = document.getElementById('hotel-question-filter');
     const filterHotelFAQ = document.getElementById('hotel-faq-filter');
+    const filterHotelBooking = document.getElementById('hotel-booking-filter');
+    const hotelsForUpdate = document.getElementById('update-hotel');
+
 
 
     // Clear existing content
@@ -220,6 +272,7 @@ function getOwnerHotels() {
             
             const card = document.createElement('div');
             card.className = 'hotel-card';
+            card.id = `hotel-${hotel.id}`;
             card.innerHTML = `
                 <div class="hotel-image" style="background-image: url('${hotel.image || '/images/placeholder.png'}')"></div>
                 <div class="hotel-card-body">
@@ -265,6 +318,16 @@ function getOwnerHotels() {
             option4.value = hotel.id;
             option4.textContent = hotel.name || 'Unnamed Hotel';
             filterHotelFAQ.appendChild(option4);
+
+            const option5 = document.createElement('option');
+            option5.value = hotel.id;
+            option5.textContent = hotel.name || 'Unnamed Hotel';
+            filterHotelBooking.appendChild(option5);
+
+            const option6 = document.createElement('option');
+            option6.value = hotel.id;
+            option6.textContent = hotel.name || 'Unnamed Hotel';
+            hotelsForUpdate.appendChild(option6);
         });
 
         // Add event listener for hotel selection only once
@@ -279,6 +342,12 @@ function getOwnerHotels() {
 
         filterHotelFAQ.removeEventListener('change', handleHotelSelectionForFaq);
         filterHotelFAQ.addEventListener('change', handleHotelSelectionForFaq);
+
+        filterHotelBooking.removeEventListener('change', handleHotelSelectionForBooking);
+        filterHotelBooking.addEventListener('change', handleHotelSelectionForBooking);
+
+        hotelsForUpdate.removeEventListener('change', handleHotelSelectionForUpdate);
+        hotelsForUpdate.addEventListener('change', handleHotelSelectionForUpdate);
     })
     .catch(error => {
         console.error('Error fetching owner hotels:', error);
@@ -362,16 +431,35 @@ function handleHotelSelection(e) {
                     <input type="number" class="price-edit" style="display: none;" value="${roomtype.numberAvailable}">
                 </td>
                 <td>
-                    <button class="btn btn-secondary btn-sm edit-price">
-                        <i class="fas fa-edit"></i> Edit Price
-                    </button>
-                    <button class="btn btn-danger btn-sm">
-                        <i class="fas fa-trash-alt"></i>
+                    <button id="edit-roomtype-${roomtype.id}" class="btn btn-secondary btn-sm edit-price">
+                        <i class="fas fa-edit"></i> Edit Room type
                     </button>
                 </td>
             `;
             hotelRooms.appendChild(row);
         });
+
+                // Add event listeners to the edit buttons
+                data.forEach(roomtype => {
+                    const editRoomModal = document.getElementById('edit-roomtype-modal');
+                    const closeModal = document.querySelectorAll('.close-modal');                    const editButton = document.getElementById(`edit-roomtype-${roomtype.id}`);
+                    if (editButton) {
+                        editButton.addEventListener('click', () => {
+                            document.getElementById('price').value = roomtype.price;
+                            document.getElementById('totalnumber').value = roomtype.totalnumber;
+                            editRoomModal.style.display = 'flex'; // Function to show the modal
+                        });
+                    }
+                    if (closeModal[2]) {
+                        closeModal[2].addEventListener('click', function() {
+                            editRoomModal.style.display = 'none';
+                        });
+                    }
+                    window.addEventListener('click', function(e) {
+                        if (e.target === editRoomModal) {
+                            editRoomModal.style.display = 'none';}
+                    });
+                });
     })
     .catch(error => {
         console.error('Error fetching room types:', error);
@@ -635,6 +723,121 @@ function handleHotelSelectionForFaq(e) {
 
 
 
+// Separate function for handling hotel selection for questions
+function handleHotelSelectionForBooking(e) {
+    const value = e.target.value;
+    const hotelBookings = document.getElementById('hotel-bookings');
+
+    if (value === 'all') {
+
+        hotelBookings.innerHTML = '<p>Please select a hotel to display its bookings</p>';
+        localStorage.setItem('BookingsHotelId', 'all');
+        console.log('currently ', localStorage.getItem('BookingsHotelId'));
+        return;  //to be touched
+    }
+
+
+    hotelBookings.innerHTML = '';
+
+    console.log('Selected hotel id:', value);
+    localStorage.setItem('BookingsHotelId', value);
+    console.log('Current hotel set to: ', localStorage.getItem('BookingsHotelId'));
+
+
+    fetch(`/api/bookings/hotels/${encodeURIComponent(value)}`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json'
+        }
+    })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Hotel bookings:', data);
+
+            if (!Array.isArray(data) || data.length === 0) {
+                hotelBookings.innerHTML = '<p>No bookings for this hotel yet!</p>';
+                return;
+            }
+
+            data.forEach(booking => {
+                if (!booking) return; // Skip null room types
+
+                fetch(`/api/bookings/hotels/${encodeURIComponent(booking.clientId)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                    .then(data => {
+                        console.log('Hotel bookings:', data);
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                          <td>${booking.hotelName}</td>
+                          <td>${data.firstName} ${data.lastName}</td>
+                          <td>${booking.roomType}</td>
+                          <td>${booking.checkinDate}</td>
+                          <td>${booking.price}</td>
+                          <td><span class="badge badge-success">${booking.status}</span></td>
+                   
+                       `;
+                        hotelBookings.appendChild(row);
+                    })
+                    .catch(error => {
+                            console.error('Error fetching client name:', error);
+                            alert("Error fetching client name: " + error.message);
+                   });
+
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching reviews:', error);
+            hotelBookings.innerHTML = `
+            <div class="error-message">
+                <p>Error loading bookings: ${error.message}</p>
+                <p>Please try refreshing the page or contact support if the problem persists.</p>
+            </div>`;
+        });
+}
+
+
+// Separate function for handling hotel selection for updates
+function handleHotelSelectionForUpdate(e) {
+    const value = e.target.value;
+    const message = document.getElementById('message');
+
+    if (value === 'all') {
+
+        message.innerHTML = '<p>Please select a hotel for the update</p>';
+        localStorage.setItem('updatesHotelId', 'all');
+        console.log('currently ', localStorage.getItem('updatesHotelId'));
+        return;
+    }
+
+    message.innerHTML = '';
+
+    console.log('Selected hotel id:', value);
+    localStorage.setItem('updatesHotelId', value);
+    console.log('Current hotel set to: ', localStorage.getItem('updatesHotelId'));
+
+}
+
+
+
 function getServices(){
     const services = document.getElementById('service-elements');
 
@@ -671,6 +874,67 @@ function getServices(){
         services.innerHTML = `<p>Error fetching services: ${error.message}</p>`;
     })
 }
+
+
+function getBookings(){
+    const bookings = document.getElementById('booking-list');
+    const currentUser = JSON.parse(localStorage.getItem('user'));
+    const ownerId = currentUser.id;
+
+    fetch(`/api/bookings/hotels/${encodeURIComponent(ownerId)}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success data in native form:', data);
+
+            data.forEach(book => {
+
+                fetch(`/api/bookings/hotels/${encodeURIComponent(book.clientId)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).then(response => {
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            throw new Error(`HTTP error! status: ${response.status}, message: ${text}`);
+                        });
+                    }
+                    return response.json();
+                })
+                    .then(data => {
+                        console.log('Hotel bookings:', data);
+
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${book.clientId || data.firstName || data.lastName}</td>
+                            <td>${book.hotelName}</td>
+                            <td>${book.roomType}</td>
+                            <td>${book.checkinDate}</td>
+                            <td>$${book.price}</td>
+                            <td>${book.cancellationDate}</td>
+                            <td><span class="badge badge-success">${book.status}</span></td>
+<!--                            <td>-->
+<!--                              <button class="btn btn-secondary btn-sm">-->
+<!--                                <i class="fas fa-eye"></i> Details-->
+<!--                              </button>-->
+<!--                            </td>-->
+                            `
+                        bookings.appendChild(row);
+                    })
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching bookings: ', error);
+            bookings.innerHTML = `<p>Error fetching bookings: ${error.message}</p>`;
+        })
+}
+
+
 
 function addFaq(){
     document.getElementById('add-faq-form').addEventListener('submit', function (e){
@@ -887,8 +1151,10 @@ document.addEventListener('DOMContentLoaded', function(){
     });
 
     getServices();
+    getBookings();
     registerHotels();
     getOwnerHotels();
+    updateHotel();
     addRoomType();
     addFaq();
 

@@ -68,6 +68,20 @@ public class BookingService {
                 .map(this::getReservationDTO).toList();
     }
 
+    public List<ClientReservationDTO> getHotelReservations(Integer hotelId) {
+
+        return bookingRepo.findBookingsByHotelId(hotelId).stream()
+                                                           .map(this::getReservationDTO)
+                                                           .toList();
+    }
+
+    public List<ClientReservationDTO> getOwnerReservations(Integer ownerId) {
+
+        return bookingRepo.findByRoomType_Hotel_Owner_Id(ownerId).stream()
+                .map(this::getReservationDTO)
+                .toList();
+    }
+
     public List<ClientReservationDTO> getClientReservations(User client) {
         return bookingRepo.findByClient(client).stream()
                 .map(this::getReservationDTO).toList();

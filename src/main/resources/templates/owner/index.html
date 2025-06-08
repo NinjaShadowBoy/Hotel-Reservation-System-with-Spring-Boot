@@ -154,17 +154,40 @@
   /* ====== SIDEBAR ====== */
   .sidebar {
     position: fixed;
-    width: var(--sidebar-width);
+    left: 0;
+    top: 0;
     height: 100vh;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    color: white;
-    padding: var(--spacing-lg) 0;
-    overflow-y: auto;
+    width: var(--sidebar-width);
+    background: linear-gradient(135deg, #43609f, #4361ee);
+    color: #ffffff;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    z-index: 100;
-    box-shadow: var(--shadow-lg);
-    transition: all var(--transition-medium);
+    z-index: 1000;
+    transition: all 0.3s ease;
+  }
+
+  .sidebar.dark-theme {
+    background: linear-gradient(135deg, #131333, #01203c);
+    color: #ffffff;
+  }
+
+  .sidebar.dark-theme .nav-item {
+    color: #ffffff;
+  }
+
+  .sidebar.dark-theme .nav-item:hover,
+  .sidebar.dark-theme .nav-item.active {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+  }
+
+  .sidebar.dark-theme .logo {
+    color: #ffffff;
+  }
+
+  .sidebar.dark-theme .sidebar-footer {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .sidebar-header {
@@ -1290,13 +1313,13 @@
     }
 
     .sidebar.dark-theme {
-      background: linear-gradient(135deg, #0f0f2b, #000000); /* Dark blue gradient */
-      color: #0c0cd1; /* Change text color to white for better contrast */
+      background: linear-gradient(135deg, #0a0a1a, #000000); /* Darker blue gradient */
+      color: #ffffff; /* Change text color to white for better contrast */
     }
 
     .sidebar.dark-theme .nav-item:hover,
     .sidebar.dark-theme .nav-item.active {
-      background-color: rgba(255, 255, 255, 0.1); /* Lighten hover effect */
+      background-color: rgba(255, 255, 255, 0.05); /* Lighter hover effect */
     }
 
     /* Adjusting button colors for dark theme */
@@ -1435,7 +1458,7 @@
             <i class="fas fa-plus"></i> Add New Hotel
           </a>
 
-          <a class="btn btn-primary btn-sm" data-tab="edit-hotel">
+          <a class="btn btn-primary btn-sm" id="edit-hotel">
             <i class="fas fa-pen-to-square"></i>  Edit Hotel
           </a>
 
@@ -1448,6 +1471,11 @@
       <div class="card">
         <div class="card-header">
           <h2>Recent Bookings</h2>
+          <div style="position: absolute; right: 140px;">
+            <select id="hotel-booking-filter" class="form-control">
+              <option value="all">Choose Hotel</option>
+            </select>
+          </div>
           <a class="btn btn-primary btn-sm" data-tab="bookings">
             <i class="fas fa-eye"></i> View All
           </a>
@@ -1456,49 +1484,16 @@
           <div class="table-container">
             <table>
               <thead>
-              <tr>
-                <th>Hotel</th>
-                <th>Guest</th>
-                <th>Room Type</th>
-                <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Status</th>
-              </tr>
+                <tr>
+                  <th>Hotel</th>
+                  <th>Guest</th>
+                  <th>Room Type</th>
+                  <th>Check-in</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                </tr>
               </thead>
-              <tbody>
-              <tr>
-                <td>Oceanview Resort</td>
-                <td>John Smith</td>
-                <td>Deluxe Suite</td>
-                <td>May 15, 2025</td>
-                <td>May 18, 2025</td>
-                <td><span class="badge badge-success">Confirmed</span></td>
-              </tr>
-              <tr>
-                <td>Downtown Suites</td>
-                <td>Emma Johnson</td>
-                <td>Double Room</td>
-                <td>May 14, 2025</td>
-                <td>May 16, 2025</td>
-                <td><span class="badge badge-warning">Pending</span></td>
-              </tr>
-              <tr>
-                <td>Mountain Lodge</td>
-                <td>Robert Chen</td>
-                <td>Family Suite</td>
-                <td>May 20, 2025</td>
-                <td>May 25, 2025</td>
-                <td><span class="badge badge-warning">Pending</span></td>
-              </tr>
-              <tr>
-                <td>Lakeview Inn</td>
-                <td>Sarah Thompson</td>
-                <td>Standard Room</td>
-                <td>May 18, 2025</td>
-                <td>May 20, 2025</td>
-                <td><span class="badge badge-success">Confirmed</span></td>
-              </tr>
-              </tbody>
+              <tbody id="hotel-bookings"></tbody>
             </table>
           </div>
         </div>
@@ -1573,13 +1568,6 @@
 <!--              </div>-->
 <!--            </div>-->
 
-<!--              <div class="form-group">-->
-  <!--              <label>Hotel Photos</label>-->
-  <!--              <div class="file-upload btn btn-secondary">-->
-  <!--                <i class="fas fa-cloud-upload-alt"></i> Upload Images-->
-  <!--                <input type="file" id="hotel-photos" name="hotel-photos" multiple accept="image/*">-->
-<!--              </div>-->
-              <div class="file-preview" id="photo-preview"></div>
 <!--            </div>-->
 
             <div class="form-group">
@@ -1642,111 +1630,109 @@
       <div class="card">
         <div class="card-header">
           <h2>All Bookings</h2>
-          <div>
-            <input type="date" id="booking-date-filter" class="form-control">
-          </div>
+<!--          <div>-->
+<!--            <input type="date" id="booking-date-filter" class="form-control">-->
+<!--          </div>-->
         </div>
         <div class="card-body">
           <div class="table-container">
             <table id="bookings-table">
               <thead>
               <tr>
-                <th>Booking ID</th>
                 <th>Guest</th>
                 <th>Hotel</th>
                 <th>Room Type</th>
                 <th>Check-in</th>
-                <th>Check-out</th>
-                <th>Total</th>
+                <th>Price</th>
+                <th>Cancellation Date</th>
                 <th>Status</th>
-                <th>Actions</th>
               </tr>
               </thead>
-              <tbody>
-              <tr>
-                <td>#BK1298</td>
-                <td>John Smith</td>
-                <td>Oceanview Resort</td>
-                <td>Deluxe Suite</td>
-                <td>May 15, 2025</td>
-                <td>May 18, 2025</td>
-                <td>$777</td>
-                <td><span class="badge badge-success">Confirmed</span></td>
-                <td>
-                  <button class="btn btn-secondary btn-sm">
-                    <i class="fas fa-eye"></i> Details
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>#BK1299</td>
-                <td>Emma Johnson</td>
-                <td>Downtown Suites</td>
-                <td>Double Room</td>
-                <td>May 14, 2025</td>
-                <td>May 16, 2025</td>
-                <td>$318</td>
-                <td><span class="badge badge-warning">Pending</span></td>
-                <td>
-                  <button class="btn btn-success btn-sm confirm-booking">
-                    <i class="fas fa-check"></i> Confirm
-                  </button>
-                  <button class="btn btn-danger btn-sm">
-                    <i class="fas fa-times"></i> Cancel
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>#BK1300</td>
-                <td>Robert Chen</td>
-                <td>Mountain Lodge</td>
-                <td>Family Suite</td>
-                <td>May 20, 2025</td>
-                <td>May 25, 2025</td>
-                <td>$1,645</td>
-                <td><span class="badge badge-warning">Pending</span></td>
-                <td>
-                  <button class="btn btn-success btn-sm confirm-booking">
-                    <i class="fas fa-check"></i> Confirm
-                  </button>
-                  <button class="btn btn-danger btn-sm">
-                    <i class="fas fa-times"></i> Cancel
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>#BK1301</td>
-                <td>Sarah Thompson</td>
-                <td>Lakeview Inn</td>
-                <td>Standard Room</td>
-                <td>May 18, 2025</td>
-                <td>May 20, 2025</td>
-                <td>$318</td>
-                <td><span class="badge badge-success">Confirmed</span></td>
-                <td>
-                  <button class="btn btn-secondary btn-sm">
-                    <i class="fas fa-eye"></i> Details
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>#BK1302</td>
-                <td>Michael Brown</td>
-                <td>Oceanview Resort</td>
-                <td>Standard Room</td>
-                <td>May 22, 2025</td>
-                <td>May 24, 2025</td>
-                <td>$318</td>
-                <td><span class="badge badge-info">New</span></td>
-                <td>
-                  <button class="btn btn-success btn-sm confirm-booking">
-                    <i class="fas fa-check"></i> Confirm
-                  </button>
-                  <button class="btn btn-danger btn-sm">
-                    <i class="fas fa-times"></i> Cancel
-                  </button>
-                </td>
-              </tr>
+              <tbody id="booking-list">
+<!--              <tr>-->
+<!--                <td>#BK1298</td>-->
+<!--                <td>John Smith</td>-->
+<!--                <td>Oceanview Resort</td>-->
+<!--                <td>Deluxe Suite</td>-->
+<!--                <td>May 15, 2025</td>-->
+<!--                <td>May 18, 2025</td>-->
+<!--                <td>$777</td>-->
+<!--                <td><span class="badge badge-success">Confirmed</span></td>-->
+<!--                <td>-->
+<!--                  <button class="btn btn-secondary btn-sm">-->
+<!--                    <i class="fas fa-eye"></i> Details-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <td>#BK1299</td>-->
+<!--                <td>Emma Johnson</td>-->
+<!--                <td>Downtown Suites</td>-->
+<!--                <td>Double Room</td>-->
+<!--                <td>May 14, 2025</td>-->
+<!--                <td>May 16, 2025</td>-->
+<!--                <td>$318</td>-->
+<!--                <td><span class="badge badge-warning">Pending</span></td>-->
+<!--                <td>-->
+<!--                  <button class="btn btn-success btn-sm confirm-booking">-->
+<!--                    <i class="fas fa-check"></i> Confirm-->
+<!--                  </button>-->
+<!--                  <button class="btn btn-danger btn-sm">-->
+<!--                    <i class="fas fa-times"></i> Cancel-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <td>#BK1300</td>-->
+<!--                <td>Robert Chen</td>-->
+<!--                <td>Mountain Lodge</td>-->
+<!--                <td>Family Suite</td>-->
+<!--                <td>May 20, 2025</td>-->
+<!--                <td>May 25, 2025</td>-->
+<!--                <td>$1,645</td>-->
+<!--                <td><span class="badge badge-warning">Pending</span></td>-->
+<!--                <td>-->
+<!--                  <button class="btn btn-success btn-sm confirm-booking">-->
+<!--                    <i class="fas fa-check"></i> Confirm-->
+<!--                  </button>-->
+<!--                  <button class="btn btn-danger btn-sm">-->
+<!--                    <i class="fas fa-times"></i> Cancel-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <td>#BK1301</td>-->
+<!--                <td>Sarah Thompson</td>-->
+<!--                <td>Lakeview Inn</td>-->
+<!--                <td>Standard Room</td>-->
+<!--                <td>May 18, 2025</td>-->
+<!--                <td>May 20, 2025</td>-->
+<!--                <td>$318</td>-->
+<!--                <td><span class="badge badge-success">Confirmed</span></td>-->
+<!--                <td>-->
+<!--                  <button class="btn btn-secondary btn-sm">-->
+<!--                    <i class="fas fa-eye"></i> Details-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
+<!--              <tr>-->
+<!--                <td>#BK1302</td>-->
+<!--                <td>Michael Brown</td>-->
+<!--                <td>Oceanview Resort</td>-->
+<!--                <td>Standard Room</td>-->
+<!--                <td>May 22, 2025</td>-->
+<!--                <td>May 24, 2025</td>-->
+<!--                <td>$318</td>-->
+<!--                <td><span class="badge badge-info">New</span></td>-->
+<!--                <td>-->
+<!--                  <button class="btn btn-success btn-sm confirm-booking">-->
+<!--                    <i class="fas fa-check"></i> Confirm-->
+<!--                  </button>-->
+<!--                  <button class="btn btn-danger btn-sm">-->
+<!--                    <i class="fas fa-times"></i> Cancel-->
+<!--                  </button>-->
+<!--                </td>-->
+<!--              </tr>-->
               </tbody>
             </table>
           </div>
@@ -1816,7 +1802,6 @@
         </div>
       </div>
 
-      <!-- Existing FAQ Display Section -->
       <div class="card">
         <div class="card-header">
           <h2>Your FAQs</h2>
@@ -2130,32 +2115,7 @@
 
         <div class="form-group">
           <label style="padding-bottom: 10px">Room Amenities</label>
-          <div id="service-elements" class="checkbox-group">
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-tv" name="room-amenities[]" value="tv" checked>-->
-<!--              <label for="amenity-tv">TV</label>-->
-<!--            </div>-->
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-ac-room" name="room-amenities[]" value="ac" checked>-->
-<!--              <label for="amenity-ac-room">Air Conditioning</label>-->
-<!--            </div>-->
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-minibar" name="room-amenities[]" value="minibar">-->
-<!--              <label for="amenity-minibar">Minibar</label>-->
-<!--            </div>-->
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-safe" name="room-amenities[]" value="safe">-->
-<!--              <label for="amenity-safe">Safe</label>-->
-<!--            </div>-->
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-wifi-room" name="room-amenities[]" value="wifi" checked>-->
-<!--              <label for="amenity-wifi-room">Wi-Fi</label>-->
-<!--            </div>-->
-<!--            <div class="checkbox-item">-->
-<!--              <input type="checkbox" id="amenity-bath" name="room-amenities[]" value="bath">-->
-<!--              <label for="amenity-bath">Bathtub</label>-->
-<!--            </div>-->
-          </div>
+          <div id="service-elements" class="checkbox-group"></div>
         </div>
 
 <!--        <div class="form-group">-->
@@ -2182,6 +2142,92 @@
   </div>
 </div>
 
+
+
+
+<!-- Edit hotel Modal -->
+<div class="modal" id="edit-hotel-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Hotel</h2>
+      <button class="close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="edit-hotel-form">
+
+        <div>
+          <select id="update-hotel" class="form-control">
+            <option value="all">Choose Hotel</option>
+          </select>
+        </div>
+        <div id="message"></div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label for="hotelName">Hotel Name</label>
+          <input type="text" id="hotelName" name="hotelName" placeholder="New hotel name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Hotel Photos</label>
+          <div class="file-upload btn btn-secondary">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Images
+            <input type="file" id="photo" name="photo" multiple accept="image/*">
+          </div>
+          <div class="file-preview" id="photo-preview"></div>
+
+
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i> Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+<!-- Edit roomtype Modal -->
+<div class="modal" id="edit-roomtype-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Room type</h2>
+      <button class="close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="edit-roomtype-form">
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label for="price">Price</label>
+          <input type="number" id="price" name="price" placeholder="New price" required>
+        </div>
+
+        <div class="form-group" style="margin-top: 20px;">
+          <label for="totalnumber">Total Number</label>
+          <input type="number" id="totalnumber" name="totalnumber" placeholder="New total number of rooms" required>
+        </div>
+
+        <div class="form-group">
+          <label>Room type Photos</label>
+          <div class="file-upload btn btn-secondary">
+            <i class="fas fa-cloud-upload-alt"></i> Upload Images
+            <input type="file" id="photo-roomtype" name="photo-roomtype" multiple accept="image/*">
+          </div>
+          <div class="file-preview" id="roomtype-photo-preview"></div>
+
+
+          <div class="form-group">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-plus-circle"></i> Save Changes
+            </button>
+          </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
+
 <!-- Main JavaScript for the dashboard -->
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -2189,9 +2235,11 @@
     // Theme toggle
     const body = document.body;
     const themeToggle = document.querySelector('.theme-toggle');
+    const sidebar = document.querySelector('.sidebar');
 
     themeToggle.addEventListener('click', function() {
       body.classList.toggle('dark-theme');
+      sidebar.classList.toggle('dark-theme');
       const icon = themeToggle.querySelector('i');
 
       if (body.classList.contains('dark-theme')) {
@@ -2342,10 +2390,12 @@
 
     // Add Hotel Form handling is now in indexO.js
 
-    // Add Room Modal
+    // Add Room Modal and edit Hotel Modal
     const addRoomBtn = document.getElementById('add-room-btn');
+    const editHotelBtn = document.getElementById('edit-hotel');
     const addRoomModal = document.getElementById('add-room-modal');
-    const closeModal = document.querySelector('.close-modal');
+    const editHotelModal = document.getElementById('edit-hotel-modal');
+    const closeModal = document.querySelectorAll('.close-modal');
 
     if (addRoomBtn) {
       addRoomBtn.addEventListener('click', function() {
@@ -2357,17 +2407,33 @@
       });
     }
 
-    if (closeModal) {
-      closeModal.addEventListener('click', function() {
+    if (editHotelBtn) {
+      editHotelBtn.addEventListener('click', function() {
+        editHotelModal.style.display = 'flex';
+      });
+    }
+
+    if (closeModal[0]) {
+      closeModal[0].addEventListener('click', function() {
         addRoomModal.style.display = 'none';
+      });
+    }
+
+    if (closeModal[1]) {
+      closeModal[1].addEventListener('click', function() {
+        editHotelModal.style.display = 'none';
       });
     }
 
     // Close modal when clicking outside
     window.addEventListener('click', function(e) {
       if (e.target === addRoomModal) {
-        addRoomModal.style.display = 'none';
-      }
+        addRoomModal.style.display = 'none';}
+    });
+
+    window.addEventListener('click', function(e) {
+      if (e.target === editHotelModal) {
+        editHotelModal.style.display = 'none';}
     });
 
     // Add Room Form

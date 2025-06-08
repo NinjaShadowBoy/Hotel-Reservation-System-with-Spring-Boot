@@ -10,11 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,6 +89,26 @@ public class HotelAPI {
         catch (Exception e){
             logger.error("Error adding hotel: {}", e.getMessage(), e);
             return new ResponseEntity<>(new Hotel(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/api/hotels/{hotelId}/update")
+    public ResponseEntity<HotelDetailsDTO> updateHotel(@PathVariable Integer hotelId, @RequestParam String hotelName, @RequestParam MultipartFile photo) {
+        try {
+            // Validate hotel ID
+            if (hotelId == null || hotelId <= 0) {
+                logger.warn("Invalid hotel Id: {}", hotelId);
+                return new ResponseEntity<>(new HotelDetailsDTO(), HttpStatus.BAD_REQUEST);
+            }
+
+            HotelDetailsDTO updatedHotel = hotelService.updateHotel(hotelId, hotelName, photo);
+            return new ResponseEntity<>(updatedHotel, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            logger.error("Error updating hotel with ID {}: ", hotelId, e);
+            return new ResponseEntity<>(new HotelDetailsDTO(), HttpStatus.NOT_FOUND);
+        } catch (Exception e){
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(new HotelDetailsDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
