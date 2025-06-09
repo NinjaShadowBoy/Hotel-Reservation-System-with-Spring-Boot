@@ -19,7 +19,7 @@
             hotels: '/api/hotels',
             roomTypes: '/api/roomtype',
             reviews: '/api/reviews',
-            faq: '/api/question',
+            faq: '/api/faqs',
             reservation: '/api/reservation'
         }
     };

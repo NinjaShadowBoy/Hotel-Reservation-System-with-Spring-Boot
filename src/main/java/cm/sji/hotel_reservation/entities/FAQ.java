@@ -16,7 +16,7 @@ public class FAQ {
     Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "hotel_id", nullable = false)
+    @JoinColumn(nullable = false)
     Hotel hotel;
 
     @ColumnDefault("")
