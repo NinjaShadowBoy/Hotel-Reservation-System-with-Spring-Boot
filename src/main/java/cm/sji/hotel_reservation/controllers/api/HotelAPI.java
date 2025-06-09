@@ -3,6 +3,7 @@ package cm.sji.hotel_reservation.controllers.api;
 
 import cm.sji.hotel_reservation.dtos.HotelDetailsDTO;
 import cm.sji.hotel_reservation.entities.Hotel;
+import cm.sji.hotel_reservation.repositories.HotelRepo;
 import cm.sji.hotel_reservation.services.HotelService;
 import cm.sji.hotel_reservation.services.RoomServiceService;
 import lombok.AllArgsConstructor;
@@ -10,11 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +37,8 @@ public class HotelAPI {
         }
     }
 
+
+
     @GetMapping("/api/owner/{ownerId}/hotels")
     public ResponseEntity<List<HotelDetailsDTO>> getAllOwnerHotels(@PathVariable Integer ownerId) {
         try {
@@ -58,43 +57,34 @@ public class HotelAPI {
     }
 
     @PostMapping("/api/hotels/add")
-    public ResponseEntity<Hotel> addHotel(@RequestBody Map<String, Object> hotelData) {
+    public ResponseEntity<?> addHotel(@RequestBody Map<String, Object> hotelData) {
         try {
-            logger.info("Received hotel data: {}", hotelData);
+            logger.info("Received hotel data: {}", hotelData.toString());
 
-//            // Validate required fields
-            if (hotelData == null || hotelData.isEmpty()) {
-                logger.warn("Hotel data is null or empty");
-                return new ResponseEntity<>(new Hotel(), HttpStatus.BAD_REQUEST);
-            }
+            // Detailed field logging
+            logger.info("Attempting to parse ownerId: {}", hotelData.get("ownerId"));
+            logger.info("Name: {}", hotelData.get("name"));
+            logger.info("Location: {}", hotelData.get("location"));
+            logger.info("Rating: {}", hotelData.get("rating"));
 
-            Integer id = Integer.parseInt(hotelData.get("id").toString());
+            Integer ownerId = Integer.parseInt(hotelData.get("ownerId").toString());
             String name = (String) hotelData.get("name");
             String location = (String) hotelData.get("location");
             String description = (String) hotelData.get("description");
             Float rating = Float.parseFloat(hotelData.get("rating").toString());
 
-            logger.info("Extracted hotel properties: name={}, location={}, description={}, rating={}", name, location, description, rating);
+            logger.info("Creating hotel for owner: {}, name: {}", ownerId, name);
+            Hotel newHotel = hotelService.addHotel(ownerId, name, location, description, rating);
 
-            Hotel newHotel = hotelService.addHotel(id, name, location, description, rating);
+            logger.info("Hotel created successfully with ID: {}", newHotel.getId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(newHotel);
 
-            if (newHotel == null) {
-                logger.warn("Hotel creation returned null");
-                return new ResponseEntity<>(new Hotel(), HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            logger.info("successfully created hotel: {}", newHotel);
-
-            return new ResponseEntity<>(newHotel, HttpStatus.CREATED);
-        } catch (RuntimeException e) {
-            logger.error("Business logic error adding hotel: ", e);
-            return new ResponseEntity<>(new Hotel(), HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e){
-            logger.error("Error adding hotel: {}", e.getMessage(), e);
-            return new ResponseEntity<>(new Hotel(), HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (Exception e) {
+            logger.error("Error adding hotel", e);
+            return ResponseEntity.internalServerError()
+                    .body("Error adding hotel: " + e.getMessage());
         }
     }
-
     @GetMapping("/api/hotels/{hotelId}")
     public ResponseEntity<HotelDetailsDTO> getHotel(@PathVariable Integer hotelId) {
         try {

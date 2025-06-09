@@ -974,7 +974,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="nav-link">
+            <a href="#" class="nav-link"  data-section="settings">
                 <i class="fas fa-cog"></i>
                 <span>Settings</span>
             </a>
@@ -994,22 +994,12 @@
 </nav>
 
 <!-- Main Content Area -->
-<div class="main-content">
+ <div class="main-content">
     <div class="container">
         <!-- Dashboard Overview -->
         <div th:fragment="dashboard" class="content-section active" id="dashboard">
             <div class="content-header">
                 <h2>Dashboard Overview</h2>
-                <div class="actions">
-                    <button class="btn-light">
-                        <i class="fas fa-download"></i>
-                        <span>Export</span>
-                    </button>
-                    <button class="btn-primary">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Refresh</span>
-                    </button>
-                </div>
             </div>
 
 
@@ -1932,14 +1922,105 @@
                     color: #991b1b;
                 }
 
+                .btn-edit {
+                    background-color: #4e73df;
+                    color: white;
+                    border: none;
+                    transition: all 0.3s;
+                }
+
+                .btn-edit:hover {
+                    background-color: #3a5ec2;
+                    transform: translateY(-1px);
+                }
+
+                .btn-delete {
+                    background-color: #e74a3b;
+                    color: white;
+                    border: none;
+                    transition: all 0.3s;
+                }
+
                 .table-actions {
                     display: flex;
                     gap: 8px;
+                    justify-content: center;
                 }
 
                 .btn-sm {
                     padding: 6px 8px;
                     font-size: 0.75rem;
+                    border-radius: 4px;
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 5px;
+                }
+
+                .btn-delete:hover {
+                    background-color: #d62c1a;
+                    transform: translateY(-1px);
+                }
+
+                /* Modal Styling */
+                .modal {
+                    display: none;
+                    position: fixed;
+                    z-index: 1000;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0,0,0,0.5);
+                }
+
+                .modal-content {
+                    background-color: #f8f9fc;
+                    margin: 5% auto;
+                    padding: 20px;
+                    border-radius: 8px;
+                    width: 50%;
+                    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                }
+
+                .modal-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 20px;
+                    padding-bottom: 10px;
+                    border-bottom: 1px solid #ddd;
+                }
+
+                .modal-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+
+                /* Form Styling */
+                .form-group {
+                    margin-bottom: 15px;
+                }
+
+                .form-group label {
+                    display: block;
+                    margin-bottom: 5px;
+                    font-weight: 600;
+                }
+
+                .form-group input,
+                .form-group select {
+                    width: 100%;
+                    padding: 8px 12px;
+                    border: 1px solid #ddd;
+                    border-radius: 4px;
+                    font-size: 14px;
+                }
+
+                .form-row {
+                    display: flex;
+                    gap: 15px;
                 }
 
                 .storage-status {
@@ -1988,6 +2069,19 @@
                     text-align: center;
                     padding: 20px;
                     color: var(--text-secondary);
+                }
+                .icon {
+                    width: 14px;
+                    height: 14px;
+                }
+                th, td {
+                    padding: 12px 8px;
+                    font-size: 14px;
+                }
+
+                .action-button {
+                    width: 32px;
+                    height: 32px;
                 }
             </style>
         </head>
@@ -2040,15 +2134,15 @@
         </div>
 
         <!-- Add User Modal -->
-        <div id="addUserModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add New User</h3>
-                    <button class="close" onclick="closeAddModal()">&times;</button>
+        <div id="addUserModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5);">
+            <div class="modal-content" style="background-color: white; margin: 5% auto; padding: 20px; border-radius: 12px; width: 90%; max-width: 500px; position: relative;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                    <h3 style="margin: 0; color: #1e293b;">Add New User</h3>
+                    <button class="close" onclick="closeAddModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
                 </div>
                 <form id="addUserForm">
-                    <div class="form-row">
-                        <div class="form-group">
+                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1;">
                             <label for="addFirstName">First Name</label>
                             <input type="text" id="addFirstName" name="firstName" required>
                         </div>
@@ -2094,6 +2188,7 @@
             </div>
         </div>
 
+
         <!-- Edit User Modal -->
         <div id="editUserModal" class="modal">
             <div class="modal-content">
@@ -2102,6 +2197,8 @@
                     <button class="close" onclick="closeEditModal()">×</button>
                 </div>
                 <form id="editUserForm">
+                    <input type="hidden" id="editUserId" name="id">
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editFirstName">First Name</label>
@@ -2112,14 +2209,17 @@
                             <input type="text" id="editLastName" name="lastName" required>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label for="editEmail">Email Address</label>
                         <input type="email" id="editEmail" name="email" required>
                     </div>
+
                     <div class="form-group">
                         <label for="editPassword">Password (leave blank to keep unchanged)</label>
                         <input type="password" id="editPassword" name="password">
                     </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editRole">Role</label>
@@ -2137,6 +2237,7 @@
                             </select>
                         </div>
                     </div>
+
                     <div class="modal-actions">
                         <button type="button" class="btn-light" onclick="closeEditModal()">Cancel</button>
                         <button type="submit" class="btn-success">
@@ -2149,7 +2250,7 @@
         </div>
 
         <script>
-            const API_BASE_URL = 'http://localhost:8081/api/owners';
+            const API_BASE_URL = 'http://localhost:8081/api/users';
             let currentEditingUserId = null;
             let users = []; // Store loaded users
 
@@ -2266,45 +2367,28 @@
                     user.role === 'OWNER' ? 'Owner' :
                         user.role === 'ADMIN' ? 'Admin' : user.role;
 
-                const status = user.active ? 'Active' : 'Inactive';
-                const statusClass = user.active ? 'badge-success' : 'badge-danger';
-                const statusIcon = user.active ? 'fas fa-check' : 'fas fa-times';
 
                 row.innerHTML = `
-                <td>${user.firstName || ''}</td>
-                <td>${user.lastName || ''}</td>
-                <td>${user.email || 'N/A'}</td>
-                <td><span class="role-badge role-${user.role.toLowerCase()}">${roleDisplay}</span></td>
-                <td>${joinDate}</td>
-                <td><span class="badge ${statusClass}"><i class="${statusIcon}"></i> ${status}</span></td>
-                <td>
-                    <div class="table-actions">
-                        <button class="btn-light btn-sm edit-user-btn" title="Edit User" data-user-id="${user.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-danger btn-sm user-delete-btn" title="Delete User" data-user-id="${user.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-
-                // Add event listeners
-                const editBtn = row.querySelector('.edit-user-btn');
-                const deleteBtn = row.querySelector('.user-delete-btn');
-
-                editBtn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-user-id');
-                    openEditModal(parseInt(userId));
-                });
-
-                deleteBtn.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-user-id');
-                    const userEmail = user.email;
-                    if (confirm(`Are you sure you want to delete user ${userEmail}?`)) {
-                        deleteUser(parseInt(userId));
-                    }
-                });
+        <td>${user.firstName || ''}</td>
+        <td>${user.lastName || ''}</td>
+        <td>${user.email || 'N/A'}</td>
+        <td><span class="role-badge role-${user.role.toLowerCase()}">${roleDisplay}</span></td>
+        <td>${joinDate}</td>
+        <td><span class="badge ${user.active ? 'badge-success' : 'badge-danger'}">
+            <i class="fas ${user.active ? 'fa-check' : 'fa-times'}"></i>
+            ${user.active ? 'Active' : 'Inactive'}
+        </span></td>
+        <td>
+            <div class="table-actions">
+                <button class="btn-edit btn-sm edit-user-btn" title="Edit User">
+                    <i class="fas fa-edit"></i> Edit
+                </button>
+                <button class="btn-delete btn-sm user-delete-btn" title="Delete User">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </td>
+    `;
 
                 return row;
             }
@@ -2529,20 +2613,24 @@
                 const user = users.find(u => u.id === userId);
 
                 if (user) {
+                    // Populate form fields
+                    document.getElementById('editUserId').value = user.id;
                     document.getElementById('editFirstName').value = user.firstName || '';
                     document.getElementById('editLastName').value = user.lastName || '';
                     document.getElementById('editEmail').value = user.email || '';
                     document.getElementById('editPassword').value = '';
                     document.getElementById('editRole').value = user.role;
                     document.getElementById('editStatus').value = user.active ? 'true' : 'false';
-                    document.getElementById('editUserModal').classList.add('active');
+
+                    // Show modal
+                    document.getElementById('editUserModal').style.display = 'block';
                 } else {
                     showNotification('User not found', 'error');
                 }
             }
 
             function closeEditModal() {
-                document.getElementById('editUserModal').classList.remove('active');
+                document.getElementById('editUserModal').style.display = 'none';
                 currentEditingUserId = null;
             }
             function loadOwners() {
@@ -2556,6 +2644,13 @@
                         }
                     })
                     .catch(error => console.error('Error:', error));
+            }
+            function setupDeleteButton(userId, userEmail) {
+                if (confirm(`Are you sure you want to delete user ${userEmail}? This action cannot be undone.`)) {
+                    deleteUser(userId)
+                        .then(() => showNotification('User deleted successfully', 'success'))
+                        .catch(error => showNotification(error.message, 'error'));
+                }
             }
 
             function displayOwners(owners) {
@@ -2710,6 +2805,32 @@
 
                 // Load users from API
                 loadUsers();
+                document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+                    const userData = {
+                        id: currentEditingUserId,
+                        firstName: formData.get('firstName'),
+                        lastName: formData.get('lastName'),
+                        email: formData.get('email'),
+                        role: formData.get('role'),
+                        active: formData.get('active') === 'true'
+                    };
+
+                    // Only include password if it was provided
+                    const password = formData.get('password');
+                    if (password && password.trim() !== '') {
+                        userData.password = password;
+                    }
+
+                    try {
+                        await updateUser(currentEditingUserId, userData);
+                        closeEditModal();
+                    } catch (error) {
+                        console.error('Error updating user:', error);
+                    }
+                });
 
                 // Add User button
                 const addUserBtn = document.getElementById('addUserBtn');
@@ -2835,6 +2956,34 @@
                     });
                 }
 
+                // Edit User Form Submission
+                document.getElementById('editUserForm').addEventListener('submit', async function(e) {
+                    e.preventDefault();
+
+                    const formData = new FormData(this);
+                    const userData = {
+                        firstName: formData.get('firstName'),
+                        lastName: formData.get('lastName'),
+                        email: formData.get('email'),
+                        role: formData.get('role'),
+                        active: formData.get('active') === 'true'
+                    };
+
+                    // Only include password if it was provided
+                    const password = formData.get('password');
+                    if (password) {
+                        userData.password = password;
+                    }
+
+                    try {
+                        await updateUser(currentEditingUserId, userData);
+                        closeEditModal();
+                    } catch (error) {
+                        console.error('Error updating user:', error);
+                        // Error is already shown in updateUser function
+                    }
+                });
+
                 // Keyboard shortcuts
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
@@ -2844,6 +2993,13 @@
                         if (document.getElementById('editUserModal')?.classList.contains('active')) {
                             closeEditModal();
                         }
+                    }
+                });
+                // Close modal when clicking outside
+                window.addEventListener('click', function(event) {
+                    const editModal = document.getElementById('editUserModal');
+                    if (event.target === editModal) {
+                        closeEditModal();
                     }
                 });
 
@@ -3486,12 +3642,6 @@
                                 <i class="fas fa-search"></i>
                                 <input type="search" placeholder="Search pending hotels...">
                             </div>
-                            <select>
-                                <option value="all">All Categories</option>
-                                <option value="luxury">Luxury</option>
-                                <option value="budget">Budget</option>
-                                <option value="boutique">Boutique</option>
-                            </select>
                         </div>
 
                         <table>
@@ -3704,18 +3854,14 @@
         </div>
 
         <script>
+            let allHotels = [];
+
             // Global variables
             const modal = document.getElementById('addHotelModal');
             const addHotelBtn = document.getElementById('addHotelBtn');
             const closeBtn = document.querySelector('.close');
             const cancelBtn = document.getElementById('cancelBtn');
             const form = document.getElementById('addHotelForm');
-
-            // Initialize the application
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('Hotel Management System loaded successfully!');
-                initializeEventListeners();
-            });
 
             function initializeEventListeners() {
                 // Tab functionality
@@ -3747,6 +3893,7 @@
                 // Action buttons
                 document.addEventListener('click', handleActionButtons);
             }
+
 
             function switchTab(tabName) {
                 console.log('Switching to tab:', tabName);
@@ -3819,38 +3966,112 @@
             function handleFormSubmit(e) {
                 e.preventDefault();
 
-                if (validateForm()) {
-                    const formData = {
-                        name: document.getElementById('hotelName').value,
-                        location: document.getElementById('hotelLocation').value,
-                        category: document.getElementById('hotelCategory').value,
-                        rating: document.getElementById('hotelRating').value,
-                        description: document.getElementById('hotelDescription').value,
-                        ownerEmail: document.getElementById('ownerEmail').value
-                    };
+                if (!validateForm()) return;
 
-                    // Show success message
-                    document.getElementById('successAlert').style.display = 'block';
-                    document.getElementById('errorAlert').style.display = 'none';
+                const ownerId = 1; // TEMPORARY - replace with actual logged-in user ID
+                const formData = {
+                    ownerId: ownerId,
+                    name: document.getElementById('hotelName').value,
+                    location: document.getElementById('hotelLocation').value,
+                    description: document.getElementById('hotelDescription').value,
+                    rating: parseFloat(document.getElementById('hotelRating').value)
+                };
 
-                    // Add the new hotel to the pending table
-                    addHotelToTable(formData);
+                console.log("Submitting:", formData);
 
-                    // Reset and close
-                    setTimeout(() => {
-                        resetForm();
+                fetch('http://localhost:8081/api/hotels/add', { // Note port 8081
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(err => {
+                                throw new Error(err.message || 'Server error');
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Success:", data);
+                        alert("Hotel added successfully! ID: " + data.id);
+                        addHotelToTable(data);
                         closeModal();
-                    }, 1500);
-                }
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                        alert("Error: " + error.message);
+                    });
             }
-            function validateForm() {
+            // Add this function to fetch hotels from your API
+            async function fetchAllHotels() {
+                // Initialize the application
+                document.addEventListener('DOMContentLoaded', function() {
+                    console.log('Hotel Management System loaded successfully!');
+                    initializeEventListeners();
+
+                });
+                try {
+                    const response = await fetch('/api/hotels');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch hotels');
+                    }
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error fetching hotels:', error);
+                    return [];
+                }
+
+            }
+            // Function to populate the hotels table
+            function populateHotelsTable(hotels) {
+                const tableBody = document.getElementById('pendingHotelsTable');
+                tableBody.innerHTML = ''; // Clear existing rows
+
+                hotels.forEach(hotel => {
+                    const row = document.createElement('tr');
+
+                    // Create rating display
+                    const fullStars = '★'.repeat(Math.floor(hotel.rating));
+                    const emptyStars = '☆'.repeat(5 - Math.floor(hotel.rating));
+                    const ratingDisplay = `
+            <div class="rating-display">
+                ${fullStars}${emptyStars}
+                <span class="rating-value">${hotel.rating.toFixed(1)}</span>
+            </div>
+        `;
+
+                    row.innerHTML = `
+            <td><strong>${hotel.name}</strong></td>
+            <td>${hotel.owner?.email || 'N/A'}</td>
+            <td>${hotel.location}</td>
+            <td>${ratingDisplay}</td>
+            <td>${hotel.description}</td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-light btn-sm" title="View Details"><i class="fas fa-eye"></i></button>
+                    <button class="btn-success btn-sm hotel-approve-btn" title="Approve"><i class="fas fa-check"></i></button>
+                    <button class="btn-danger btn-sm hotel-reject-btn" title="Reject"><i class="fas fa-times"></i></button>
+                </div>
+            </td>
+        `;
+
+                    tableBody.appendChild(row);
+                });
+
+                // Update the pending count
+                updatePendingCount();
+            }
+                function validateForm() {
                 let isValid = true;
 
                 // Reset errors
                 document.querySelectorAll('.error').forEach(el => el.textContent = '');
                 document.getElementById('errorAlert').style.display = 'none';
 
-                // Validate each field
+                // Validate required fields (remove category validation since it's not in backend)
                 if (!document.getElementById('hotelName').value) {
                     document.getElementById('nameError').textContent = 'Hotel name is required';
                     isValid = false;
@@ -3858,11 +4079,6 @@
 
                 if (!document.getElementById('hotelLocation').value) {
                     document.getElementById('locationError').textContent = 'Location is required';
-                    isValid = false;
-                }
-
-                if (!document.getElementById('hotelCategory').value) {
-                    document.getElementById('categoryError').textContent = 'Category is required';
                     isValid = false;
                 }
 
@@ -3892,27 +4108,91 @@
                 updateStars(0);
             }
             function handleActionButtons(e) {
+                const row = e.target.closest('tr');
+                if (!row) return;
+
+                const hotelName = row.querySelector('td:first-child strong').textContent;
+                const hotelEmail = row.querySelector('td:nth-child(2)').textContent;
+                const hotelLocation = row.querySelector('td:nth-child(3)').textContent;
+                const hotelRating = parseFloat(row.querySelector('.rating-value').textContent);
+                const hotelDescription = row.querySelector('td:nth-child(5)').textContent;
+
+                const hotelData = {
+                    name: hotelName,
+                    ownerEmail: hotelEmail,
+                    location: hotelLocation,
+                    rating: hotelRating,
+                    description: hotelDescription
+                };
+
                 if (e.target.closest('.hotel-approve-btn')) {
-                    const row = e.target.closest('tr');
-                    const hotelName = row.querySelector('td:first-child strong').textContent;
                     console.log(`Approving hotel: ${hotelName}`);
-                    // In a real app, you would send this to your backend
-                    row.remove();
-                }
-
-                if (e.target.closest('.hotel-reject-btn')) {
-                    const row = e.target.closest('tr');
-                    const hotelName = row.querySelector('td:first-child strong').textContent;
+                    approveHotel(row, hotelData);
+                } else if (e.target.closest('.hotel-reject-btn')) {
                     console.log(`Rejecting hotel: ${hotelName}`);
-                    // In a real app, you would send this to your backend
-                    row.remove();
-                }
-
-                if (e.target.closest('.btn-light')) {
-                    const row = e.target.closest('tr');
-                    const hotelName = row.querySelector('td:first-child strong').textContent;
+                    rejectHotel(row, hotelData);
+                } else if (e.target.closest('.btn-light')) {
                     console.log(`Viewing details for: ${hotelName}`);
-                    // In a real app, you would show a details modal
+                    viewHotelDetails(hotelData);
+                }
+            }
+            async function approveHotel(row, hotelData) {
+                try {
+                    // In a real app, you would send this to your backend API
+                    // const response = await fetch('/api/hotels/approve', {
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' },
+                    //     body: JSON.stringify({ hotelId: hotelData.id })
+                    // });
+                    // if (!response.ok) throw new Error('Approval failed');
+
+                    // For demo purposes, we'll simulate the API call
+                    console.log('Approving hotel:', hotelData);
+
+                    // Remove from pending table
+                    row.remove();
+
+                    // Add to active hotels (you would normally fetch updated list from backend)
+                    addHotelToActiveTable(hotelData);
+
+                    updatePendingCount();
+                    updateActiveCount();
+
+                    // Show success message
+                    alert(`Hotel "${hotelData.name}" approved successfully!`);
+                } catch (error) {
+                    console.error('Error approving hotel:', error);
+                    alert(`Error approving hotel: ${error.message}`);
+                }
+            }
+
+            async function rejectHotel(row, hotelData) {
+                try {
+                    // In a real app, you would send this to your backend API
+                    // const response = await fetch('/api/hotels/reject', {
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' },
+                    //     body: JSON.stringify({ hotelId: hotelData.id })
+                    // });
+                    // if (!response.ok) throw new Error('Rejection failed');
+
+                    // For demo purposes, we'll simulate the API call
+                    console.log('Rejecting hotel:', hotelData);
+
+                    // Remove from pending table
+                    row.remove();
+
+                    // Add to suspended hotels (you would normally fetch updated list from backend)
+                    addHotelToSuspendedTable(hotelData);
+
+                    updatePendingCount();
+                    updateSuspendedCount();
+
+                    // Show success message
+                    alert(`Hotel "${hotelData.name}" rejected and moved to suspended list.`);
+                } catch (error) {
+                    console.error('Error rejecting hotel:', error);
+                    alert(`Error rejecting hotel: ${error.message}`);
                 }
             }
             function loadActiveHotels() {
@@ -3987,14 +4267,135 @@
             function capitalizeFirstLetter(string) {
                 return string.charAt(0).toUpperCase() + string.slice(1);
             }
+            function viewHotelDetails(hotelData) {
+                // In a real app, this would redirect to the hotel details page
+                // or open a modal with more details
+                console.log('Viewing hotel details:', hotelData);
 
-            // Update the pending count display
+                // For demo purposes, we'll simulate opening the hotel page
+                // You would replace this with your actual hotel page URL structure
+                const hotelSlug = hotelData.name.toLowerCase().replace(/\s+/g, '-');
+                window.open(`/client/home?hotel=${hotelSlug}`, '_blank');
+            }
+
+            async function fetchAllHotels() {
+                try {
+                    const response = await fetch('/api/hotels');
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch hotels');
+                    }
+                    const hotels = await response.json();
+
+                    // Log the response to debug
+                    console.log('API Response:', hotels);
+
+                    return hotels.map(hotel => ({
+                        ...hotel,
+                        name: hotel.name,
+                        location: hotel.location,
+                        rating: parseFloat(hotel.rating),
+                        description: hotel.desc || hotel.description, // Handle both possible fields
+                        owner_id: hotel.ownerId || hotel.owner_id,
+                        owner: hotel.owner || { email: hotel.ownerEmail || 'N/A' }
+                    }));
+                } catch (error) {
+                    console.error('Error fetching hotels:', error);
+                    return [];
+                }
+            }
+            // Function to fetch hotels from your API
+            function fetchAllHotels() {
+                return fetch('/api/hotels')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch hotels');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Transform the data if needed to match expected structure
+                        return data.map(hotel => ({
+                            ...hotel,
+                            // Ensure these fields exist in the response
+                            name: hotel.name,
+                            location: hotel.location,
+                            rating: parseFloat(hotel.rating),
+                            description: hotel.description,
+                            owner_id: hotel.owner_id
+                        }));
+                    })
+                    .catch(error => {
+                        console.error('Error fetching hotels:', error);
+                        return [];
+                    });
+            }
+            function addHotelToSuspendedTable(hotelData) {
+                // In a real app, you would fetch the updated suspended hotels list from the backend
+                // For demo purposes, we'll just create a new row
+
+                const suspendedTable = document.querySelector('#suspended-hotels table tbody') || createSuspendedHotelsTable();
+
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = createHotelRowHTML(hotelData, true);
+                suspendedTable.appendChild(newRow);
+            }
+            function populateHotelsTable(hotels) {
+                const tableBody = document.getElementById('pendingHotelsTable');
+                tableBody.innerHTML = '';
+
+                hotels.forEach(hotel => {
+                    const row = document.createElement('tr');
+
+                    const fullStars = '★'.repeat(Math.floor(hotel.rating));
+                    const emptyStars = '☆'.repeat(5 - Math.floor(hotel.rating));
+                    const ratingDisplay = `
+            <div class="rating-display">
+                ${fullStars}${emptyStars}
+                <span class="rating-value">${hotel.rating?.toFixed(1) || 'N/A'}</span>
+            </div>
+        `;
+
+                    row.innerHTML = `
+            <td><strong>${hotel.name}</strong></td>
+            <td>${hotel.ownerEmail || 'User ' + hotel.owner_id || 'N/A'}</td>
+            <td>${hotel.location}</td>
+            <td>${ratingDisplay}</td>
+            <td>${hotel.description || hotel.desc || 'No description provided'}</td>
+            <td>
+                <div class="table-actions">
+                    <button class="btn-light btn-sm" title="View Details"><i class="fas fa-eye"></i></button>
+                    <button class="btn-success btn-sm hotel-approve-btn" title="Approve"><i class="fas fa-check"></i></button>
+                    <button class="btn-danger btn-sm hotel-reject-btn" title="Reject"><i class="fas fa-times"></i></button>
+                </div>
+            </td>
+        `;
+
+                    tableBody.appendChild(row);
+                });
+
+                updatePendingCount();
+            }
+
+            // Initialize the application
+            document.addEventListener('DOMContentLoaded', async function() {
+                console.log('Hotel Management System loaded successfully!');
+                initializeEventListeners();
+
+                // Fetch and display hotels when page loads
+                const hotels = await fetchAllHotels();
+                populateHotelsTable(hotels);
+            });
+
+            // Update the updatePendingCount function
             function updatePendingCount() {
                 const pendingCount = document.getElementById('pendingHotelsTable').rows.length;
-                document.querySelector('[data-tab="pending"]').textContent =
-                    `<i class="fas fa-clock"></i> Pending Approval (${pendingCount})`;
+                document.querySelector('[data-tab="pending"]').innerHTML = `
+        <i class="fas fa-clock"></i>
+        Pending Approval (${pendingCount})
+    `;
                 document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = pendingCount;
             }
+
         </script>
 
         <!-- Analytics Section -->
@@ -4688,5 +5089,170 @@
     });
 </script>
 
+
+
+<style>
+    .content-section {
+        display: none;
+        padding: 20px;
+    }
+
+    .content-section.active {
+        display: block;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+</style>
+
+<script>
+    // Tab switching functionality
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all nav items and tab contents
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            // Add active class to clicked nav item
+            this.classList.add('active');
+
+            // Show corresponding tab content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Main navigation handler
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            // Update active nav link
+            navLinks.forEach(navLink => navLink.classList.remove('active'));
+            this.classList.add('active');
+
+            // Show corresponding content section
+            const sectionId = this.getAttribute('data-section');
+            contentSections.forEach(section => section.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+
+            // If it's the settings section, activate the first tab
+            if (sectionId === 'settings') {
+                document.querySelector('.settings-nav .nav-item').click();
+            }
+        });
+    });
+
+    // Settings tab handler (separate from main navigation)
+    document.querySelectorAll('.settings-nav .nav-item').forEach(item => {
+        item.addEventListener('click', function() {
+            // Remove active class from all nav items and tab contents
+            document.querySelectorAll('.settings-nav .nav-item').forEach(nav => nav.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            // Add active class to clicked nav item
+            this.classList.add('active');
+
+            // Show corresponding tab content
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+
+    // Profile picture upload
+    document.getElementById('profilePic').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const profilePic = document.querySelector('.profile-pic');
+                profilePic.innerHTML = `<img src="${e.target.result}" alt="Profile Picture">`;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    });
+
+    // Save settings function
+    function saveSettings(section) {
+        // Show success alert
+        const alert = document.getElementById('accountSuccessAlert');
+        alert.classList.add('show');
+
+        // Hide alert after 3 seconds
+        setTimeout(() => {
+            alert.classList.remove('show');
+        }, 3000);
+
+        // Here you would typically send the data to your server
+        console.log(`Saving ${section} settings...`);
+
+        // Example of collecting form data
+        if (section === 'profile') {
+            const profileData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                position: document.getElementById('position').value
+            };
+            console.log('Profile data:', profileData);
+        }
+    }
+
+    // Password strength indicator (optional enhancement)
+    document.getElementById('newPassword')?.addEventListener('input', function() {
+        const password = this.value;
+        // Add password strength logic here
+    });
+
+    // Form validation
+    document.querySelectorAll('input[type="email"]').forEach(input => {
+        input.addEventListener('blur', function() {
+            const email = this.value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#e8ecf4';
+            }
+        });
+    });
+
+    // Phone number formatting
+    document.getElementById('phone')?.addEventListener('input', function() {
+        let value = this.value.replace(/\D/g, '');
+        if (value.length >= 6) {
+            value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+        } else if (value.length >= 3) {
+            value = value.replace(/(\d{3})(\d{0,3})/, '($1) $2');
+        }
+        this.value = value;
+    });
+
+    // Auto-save functionality (optional)
+    let autoSaveTimeout;
+    document.querySelectorAll('input, select, textarea').forEach(element => {
+        element.addEventListener('input', function() {
+            clearTimeout(autoSaveTimeout);
+            autoSaveTimeout = setTimeout(() => {
+                // Auto-save logic here
+                console.log('Auto-saving...');
+            }, 2000);
+        });
+    });
+</script>
 </body>
+
+
+
 </html>
+
+
+
+
+
+

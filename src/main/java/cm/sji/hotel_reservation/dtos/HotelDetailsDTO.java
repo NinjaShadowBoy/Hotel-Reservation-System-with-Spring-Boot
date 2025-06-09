@@ -19,11 +19,12 @@ public class HotelDetailsDTO {
     String name;
     String image;
     String location;
-    String desc;
+    String description;
 
     Double lowestPrice;
 
     Float rating;
+    String ownerEmail;
 
     Set<String> services;
 }

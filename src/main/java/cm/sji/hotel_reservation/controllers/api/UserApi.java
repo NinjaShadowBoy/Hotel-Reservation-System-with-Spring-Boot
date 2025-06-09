@@ -1,10 +1,10 @@
 package cm.sji.hotel_reservation.controllers.api;
 
-import cm.sji.hotel_reservation.dtos.ApiResponse;
-import cm.sji.hotel_reservation.dtos.UserCreateRequest;
-import cm.sji.hotel_reservation.dtos.UserResponse;
+import cm.sji.hotel_reservation.dtos.*;
 import cm.sji.hotel_reservation.entities.User;
+import cm.sji.hotel_reservation.services.AuthenticationService;
 import cm.sji.hotel_reservation.services.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -46,6 +47,25 @@ public class UserApi {
             logger.error("Error retrieving users: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(false, "Error retrieving users: " + e.getMessage(), null));
+        }
+    }
+
+    @PostMapping("/api/owner/login")
+    public ResponseEntity<UserDTO> login(@RequestBody Map<String, String> userData, HttpServletResponse response) {
+        String email = userData.get("email");
+        String password = userData.get("password");
+
+        logger.info("Attempting to log in user with email: {}", email);
+        Optional<User> userOptional = userService.findByEmail(email);
+        if (userOptional.isPresent()) {
+            AuthenticationRequest authenticationRequest = new AuthenticationRequest(email, password);
+            AuthenticationService authenticationService = null;
+            AuthenticationResponse authenticationResponse = authenticationService.authenticate(authenticationRequest, response);
+
+            return ResponseEntity.ok().body(userService.getUserDTO(authenticationResponse.getUser()));
+        }else{
+            logger.warn("User with email {} not found", email);
+            return ResponseEntity.status(404).body(null);
         }
     }
 
@@ -155,25 +175,6 @@ public class UserApi {
             logger.error("Error updating user with ID {}: ", id, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(false, "Error updating user: " + e.getMessage(), null));
-        }
-    }
-    @GetMapping("/by-role/{role}")
-    public ResponseEntity<ApiResponse> getUsersByRole(@PathVariable String role) {
-        try {
-            logger.info("Retrieving users with role: {}", role);
-
-            List<User> users = userService.findByRole(role);
-            List<UserResponse> userResponses = users.stream()
-                    .map(UserResponse::fromUser)
-                    .toList();
-
-            return ResponseEntity.ok(
-                    new ApiResponse(true, "Users retrieved successfully", userResponses)
-            );
-        } catch (Exception e) {
-            logger.error("Error retrieving users by role: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse(false, "Error retrieving users: " + e.getMessage(), null));
         }
     }
 }
