@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
@@ -23,6 +25,8 @@ public class HotelService {
     private final HotelRepo hotelRepo;
 
     private final OfferRepo offerRepo;
+
+    private final PhotoService photoService;
 
     private final RoomTypeRepo roomTypeRepo;
 
@@ -36,9 +40,10 @@ public class HotelService {
     @Value("${roomphoto.upload.dir}")
     private String roomphotoDir;
 
-    public HotelService(HotelRepo hotelRepo, OfferRepo offerRepo, RoomTypeRepo roomTypeRepo, HotelPhotoRepo hotelPhotoRepo, UserRepo userRepo) {
+    public HotelService(HotelRepo hotelRepo, OfferRepo offerRepo, PhotoService photoService, RoomTypeRepo roomTypeRepo, HotelPhotoRepo hotelPhotoRepo, UserRepo userRepo) {
         this.hotelRepo = hotelRepo;
         this.offerRepo = offerRepo;
+        this.photoService = photoService;
         this.roomTypeRepo = roomTypeRepo;
         this.hotelPhotoRepo = hotelPhotoRepo;
         this.userRepo = userRepo;
@@ -103,6 +108,27 @@ public class HotelService {
             return null;
         }
 
+    }
+
+    public HotelDetailsDTO updateHotel(Integer hotelId, String hotelName, MultipartFile file) throws IOException {
+        try{
+            Hotel hotel = hotelRepo.findById(hotelId)
+                    .orElseThrow(() -> new IllegalArgumentException("Hotel not found"));
+            logger.info("Updating hotel: {}", hotel.getId());
+
+            hotel.setName(hotelName);
+            hotel.setUpdatedAt(LocalDateTime.now());
+            logger.info("Updated hotel name to: {}", hotelName);
+
+            photoService.saveHotelPhoto(file, hotelId);
+            logger.info("Saved hotel photo for hotel ID: {}", hotelId);
+
+            return getHotelDTO(hotelRepo.save(hotel));
+
+        }catch (Exception e) {
+            logger.error("Error updating hotel {}: {}", hotelId, e.getMessage(), e);
+            throw e;
+        }
     }
 
     private HotelDetailsDTO getHotelDTO(Hotel hotel) {
