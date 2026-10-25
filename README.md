@@ -55,7 +55,8 @@ This Hotel Reservation System is a full-featured application designed to manage 
 ### Advanced Features
 
 - **Internationalization**
-  - Support for multiple languages (English, French, Spanish, German, Chinese)
+  - Configured for English, French, Spanish, German and Chinese
+    (`application.locales`); the message bundles are not written yet
 
 - **Reporting**
   - Booking statistics
@@ -75,7 +76,7 @@ This Hotel Reservation System is a full-featured application designed to manage 
 Before you begin, ensure you have the following installed:
 
 - Java Development Kit (JDK) 21 or later
-- Maven 3.6.0 or later
+- Maven is optional: the Maven wrapper (`mvnw`) is included
 - MySQL 8.0 or later (or MariaDB as an alternative)
 - Git (optional, for cloning the repository)
 - Stripe CLI (optional, for payment testing)
@@ -90,7 +91,8 @@ Before you begin, ensure you have the following installed:
 
 2. Build the project:
    ```bash
-   mvn clean install
+   chmod +x mvnw          # macOS/Linux: the wrapper is not marked executable in git
+   ./mvnw clean install   # Windows: mvnw.cmd clean install
    ```
 
 3. Create a MySQL database:
@@ -98,10 +100,15 @@ Before you begin, ensure you have the following installed:
    CREATE DATABASE hotel_reservation;
    ```
 
-4. (Optional) Import sample data:
+4. (Optional) Import sample data and the matching photos:
    ```bash
    mysql -u username -p hotel_reservation < hotel_reservation_mock_data.sql
+   unzip uploads.zip      # creates uploads/hotelphotos and uploads/roomphotos
    ```
+   The dump contains sample hotels, rooms, bookings, reviews and users
+   (clients, hotel owners and an admin). `mock_data_sql.sql` is an older,
+   smaller data set; `passwords.txt` lists the plain-text passwords of its
+   users.
 
 ## Configuration
 
@@ -114,6 +121,8 @@ spring.datasource.url=jdbc:mysql://localhost:3306/hotel_reservation?createDataba
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 ```
+
+The defaults are `root` / `root`.
 
 ### Email Configuration
 
@@ -153,27 +162,25 @@ roomphoto.upload.dir=uploads/roomphotos
 Run the application in development mode:
 
 ```bash
-mvn spring-boot:run
+./mvnw spring-boot:run
 ```
 
-Or with a specific profile:
-
-```bash
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-```
+Then open http://localhost:8080, which redirects to the client home page
+(`/client/home`). Hotel owners sign in at `/owner`, and the admin dashboard is
+at `/admin/home`.
 
 ### Production Mode
 
 For production deployment, build a WAR file:
 
 ```bash
-mvn clean package
+./mvnw clean package
 ```
 
 Then deploy the WAR file to your application server or run it directly:
 
 ```bash
-java -jar target/hotel-reservation.war
+java -jar target/hotel-reservation-0.0.1-SNAPSHOT.war
 ```
 
 ### Stripe Webhook Testing
@@ -184,6 +191,9 @@ For testing Stripe webhooks locally:
 stripe login
 stripe listen --forward-to localhost:8080/api/stripe/webhook
 ```
+
+`start-stripe-listener.sh` runs the same `stripe listen` command in the
+background.
 
 ## API Documentation
 
@@ -258,4 +268,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+No license file is included yet, so all rights are reserved by the author.
